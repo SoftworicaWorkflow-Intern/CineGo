@@ -119,9 +119,9 @@
         <form
             action="{{ route('movies.index') }}"
             method="GET"
-            class="card grid gap-3 p-4 sm:grid-cols-2 sm:p-5 lg:grid-cols-[2fr_1fr_1fr_1fr_auto]"
+            class="card grid items-center gap-3 p-4 sm:p-5 md:grid-cols-[2fr_1fr_1fr_1fr_auto]"
         >
-            <div class="relative">
+            <div class="relative flex h-11 min-h-11 items-center">
                 <x-icon name="search" :size="17" class="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-cg-red" />
                 <label class="sr-only" for="home-search">{{ ui('search_movies', 'Search movies') }}</label>
                 <input
@@ -129,38 +129,41 @@
                     type="search"
                     name="q"
                     value="{{ request('q') }}"
-                    placeholder="{{ ui('search_placeholder', 'Search movie, genre, language or cinema…') }}"
-                    class="input pl-10"
+                    placeholder="{{ ui('search_placeholder', 'Search movies') }}"
+                    class="input h-11 min-h-11 w-full py-2.5 pl-10"
                 >
             </div>
 
             <label class="sr-only" for="home-genre">{{ ui('genre', 'Genre') }}</label>
-            <select id="home-genre" name="genre" class="input cursor-pointer">
+            <select id="home-genre" name="genre" class="input h-11 min-h-11 cursor-pointer py-2.5">
                 <option value="">{{ ui('genre', 'Genre') }}</option>
                 @foreach ($genreOptions as $genre)
                     <option value="{{ $genre }}" @selected(request('genre') === $genre)>{{ $genre }}</option>
                 @endforeach
             </select>
 
-            <label class="sr-only" for="home-language">{{ ui('language_label', 'Language') }}</label>
-            <select id="home-language" name="language" class="input cursor-pointer">
-                <option value="">{{ ui('language_label', 'Language') }}</option>
-                @foreach ($languages as $language)
-                    <option value="{{ $language }}" @selected(request('language') === $language)>{{ $language }}</option>
-                @endforeach
+            <label class="sr-only" for="home-date">{{ ui('select_date', 'Select date') }}</label>
+            <select id="home-date" name="show_date" class="input h-11 min-h-11 cursor-pointer py-2.5">
+                <option value="">{{ ui('select_date', 'Select date') }}</option>
+                @for ($day = 0; $day < 7; $day++)
+                    @php($date = now()->addDays($day))
+                    <option value="{{ $date->toDateString() }}" @selected(request('show_date') === $date->toDateString())>
+                        {{ $date->isToday() ? ui('today', 'Today') : $date->format('D, M j') }}
+                    </option>
+                @endfor
             </select>
 
-            <label class="sr-only" for="home-cinema">{{ ui('cinemas', 'Cinemas') }}</label>
-            <select id="home-cinema" name="cinema" class="input cursor-pointer">
-                <option value="">{{ ui('cinemas', 'Cinemas') }}</option>
-                @foreach ($cinemas as $cinema)
-                    <option value="{{ $cinema->id }}" @selected((string) request('cinema') === (string) $cinema->id)>
-                        {{ $cinema->localised_name() }}
+            <label class="sr-only" for="home-time">{{ ui('show_time', 'Show time') }}</label>
+            <select id="home-time" name="show_time" class="input h-11 min-h-11 cursor-pointer py-2.5">
+                <option value="">{{ ui('show_time', 'Show time') }}</option>
+                @foreach (['10:30', '13:15', '16:00', '19:00', '21:30'] as $time)
+                    <option value="{{ $time }}" @selected(request('show_time') === $time)>
+                        {{ \Carbon\Carbon::createFromFormat('H:i', $time)->format('g:i A') }}
                     </option>
                 @endforeach
             </select>
 
-            <button type="submit" class="btn-primary sm:col-span-2 lg:col-span-1">
+            <button type="submit" class="btn-primary h-11 min-h-11 py-2.5">
                 <x-icon name="search" :size="16" /> {{ ui('search', 'Search') }}
             </button>
         </form>
@@ -234,59 +237,6 @@
                             <x-icon name="chevron-right" :size="17" />
                         </span>
                     </a>
-                @endforeach
-            </div>
-        </section>
-    @endif
-
-    {{-- ============================================================
-         Section 7: Choose Your Cinema
-    ============================================================ --}}
-    @if ($cinemas->isNotEmpty())
-        <section class="container-page pt-16">
-            <x-section-head
-                :kicker="ui('choose_cinema', 'Choose Your Cinema')"
-                :title="ui('choose_cinema_sub', 'Find the CineGo branch closest to you.')"
-                :href="route('cinemas.index')"
-                :label="ui('view_all', 'View all')"
-            />
-
-            <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                @foreach ($cinemas as $cinema)
-                    <article class="card card-hover flex flex-col p-5">
-                        <div class="mb-3 flex items-start justify-between gap-3">
-                            <span class="flex h-11 w-11 items-center justify-center rounded-lg bg-cg-red/15 text-cg-red">
-                                <x-icon name="armchair" :size="21" />
-                            </span>
-                            <span class="badge-dark">{{ $cinema->city?->display_name() }}</span>
-                        </div>
-
-                        <h3 class="text-lg font-semibold text-cg-white">{{ $cinema->localised_name() }}</h3>
-
-                        <p class="mt-1.5 flex items-start gap-2 text-sm text-cg-muted">
-                            <x-icon name="map-pin" :size="15" class="mt-0.5 shrink-0 text-cg-red" />
-                            {{ $cinema->localised_address() }}
-                        </p>
-
-                        @if ($cinema->facilities)
-                            <div class="mt-3 flex flex-wrap gap-1.5">
-                                @foreach (array_slice($cinema->facilities, 0, 4) as $facility)
-                                    <span class="rounded-md border border-cg-border bg-cg-charcoal px-2 py-1 text-[11px] text-cg-muted">
-                                        {{ $facility }}
-                                    </span>
-                                @endforeach
-                            </div>
-                        @endif
-
-                        <div class="mt-5 flex gap-2 pt-auto">
-                            <a href="{{ route('cinemas.show', $cinema) }}" class="btn-outline flex-1 justify-center px-3 py-2 text-xs">
-                                {{ ui('view_cinema', 'View Cinema') }}
-                            </a>
-                            <a href="{{ route('cinemas.show', $cinema) }}#showtimes" class="btn-primary flex-1 justify-center px-3 py-2 text-xs">
-                                {{ ui('view_showtimes', 'View Showtimes') }}
-                            </a>
-                        </div>
-                    </article>
                 @endforeach
             </div>
         </section>

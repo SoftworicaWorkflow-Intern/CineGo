@@ -22,6 +22,8 @@ class MovieController extends Controller
             'tab' => 'nullable|in:all,now_showing,coming_soon,popular,top_rated',
             'genre' => 'nullable|string|max:40',
             'language' => 'nullable|string|max:40',
+            'show_date' => 'nullable|date_format:Y-m-d',
+            'show_time' => 'nullable|date_format:H:i',
             'year' => 'nullable|integer|min:1950|max:2100',
             'cinema' => 'nullable|integer|exists:cinemas,id',
             'q' => 'nullable|string|max:80',
@@ -157,6 +159,14 @@ class MovieController extends Controller
 
         if (! empty($validated['language'])) {
             $query->where('language', $validated['language']);
+        }
+
+        if (! empty($validated['show_date']) || ! empty($validated['show_time'])) {
+            $query->whereHas('showtimes', function ($builder) use ($validated) {
+                $builder->active()
+                    ->when($validated['show_date'] ?? null, fn ($showtimes, $date) => $showtimes->whereDate('show_date', $date))
+                    ->when($validated['show_time'] ?? null, fn ($showtimes, $time) => $showtimes->whereTime('start_time', $time));
+            });
         }
 
         if (! empty($validated['year'])) {

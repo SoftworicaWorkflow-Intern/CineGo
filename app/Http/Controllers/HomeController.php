@@ -2,11 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Cinema;
 use App\Models\Movie;
 use App\Models\Offer;
 use Illuminate\Contracts\View\View;
-use Illuminate\Database\Eloquent\Builder;
 
 class HomeController extends Controller
 {
@@ -35,8 +33,6 @@ class HomeController extends Controller
             ->limit(6)
             ->get();
 
-        $cinemas = $this->cinemaQuery()->limit(6)->get();
-
         $offers = Offer::query()
             ->currentlyValid()
             ->orderByDesc('created_at')
@@ -45,32 +41,15 @@ class HomeController extends Controller
 
         $genres = $this->genreCounts();
         $genreOptions = $this->allGenres();
-        $languages = Movie::query()->active()->select('language')->distinct()->orderBy('language')->pluck('language');
 
         return view('home', compact(
             'featured',
             'nowShowing',
             'comingSoon',
-            'cinemas',
             'offers',
             'genres',
             'genreOptions',
-            'languages',
         ));
-    }
-
-    /**
-     * @return Builder<Cinema>
-     */
-    private function cinemaQuery(): Builder
-    {
-        $query = Cinema::query()->active()->with('city');
-
-        if ($city = selected_city()) {
-            $query->where('city_id', $city->id);
-        }
-
-        return $query->orderBy('name');
     }
 
     /**
