@@ -130,7 +130,7 @@
                     @else
                         <div class="space-y-3">
                             @foreach ($favorites as $movie)
-                                <a href="{{ route('movies.show', $movie) }}" class="flex items-center gap-3 rounded-lg p-1 transition hover:bg-white/5">
+                                <a href="{{ route('movies.show', $movie) }}" class="flex items-center gap-3 rounded-lg p-1 transition hover:bg-cg-charcoal">
                                     <img src="{{ $movie->poster_url }}" alt="" class="h-16 w-11 rounded-md object-cover" loading="lazy">
                                     <span class="min-w-0">
                                         <span class="line-clamp-1 block text-sm font-medium text-cg-white">{{ $movie->localised_title() }}</span>

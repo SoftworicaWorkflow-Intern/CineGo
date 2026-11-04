@@ -30,7 +30,7 @@
             </thead>
             <tbody class="divide-y divide-cg-border-soft">
                 @forelse ($cinemas as $cinema)
-                    <tr class="transition hover:bg-white/[0.03]">
+                    <tr class="transition hover:bg-cg-charcoal">
                         <td class="px-5 py-4">
                             <a href="{{ route('cinemas.show', $cinema) }}" class="block font-medium text-cg-white hover:text-cg-red">
                                 {{ $cinema->localised_name() }}

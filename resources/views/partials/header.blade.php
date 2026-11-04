@@ -5,7 +5,6 @@
     ['route' => 'pages.about', 'label' => ui('about', 'About Us'), 'match' => 'pages.about'],
     ['route' => 'pages.contact', 'label' => ui('contact', 'Contact'), 'match' => 'pages.contact'],
 ])
-)
 
 {{-- Announcement bar --}}
 @if ($announcements->isNotEmpty())
@@ -68,13 +67,13 @@
                         type="submit"
                         name="locale"
                         value="en"
-                        class="rounded-md px-2.5 py-1.5 transition {{ ($currentLocale ?? 'en') === 'en' ? 'bg-cg-red text-white' : 'text-cg-muted hover:text-white' }}"
+                        class="rounded-md px-2.5 py-1.5 transition {{ ($currentLocale ?? 'en') === 'en' ? 'bg-cg-red text-white' : 'text-cg-muted hover:text-cg-white' }}"
                     >EN</button>
                     <button
                         type="submit"
                         name="locale"
                         value="np"
-                        class="rounded-md px-2.5 py-1.5 transition {{ ($currentLocale ?? 'en') === 'np' ? 'bg-cg-red text-white' : 'text-cg-muted hover:text-white' }}"
+                        class="rounded-md px-2.5 py-1.5 transition {{ ($currentLocale ?? 'en') === 'np' ? 'bg-cg-red text-white' : 'text-cg-muted hover:text-cg-white' }}"
                     >नेपाली</button>
                 </div>
             </form>
@@ -154,7 +153,7 @@
             @foreach ($navLinks as $link)
                 <a
                     href="{{ route($link['route']) }}"
-                    class="rounded-lg px-3 py-3 text-base font-medium transition {{ request()->routeIs($link['match']) ? 'bg-cg-red/15 text-cg-white' : 'text-cg-muted hover:bg-white/5 hover:text-white' }}"
+                    class="rounded-lg px-3 py-3 text-base font-medium transition {{ request()->routeIs($link['match']) ? 'bg-cg-red/10 text-cg-red' : 'text-cg-muted hover:bg-cg-charcoal hover:text-cg-white' }}"
                 >{{ $link['label'] }}</a>
             @endforeach
 

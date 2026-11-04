@@ -9,7 +9,7 @@
         <div class="relative w-full max-w-md">
             <div class="mb-7 text-center">
                 <a href="{{ route('home') }}" class="inline-flex justify-center"><x-logo :size="44" /></a>
-                <h1 class="mt-5 font-display text-3xl tracking-wide text-white">{{ ui('forgot_password', 'Forgot your password?') }}</h1>
+                <h1 class="mt-5 font-display text-3xl tracking-wide text-cg-white">{{ ui('forgot_password', 'Forgot your password?') }}</h1>
                 <p class="mt-1.5 text-sm text-cg-muted">
                     {{ ui('forgot_sub', 'Enter your email and we will send you a reset link.') }}
                 </p>

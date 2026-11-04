@@ -74,7 +74,7 @@ function initSliders() {
             slides.forEach((slide, i) => slide.classList.toggle('cg-slide-active', i === index));
             dots.forEach((dot, i) => {
                 dot.classList.toggle('bg-cg-red', i === index);
-                dot.classList.toggle('bg-white/30', i !== index);
+                dot.classList.toggle('bg-cg-border', i !== index);
                 dot.setAttribute('aria-current', i === index ? 'true' : 'false');
             });
         };

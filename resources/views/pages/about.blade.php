@@ -86,11 +86,11 @@
                 </p>
                 <p class="mt-2.5 flex items-center gap-2 text-sm text-cg-muted">
                     <x-icon name="phone" :size="15" class="shrink-0 text-cg-red" />
-                    <a href="tel:+9779800000000" class="hover:text-white">+977-9800-000-000</a>
+                    <a href="tel:+9779800000000" class="hover:text-cg-white">+977-9800-000-000</a>
                 </p>
                 <p class="mt-2.5 flex items-center gap-2 text-sm text-cg-muted">
                     <x-icon name="mail" :size="15" class="shrink-0 text-cg-red" />
-                    <a href="mailto:support@cinego.com.np" class="hover:text-white">support@cinego.com.np</a>
+                    <a href="mailto:support@cinego.com.np" class="hover:text-cg-white">support@cinego.com.np</a>
                 </p>
             </div>
         </aside>

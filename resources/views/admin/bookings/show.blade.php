@@ -133,7 +133,7 @@
                                 @if ($payment->provider_payload)
                                     <details class="mt-2">
                                         <summary class="cursor-pointer text-[11px] text-cg-red">{{ ui('payload', 'Payload') }}</summary>
-                                        <pre class="mt-1.5 overflow-x-auto rounded bg-cg-black p-2 text-[10px] text-cg-muted">{{ json_encode($payment->provider_payload, JSON_PRETTY_PRINT) }}</pre>
+                                        <pre class="mt-1.5 overflow-x-auto rounded bg-cg-charcoal p-2 text-[10px] text-cg-muted">{{ json_encode($payment->provider_payload, JSON_PRETTY_PRINT) }}</pre>
                                     </details>
                                 @endif
                             </li>

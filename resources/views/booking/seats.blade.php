@@ -38,7 +38,7 @@
                 {{-- Seat map --}}
                 <div class="card p-4 sm:p-7">
                     <div class="mb-5 flex flex-wrap items-center justify-between gap-3">
-                        <h1 class="font-display text-2xl tracking-wide text-white">{{ ui('step_select_seats', 'Select Seats') }}</h1>
+                        <h1 class="font-display text-2xl tracking-wide text-cg-white">{{ ui('step_select_seats', 'Select Seats') }}</h1>
                         <span class="inline-flex items-center gap-2 text-xs text-cg-muted">
                             <span class="h-2 w-24 rounded-full cg-screen"></span>
                             {{ ui('screen_here', 'Screen this way') }}
@@ -97,12 +97,12 @@
                     <div class="mt-7 border-t border-cg-border-soft pt-5">
                         <p class="mb-3 text-xs font-semibold uppercase tracking-wide text-cg-dim">{{ ui('seat_legend', 'Seat legend') }}</p>
                         <div class="flex flex-wrap gap-x-5 gap-y-2.5 text-xs text-cg-muted">
-                            <span class="inline-flex items-center gap-2"><span class="h-4 w-4 rounded border border-emerald-700/50 bg-emerald-950"></span>{{ ui('seat_available', 'Available') }}</span>
+                            <span class="inline-flex items-center gap-2"><span class="h-4 w-4 rounded border border-emerald-300 bg-emerald-100"></span>{{ ui('seat_available', 'Available') }}</span>
                             <span class="inline-flex items-center gap-2"><span class="h-4 w-4 rounded border border-cg-red bg-cg-red"></span>{{ ui('seat_selected', 'Selected') }}</span>
-                            <span class="inline-flex items-center gap-2"><span class="h-4 w-4 rounded border border-blue-700/50 bg-blue-950"></span>{{ ui('seat_premium', 'Premium') }}</span>
-                            <span class="inline-flex items-center gap-2"><span class="h-4 w-4 rounded border border-purple-700/50 bg-purple-950"></span>{{ ui('seat_recliner', 'Recliner') }}</span>
-                            <span class="inline-flex items-center gap-2"><span class="h-4 w-4 rounded border border-amber-400/60 bg-amber-500/25"></span>{{ ui('seat_locked', 'Locked') }}</span>
-                            <span class="inline-flex items-center gap-2"><span class="h-4 w-4 rounded border border-white/10 bg-white/[0.06]"></span>{{ ui('seat_booked', 'Booked') }}</span>
+                            <span class="inline-flex items-center gap-2"><span class="h-4 w-4 rounded border border-blue-300 bg-blue-100"></span>{{ ui('seat_premium', 'Premium') }}</span>
+                            <span class="inline-flex items-center gap-2"><span class="h-4 w-4 rounded border border-purple-300 bg-purple-100"></span>{{ ui('seat_recliner', 'Recliner') }}</span>
+                            <span class="inline-flex items-center gap-2"><span class="h-4 w-4 rounded border border-amber-300 bg-amber-100"></span>{{ ui('seat_locked', 'Locked') }}</span>
+                            <span class="inline-flex items-center gap-2"><span class="h-4 w-4 rounded border border-gray-300 bg-gray-200"></span>{{ ui('seat_booked', 'Booked') }}</span>
                         </div>
                     </div>
                 </div>

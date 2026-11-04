@@ -19,7 +19,7 @@
                         <span class="badge-dark">{{ $cinema->halls()->active()->count() }} {{ ui('screens', 'Screens') }}</span>
                     </div>
 
-                    <h1 class="font-display text-4xl leading-tight tracking-wide text-white sm:text-5xl">
+                    <h1 class="font-display text-4xl leading-tight tracking-wide text-cg-white sm:text-5xl">
                         {{ $cinema->localised_name() }}
                     </h1>
 
@@ -147,13 +147,13 @@
                     @if ($cinema->phone)
                         <li class="flex items-center gap-2.5 text-cg-muted">
                             <x-icon name="phone" :size="16" class="shrink-0 text-cg-red" />
-                            <a href="tel:{{ $cinema->phone }}" class="hover:text-white">{{ $cinema->phone }}</a>
+                            <a href="tel:{{ $cinema->phone }}" class="hover:text-cg-white">{{ $cinema->phone }}</a>
                         </li>
                     @endif
                     @if ($cinema->email)
                         <li class="flex items-center gap-2.5 text-cg-muted">
                             <x-icon name="mail" :size="16" class="shrink-0 text-cg-red" />
-                            <a href="mailto:{{ $cinema->email }}" class="hover:text-white">{{ $cinema->email }}</a>
+                            <a href="mailto:{{ $cinema->email }}" class="hover:text-cg-white">{{ $cinema->email }}</a>
                         </li>
                     @endif
                 </ul>

@@ -30,7 +30,7 @@
             </thead>
             <tbody class="divide-y divide-cg-border-soft">
                 @forelse ($movies as $movie)
-                    <tr class="transition hover:bg-white/[0.03]">
+                    <tr class="transition hover:bg-cg-charcoal">
                         <td class="px-5 py-4">
                             <div class="flex items-center gap-3">
                                 <img src="{{ $movie->poster_url }}" alt="" class="h-14 w-10 rounded object-cover" loading="lazy">

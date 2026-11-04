@@ -36,7 +36,7 @@
                     </thead>
                     <tbody class="divide-y divide-cg-border-soft">
                         @foreach ($payments as $payment)
-                            <tr class="transition hover:bg-white/[0.03]">
+                            <tr class="transition hover:bg-cg-charcoal">
                                 <td class="px-5 py-4 font-mono text-xs text-cg-muted">{{ $payment->reference }}</td>
                                 <td class="px-5 py-4">
                                     @if ($payment->booking)

@@ -9,7 +9,7 @@
         <div class="relative w-full max-w-md">
             <div class="mb-7 text-center">
                 <a href="{{ route('home') }}" class="inline-flex justify-center"><x-logo :size="44" /></a>
-                <h1 class="mt-5 font-display text-3xl tracking-wide text-white">{{ ui('login_title', 'Welcome back') }}</h1>
+                <h1 class="mt-5 font-display text-3xl tracking-wide text-cg-white">{{ ui('login_title', 'Welcome back') }}</h1>
                 <p class="mt-1.5 text-sm text-cg-muted">{{ ui('login_sub', 'Log in to manage your bookings and tickets.') }}</p>
             </div>
 

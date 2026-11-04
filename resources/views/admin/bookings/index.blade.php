@@ -17,7 +17,7 @@
             @foreach ($statusTabs as $key => $tab)
                 <a href="{{ route('admin.bookings.index', array_filter(['status' => $key, 'q' => $term])) }}"
                     class="rounded-full border px-4 py-2 text-sm font-medium transition
-                        {{ (string) ($status ?? '') === $key ? 'border-cg-red bg-cg-red text-white' : 'border-cg-border bg-cg-charcoal text-cg-muted hover:border-cg-red hover:text-white' }}">
+                        {{ (string) ($status ?? '') === $key ? 'border-cg-red bg-cg-red text-white' : 'border-cg-border bg-cg-charcoal text-cg-muted hover:border-cg-red hover:text-cg-white' }}">
                     {{ $tab['label'] }}
                     <span class="ml-1 text-xs opacity-70">{{ number_format($tab['count']) }}</span>
                 </a>
@@ -50,7 +50,7 @@
             </thead>
             <tbody class="divide-y divide-cg-border-soft">
                 @forelse ($bookings as $booking)
-                    <tr class="transition hover:bg-white/[0.03]">
+                    <tr class="transition hover:bg-cg-charcoal">
                         <td class="px-5 py-4">
                             <a href="{{ route('admin.bookings.show', $booking) }}" class="block font-mono text-xs font-bold text-cg-white hover:text-cg-red">
                                 {{ $booking->booking_code }}

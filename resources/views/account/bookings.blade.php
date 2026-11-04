@@ -19,7 +19,7 @@
                 <a
                     href="{{ route('account.bookings', ['tab' => $key]) }}"
                     class="rounded-full border px-4 py-2 text-sm font-medium transition
-                        {{ $tab === $key ? 'border-cg-red bg-cg-red text-white' : 'border-cg-border bg-cg-charcoal text-cg-muted hover:border-cg-red hover:text-white' }}"
+                        {{ $tab === $key ? 'border-cg-red bg-cg-red text-white' : 'border-cg-border bg-cg-charcoal text-cg-muted hover:border-cg-red hover:text-cg-white' }}"
                 >{{ $label }}</a>
             @endforeach
         </div>

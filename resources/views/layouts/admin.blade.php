@@ -7,7 +7,7 @@
 
     <title>@hasSection('title')@yield('title') · CineGo Admin @else CineGo Admin @endif</title>
     <meta name="robots" content="noindex, nofollow">
-    <meta name="theme-color" content="#090909">
+    <meta name="theme-color" content="#ffffff">
 
     <link rel="icon" href="{{ asset('img/icons/icon.svg') }}" type="image/svg+xml">
     @vite(['resources/css/app.css', 'resources/js/app.js', 'resources/js/admin.js'])
@@ -52,7 +52,7 @@
                     <a
                         href="{{ route($link['route']) }}"
                         class="flex items-center gap-3 rounded-lg px-3.5 py-2.5 text-sm font-medium transition
-                            {{ request()->routeIs($link['match']) ? 'bg-cg-red/15 text-cg-white' : 'text-cg-muted hover:bg-white/5 hover:text-white' }}"
+                            {{ request()->routeIs($link['match']) ? 'bg-cg-red/10 text-cg-red' : 'text-cg-muted hover:bg-cg-charcoal hover:text-cg-white' }}"
                     >
                         <x-icon :name="$link['icon']" :size="17" class="{{ request()->routeIs($link['match']) ? 'text-cg-red' : '' }}" />
                         {{ $link['label'] }}
@@ -61,12 +61,12 @@
             </nav>
 
             <div class="mt-4 border-t border-cg-border-soft p-3">
-                <a href="{{ route('home') }}" class="flex items-center gap-3 rounded-lg px-3.5 py-2.5 text-sm font-medium text-cg-muted transition hover:bg-white/5 hover:text-white">
+                <a href="{{ route('home') }}" class="flex items-center gap-3 rounded-lg px-3.5 py-2.5 text-sm font-medium text-cg-muted transition hover:bg-cg-charcoal hover:text-cg-white">
                     <x-icon name="eye" :size="17" /> {{ ui('view_site', 'View site') }}
                 </a>
                 <form action="{{ route('logout') }}" method="POST">
                     @csrf
-                    <button type="submit" class="flex w-full items-center gap-3 rounded-lg px-3.5 py-2.5 text-sm font-medium text-cg-muted transition hover:bg-white/5 hover:text-white">
+                    <button type="submit" class="flex w-full items-center gap-3 rounded-lg px-3.5 py-2.5 text-sm font-medium text-cg-muted transition hover:bg-cg-charcoal hover:text-cg-white">
                         <x-icon name="log-out" :size="17" /> {{ ui('logout', 'Log out') }}
                     </button>
                 </form>

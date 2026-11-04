@@ -16,7 +16,7 @@
             @foreach ($tabs as $key => $item)
                 <a href="{{ route('admin.messages.index', ['tab' => $key]) }}"
                     class="rounded-full border px-4 py-2 text-sm font-medium transition
-                        {{ $tab === $key ? 'border-cg-red bg-cg-red text-white' : 'border-cg-border bg-cg-charcoal text-cg-muted hover:border-cg-red hover:text-white' }}">
+                        {{ $tab === $key ? 'border-cg-red bg-cg-red text-white' : 'border-cg-border bg-cg-charcoal text-cg-muted hover:border-cg-red hover:text-cg-white' }}">
                     {{ $item['label'] }}
                     @if ($item['count'] !== null)
                         <span class="ml-1 text-xs opacity-70">{{ number_format($item['count']) }}</span>
@@ -39,7 +39,7 @@
             </thead>
             <tbody class="divide-y divide-cg-border-soft">
                 @forelse ($messages as $message)
-                    <tr class="transition hover:bg-white/[0.03] {{ $message->is_read ? '' : 'bg-cg-red/[0.04]' }}">
+                    <tr class="transition hover:bg-cg-charcoal {{ $message->is_read ? '' : 'bg-cg-red/[0.04]' }}">
                         <td class="px-5 py-4">
                             <span class="block font-medium text-cg-white">{{ $message->name }}</span>
                             <span class="block text-xs text-cg-dim">{{ $message->email }}</span>

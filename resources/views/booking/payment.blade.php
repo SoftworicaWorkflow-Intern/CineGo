@@ -11,7 +11,7 @@
                 <span class="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-cg-red/15 text-cg-red">
                     <x-icon name="wallet" :size="26" />
                 </span>
-                <h1 class="font-display text-3xl tracking-wide text-white">{{ $providerLabel }}</h1>
+                <h1 class="font-display text-3xl tracking-wide text-cg-white">{{ $providerLabel }}</h1>
                 <p class="mt-1.5 text-sm text-cg-muted">
                     {{ ui('payment_redirect', 'Confirm the payment below to complete your booking.') }}
                 </p>
@@ -23,7 +23,7 @@
                     <div class="flex items-end justify-between gap-4">
                         <span>
                             <span class="block text-xs uppercase tracking-wide text-cg-dim">{{ ui('total', 'Total') }}</span>
-                            <span class="font-display text-4xl text-white">Rs. {{ number_format($payment->amount, 2) }}</span>
+                            <span class="font-display text-4xl text-cg-white">Rs. {{ number_format($payment->amount, 2) }}</span>
                         </span>
                         <span class="badge-dark font-mono">{{ $payment->reference }}</span>
                     </div>

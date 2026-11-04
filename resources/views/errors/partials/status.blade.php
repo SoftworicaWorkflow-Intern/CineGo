@@ -19,7 +19,7 @@
 <div class="flex min-h-[60vh] flex-col items-center justify-center py-16 text-center">
     <p class="font-display text-8xl leading-none tracking-tight text-cg-red">{{ $code }}</p>
 
-    <h1 class="mt-4 font-display text-3xl tracking-wide text-white sm:text-4xl">{{ $statusTitle }}</h1>
+    <h1 class="mt-4 font-display text-3xl tracking-wide text-cg-white sm:text-4xl">{{ $statusTitle }}</h1>
     <p class="mt-3 max-w-md text-cg-muted">{{ $statusText }}</p>
 
     <div class="mt-8 flex flex-wrap justify-center gap-3">

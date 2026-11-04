@@ -40,7 +40,7 @@
                         @endif
                     </div>
 
-                    <h1 class="font-display text-4xl leading-tight tracking-wide text-white sm:text-5xl">
+                    <h1 class="font-display text-4xl leading-tight tracking-wide text-cg-white sm:text-5xl">
                         {{ $movie->localised_title() }}
                     </h1>
 
@@ -297,7 +297,7 @@
                     <h3 class="mb-4 font-semibold text-cg-white">{{ ui('similar_movies', 'Similar movies') }}</h3>
                     <div class="space-y-3">
                         @foreach ($similar as $similarMovie)
-                            <a href="{{ route('movies.show', $similarMovie) }}" class="flex items-center gap-3 rounded-lg p-1.5 transition hover:bg-white/5">
+                            <a href="{{ route('movies.show', $similarMovie) }}" class="flex items-center gap-3 rounded-lg p-1.5 transition hover:bg-cg-charcoal">
                                 <img src="{{ $similarMovie->poster_url }}" alt="{{ $similarMovie->localised_title() }}" class="h-16 w-11 rounded-md object-cover" loading="lazy">
                                 <span class="min-w-0">
                                     <span class="line-clamp-1 block text-sm font-medium text-cg-white">{{ $similarMovie->localised_title() }}</span>

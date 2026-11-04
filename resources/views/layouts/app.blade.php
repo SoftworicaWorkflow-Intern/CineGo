@@ -7,7 +7,7 @@
 
     <title>@hasSection('title') @yield('title') · CineGo @else CineGo · Discover Movies. Book Your Seats. @endif</title>
     <meta name="description" content="@yield('meta', 'CineGo — book movie tickets online across Nepal. Pick your cinema, choose your seats and get an instant QR ticket.')">
-    <meta name="theme-color" content="#090909">
+    <meta name="theme-color" content="#ffffff">
 
     <link rel="icon" href="{{ asset('img/icons/icon.svg') }}" type="image/svg+xml">
     <link rel="manifest" href="{{ asset('manifest.webmanifest') }}">

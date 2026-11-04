@@ -20,7 +20,7 @@
                     <x-icon name="{{ $isCancelled ? 'x' : 'check-circle' }}" :size="32" />
                 </span>
 
-                <h1 class="font-display text-4xl tracking-wide text-white">
+                <h1 class="font-display text-4xl tracking-wide text-cg-white">
                     {{ $isCancelled ? ui('booking_cancelled', 'Booking cancelled') : ui('booking_confirmed', 'Booking confirmed!') }}
                 </h1>
                 <p class="mt-2 text-cg-muted">
@@ -44,7 +44,7 @@
                     <div class="relative flex flex-wrap items-start justify-between gap-4">
                         <div>
                             <p class="text-xs font-semibold uppercase tracking-widest text-cg-red">CineGo</p>
-                            <h2 class="mt-1 font-display text-3xl leading-tight tracking-wide text-white">
+                            <h2 class="mt-1 font-display text-3xl leading-tight tracking-wide text-cg-white">
                                 {{ $booking->movie_title }}
                             </h2>
                             <p class="mt-1 text-sm text-cg-muted">{{ $booking->cinema_name }} · {{ $booking->hall_name }} · {{ $booking->format }}</p>

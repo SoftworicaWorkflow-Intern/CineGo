@@ -19,14 +19,14 @@
             <a
                 href="{{ route('cinemas.index') }}"
                 class="rounded-full border px-4 py-2 text-sm font-medium transition
-                    {{ ! $selectedCity ? 'border-cg-red bg-cg-red text-white' : 'border-cg-border bg-cg-charcoal text-cg-muted hover:border-cg-red hover:text-white' }}"
+                    {{ ! $selectedCity ? 'border-cg-red bg-cg-red text-white' : 'border-cg-border bg-cg-charcoal text-cg-muted hover:border-cg-red hover:text-cg-white' }}"
             >{{ ui('all_cities', 'All Cities') }}</a>
 
             @foreach ($cities as $city)
                 <a
                     href="{{ route('cinemas.index', ['city' => $city->slug]) }}"
                     class="rounded-full border px-4 py-2 text-sm font-medium transition
-                        {{ $selectedCity === $city->slug ? 'border-cg-red bg-cg-red text-white' : 'border-cg-border bg-cg-charcoal text-cg-muted hover:border-cg-red hover:text-white' }}"
+                        {{ $selectedCity === $city->slug ? 'border-cg-red bg-cg-red text-white' : 'border-cg-border bg-cg-charcoal text-cg-muted hover:border-cg-red hover:text-cg-white' }}"
                 >{{ $city->display_name() }}</a>
             @endforeach
         </div>

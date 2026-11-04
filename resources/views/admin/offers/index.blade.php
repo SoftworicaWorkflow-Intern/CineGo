@@ -23,7 +23,7 @@
             </thead>
             <tbody class="divide-y divide-cg-border-soft">
                 @forelse ($offers as $offer)
-                    <tr class="transition hover:bg-white/[0.03]">
+                    <tr class="transition hover:bg-cg-charcoal">
                         <td class="px-5 py-4">
                             <span class="block font-medium text-cg-white">{{ $offer->title }}</span>
                             <span class="block max-w-sm truncate text-xs text-cg-dim">{{ $offer->description }}</span>

@@ -2,12 +2,12 @@
 <div
     id="trailer-modal"
     data-modal
-    class="fixed inset-0 z-50 hidden items-center justify-center bg-black/90 p-4 backdrop-blur-sm"
+    class="fixed inset-0 z-50 hidden items-center justify-center bg-black/60 p-4 backdrop-blur-sm"
     role="dialog"
     aria-modal="true"
     aria-label="Trailer"
 >
-    <div class="w-full max-w-4xl">
+    <div class="w-full max-w-4xl rounded-xl border border-cg-border bg-cg-card p-3 shadow-2xl shadow-black/20 sm:p-4">
         <div class="mb-3 flex items-center justify-between">
             <span class="text-sm font-semibold uppercase tracking-widest text-cg-muted">Trailer</span>
             <button

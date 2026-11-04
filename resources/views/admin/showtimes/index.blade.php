@@ -35,7 +35,7 @@
             </thead>
             <tbody class="divide-y divide-cg-border-soft">
                 @forelse ($showtimes as $showtime)
-                    <tr class="transition hover:bg-white/[0.03]">
+                    <tr class="transition hover:bg-cg-charcoal">
                         <td class="px-5 py-4">
                             <span class="font-medium text-cg-white">{{ $showtime->show_date->format('D, M j') }}</span>
                             @unless ($showtime->is_active)

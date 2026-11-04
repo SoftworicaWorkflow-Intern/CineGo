@@ -22,8 +22,8 @@ function mountCharts() {
     if (!data || !canvas) return;
 
     const accent = '#E50914';
-    const muted = '#B8B8B8';
-    const grid = 'rgba(255,255,255,0.06)';
+    const muted = '#666666';
+    const grid = 'rgba(23,23,23,0.08)';
 
     new Chart(canvas, {
         data: {
@@ -44,12 +44,12 @@ function mountCharts() {
                     type: 'line',
                     label: 'Revenue (Rs.)',
                     data: data.revenue,
-                    borderColor: '#4ade80',
-                    backgroundColor: 'rgba(74,222,128,0.12)',
+                    borderColor: '#16a34a',
+                    backgroundColor: 'rgba(22,163,74,0.12)',
                     fill: true,
                     tension: 0.35,
                     pointRadius: 3,
-                    pointBackgroundColor: '#4ade80',
+                    pointBackgroundColor: '#16a34a',
                     borderWidth: 2,
                     yAxisID: 'y1',
                 },
@@ -64,11 +64,11 @@ function mountCharts() {
                     labels: { color: muted, boxWidth: 12, boxHeight: 12, usePointStyle: true },
                 },
                 tooltip: {
-                    backgroundColor: '#1C1C1C',
-                    borderColor: '#303030',
+                    backgroundColor: '#ffffff',
+                    borderColor: '#e5e7eb',
                     borderWidth: 1,
                     titleColor: '#ffffff',
-                    bodyColor: '#B8B8B8',
+                    bodyColor: '#666666',
                     padding: 10,
                     cornerRadius: 8,
                 },

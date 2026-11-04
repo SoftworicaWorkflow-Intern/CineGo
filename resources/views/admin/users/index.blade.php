@@ -27,7 +27,7 @@
             </thead>
             <tbody class="divide-y divide-cg-border-soft">
                 @forelse ($users as $user)
-                    <tr class="transition hover:bg-white/[0.03]">
+                    <tr class="transition hover:bg-cg-charcoal">
                         <td class="px-5 py-4">
                             <div class="flex items-center gap-3">
                                 <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-cg-red/15 text-sm font-bold text-cg-red">

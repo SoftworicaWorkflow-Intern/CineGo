@@ -14,7 +14,7 @@
         <div class="grid gap-8 lg:grid-cols-[1fr_360px]">
             <div class="min-w-0">
                 <div class="mb-6">
-                    <h1 class="font-display text-3xl tracking-wide text-white">
+                    <h1 class="font-display text-3xl tracking-wide text-cg-white">
                         {{ ui('step_customer_info', 'Your Details') }}
                     </h1>
                     <p class="mt-1.5 text-sm text-cg-muted">

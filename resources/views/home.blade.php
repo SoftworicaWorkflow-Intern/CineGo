@@ -25,8 +25,8 @@
                         class="h-full w-full object-cover object-center"
                         {{ $index === 0 ? '' : 'fetchpriority="low"' }}
                     >
-                    <div class="absolute inset-0 bg-gradient-to-r from-cg-black via-cg-black/85 to-transparent"></div>
-                    <div class="absolute inset-0 bg-gradient-to-t from-cg-black via-transparent to-cg-black/40"></div>
+                    <div class="absolute inset-0 bg-gradient-to-r from-white/95 via-white/75 to-transparent"></div>
+                    <div class="absolute inset-0 bg-gradient-to-t from-white/90 via-transparent to-white/40"></div>
 
                     <div class="container-page absolute inset-0 flex items-center">
                         <div class="max-w-2xl pb-16 pt-10">
@@ -43,7 +43,7 @@
                                 <span class="badge-red">{{ $movie->genre_label() }}</span>
                             </div>
 
-                            <h1 class="font-display text-5xl leading-[0.95] tracking-wide text-white sm:text-6xl lg:text-7xl">
+                            <h1 class="font-display text-5xl leading-[0.95] tracking-wide text-cg-white sm:text-6xl lg:text-7xl">
                                 {{ $movie->localised_title() }}
                             </h1>
 
@@ -84,7 +84,7 @@
                     type="button"
                     data-slide-prev
                     aria-label="Previous slide"
-                    class="absolute left-3 top-1/2 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-cg-border bg-black/50 text-white backdrop-blur transition hover:border-cg-red hover:bg-cg-red sm:flex"
+                    class="absolute left-3 top-1/2 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-cg-border bg-white/90 text-cg-white shadow-sm backdrop-blur transition hover:border-cg-red hover:bg-cg-red hover:text-white sm:flex"
                 >
                     <x-icon name="arrow-left" :size="18" />
                 </button>
@@ -92,7 +92,7 @@
                     type="button"
                     data-slide-next
                     aria-label="Next slide"
-                    class="absolute right-3 top-1/2 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-cg-border bg-black/50 text-white backdrop-blur transition hover:border-cg-red hover:bg-cg-red sm:flex"
+                    class="absolute right-3 top-1/2 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-cg-border bg-white/90 text-cg-white shadow-sm backdrop-blur transition hover:border-cg-red hover:bg-cg-red hover:text-white sm:flex"
                 >
                     <x-icon name="arrow-right" :size="18" />
                 </button>
@@ -104,7 +104,7 @@
                             data-slide-dot
                             aria-label="Go to slide {{ $index + 1 }}"
                             aria-current="{{ $index === 0 ? 'true' : 'false' }}"
-                            class="h-2.5 rounded-full transition-all {{ $index === 0 ? 'w-8 bg-cg-red' : 'w-2.5 bg-white/30' }}"
+                            class="h-2.5 rounded-full transition-all {{ $index === 0 ? 'w-8 bg-cg-red' : 'w-2.5 bg-cg-border' }}"
                         ></button>
                     @endforeach
                 </div>
