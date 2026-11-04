@@ -54,6 +54,22 @@ function initAutoSubmit() {
     });
 }
 
+function initPasswordToggles() {
+    document.querySelectorAll('[data-password-toggle]').forEach((toggle) => {
+        toggle.addEventListener('click', () => {
+            const input = document.getElementById(toggle.dataset.passwordToggle);
+            if (!input) return;
+
+            const visible = input.type === 'text';
+            input.type = visible ? 'password' : 'text';
+            toggle.setAttribute('aria-label', visible ? 'Show password' : 'Hide password');
+            toggle.innerHTML = visible
+                ? '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7"></path><circle cx="12" cy="12" r="3"></circle></svg>'
+                : '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 3 18 18"></path><path d="M10.6 10.6a2 2 0 0 0 2.8 2.8"></path><path d="M9.9 4.2A10.7 10.7 0 0 1 12 4c7 0 10 8 10 8a16.7 16.7 0 0 1-3.1 4.4M6.6 6.6C3.7 8.5 2 12 2 12s3 7 10 7a10.7 10.7 0 0 0 2.1-.2"></path></svg>';
+        });
+    });
+}
+
 /**
  * Cinematic hero slider with autoplay, dots and arrows.
  * Usage: <div data-slider data-interval="6000"> … slides … </div>
@@ -194,6 +210,7 @@ function initServiceWorker() {
 document.addEventListener('DOMContentLoaded', () => {
     initToggles();
     initAutoSubmit();
+    initPasswordToggles();
     initConfirmForms();
     initSliders();
     initTrailers();

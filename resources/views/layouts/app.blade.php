@@ -9,7 +9,7 @@
     <meta name="description" content="@yield('meta', 'CineGo — book movie tickets online across Nepal. Pick your cinema, choose your seats and get an instant QR ticket.')">
     <meta name="theme-color" content="#ffffff">
 
-    <link rel="icon" href="{{ asset('img/icons/icon.svg') }}" type="image/svg+xml">
+    <link rel="icon" href="{{ asset('img/favicon.png') }}" type="image/svg+xml">
     <link rel="manifest" href="{{ asset('manifest.webmanifest') }}">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">

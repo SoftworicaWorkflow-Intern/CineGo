@@ -128,6 +128,15 @@
         @case('eye')
             <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7" /><circle cx="12" cy="12" r="3" />
             @break
+        @case('eye-off')
+            <path d="m3 3 18 18" /><path d="M10.6 10.6a2 2 0 0 0 2.8 2.8" /><path d="M9.9 4.2A10.7 10.7 0 0 1 12 4c7 0 10 8 10 8a16.7 16.7 0 0 1-3.1 4.4M6.6 6.6C3.7 8.5 2 12 2 12s3 7 10 7a10.7 10.7 0 0 0 2.1-.2" />
+            @break
+        @case('maximize')
+            <path d="M8 3H3v5M21 8V3h-5M16 21h5v-5M3 16v5h5" />
+            @break
+        @case('minimize')
+            <path d="M8 3v5H3M21 8h-5V3M16 21v-5h5M3 16h5v5" />
+            @break
         @case('info')
             <circle cx="12" cy="12" r="10" /><path d="M12 16v-4M12 8h.01" />
             @break

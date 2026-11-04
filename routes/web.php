@@ -11,6 +11,8 @@ use App\Http\Controllers\Admin\MovieController as AdminMovieController;
 use App\Http\Controllers\Admin\OfferController as AdminOfferController;
 use App\Http\Controllers\Admin\ShowtimeController as AdminShowtimeController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
+use App\Http\Controllers\Admin\SettingsController as AdminSettingsController;
+use App\Http\Controllers\Admin\UpcomingController as AdminUpcomingController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\CinemaController;
@@ -128,6 +130,8 @@ Route::prefix('account')->name('account.')->middleware('auth')->group(function (
 
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(function () {
     Route::get('/', [AdminDashboardController::class, 'index'])->name('dashboard');
+    Route::get('/upcoming', [AdminUpcomingController::class, 'index'])->name('upcoming.index');
+    Route::get('/settings', [AdminSettingsController::class, 'index'])->name('settings.index');
 
     Route::resource('movies', AdminMovieController::class)->except(['show']);
     Route::resource('cinemas', AdminCinemaController::class)->except(['show']);

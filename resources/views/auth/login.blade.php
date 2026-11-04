@@ -32,14 +32,12 @@
 
                 <div>
                     <label class="label" for="login-password">{{ ui('new_password', 'Password') }}</label>
-                    <input
-                        id="login-password"
-                        type="password"
-                        name="password"
-                        class="input"
-                        autocomplete="current-password"
-                        required
-                    >
+                    <div class="relative">
+                        <input id="login-password" type="password" name="password" class="input pr-11" autocomplete="current-password" required>
+                        <button type="button" data-password-toggle="login-password" class="absolute inset-y-0 right-0 flex w-11 items-center justify-center text-cg-dim hover:text-cg-white" aria-label="{{ ui('show_password', 'Show password') }}">
+                            <x-icon name="eye" :size="17" />
+                        </button>
+                    </div>
                 </div>
 
                 <div class="flex items-center justify-between gap-3">
