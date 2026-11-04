@@ -4,6 +4,360 @@
 @source '../../storage/framework/views/*.php';
 
 @theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
+    --font-sans: 'Instrument Sans', 'Noto Sans Devanagari', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji',
+        'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+    --font-display: 'Bebas Neue', 'Noto Sans Devanagari', 'Instrument Sans', ui-sans-serif, system-ui, sans-serif;
+
+    /* CineGo brand palette */
+    --color-cg-red: #e50914;
+    --color-cg-red-dark: #b00710;
+    --color-cg-red-soft: rgba(229, 9, 20, 0.14);
+    --color-cg-black: #090909;
+    --color-cg-charcoal: #151515;
+    --color-cg-card: #1c1c1c;
+    --color-cg-card-2: #212121;
+    --color-cg-white: #ffffff;
+    --color-cg-muted: #b8b8b8;
+    --color-cg-dim: #7d7d7d;
+    --color-cg-border: #303030;
+    --color-cg-border-soft: #262626;
+    --color-cg-green: #2ecc71;
+    --color-cg-amber: #f5a623;
+}
+
+/* ------------------------------------------------------------------ */
+/* Base: one cinematic background shared by every page                 */
+/* ------------------------------------------------------------------ */
+
+@layer base {
+    html {
+        scroll-behavior: smooth;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+        @apply bg-cg-black font-sans text-cg-white antialiased;
+        background-image:
+            radial-gradient(ellipse 90% 55% at 50% -15%, rgba(229, 9, 20, 0.2), transparent 62%),
+            radial-gradient(ellipse 55% 40% at 105% 10%, rgba(229, 9, 20, 0.07), transparent 65%),
+            radial-gradient(ellipse 55% 45% at -10% 65%, rgba(229, 9, 20, 0.05), transparent 65%),
+            linear-gradient(180deg, #0c0c0d 0%, #090909 45%, #0b0b0c 100%);
+        background-attachment: fixed;
+        background-repeat: no-repeat;
+        min-height: 100vh;
+    }
+
+    /* Subtle film-grain / spotlight texture layered above the background */
+    body::before {
+        content: '';
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        z-index: 0;
+        opacity: 0.5;
+        background-image:
+            repeating-linear-gradient(
+                0deg,
+                rgba(255, 255, 255, 0.014) 0px,
+                rgba(255, 255, 255, 0.014) 1px,
+                transparent 1px,
+                transparent 3px
+            ),
+            radial-gradient(ellipse 70% 45% at 50% 0%, rgba(255, 255, 255, 0.045), transparent 70%);
+    }
+
+    body > * {
+        position: relative;
+        z-index: 1;
+    }
+
+    ::selection {
+        @apply bg-cg-red text-white;
+    }
+
+    ::-webkit-scrollbar {
+        width: 10px;
+        height: 10px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: #0d0d0d;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: #303030;
+        border-radius: 8px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: #454545;
+    }
+
+    :focus-visible {
+        outline: 2px solid var(--color-cg-red);
+        outline-offset: 2px;
+    }
+}
+
+/* ------------------------------------------------------------------ */
+/* Shared bases (registered as utilities so variants can @apply them)  */
+/* ------------------------------------------------------------------ */
+
+@utility btn {
+    @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-lg px-5 py-2.5 text-sm font-semibold
+        transition duration-200 cursor-pointer disabled:cursor-not-allowed disabled:opacity-50;
+}
+
+@utility badge {
+    @apply inline-flex items-center gap-1 rounded-md px-2.5 py-1 text-xs font-semibold uppercase tracking-wide;
+}
+
+/* ------------------------------------------------------------------ */
+/* Components                                                          */
+/* ------------------------------------------------------------------ */
+
+@layer components {
+    .container-page {
+        @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
+    }
+
+    .card {
+        @apply rounded-xl border border-cg-border-soft bg-cg-card/85 backdrop-blur-sm;
+    }
+
+    .card-hover {
+        @apply transition duration-300 hover:border-cg-red/40 hover:bg-cg-card-2;
+    }
+
+    .btn-primary {
+        @apply btn bg-cg-red text-white hover:bg-cg-red-dark active:scale-[0.98];
+    }
+
+    .btn-outline {
+        @apply btn border border-cg-border bg-white/5 text-cg-white hover:border-cg-red hover:bg-cg-red/10;
+    }
+
+    .btn-ghost {
+        @apply btn text-cg-muted hover:bg-white/5 hover:text-cg-white;
+    }
+
+    .btn-lg {
+        @apply min-h-13 px-8 py-4 text-base;
+    }
+
+    .btn-block {
+        @apply w-full;
+    }
+
+    .input {
+        @apply w-full min-h-12 rounded-lg border border-cg-border bg-cg-charcoal/90 px-4 py-3 text-sm text-cg-white
+            placeholder:text-cg-dim transition focus:border-cg-red focus:outline-none focus:ring-2 focus:ring-cg-red/30;
+    }
+
+    .label {
+        @apply mb-2 block text-sm font-medium text-cg-muted;
+    }
+
+    .badge-red {
+        @apply badge bg-cg-red text-white;
+    }
+
+    .badge-dark {
+        @apply badge border border-cg-border bg-black/60 text-cg-muted backdrop-blur;
+    }
+
+    .badge-green {
+        @apply badge bg-cg-green/15 text-cg-green;
+    }
+
+    .badge-amber {
+        @apply badge bg-cg-amber/15 text-cg-amber;
+    }
+
+    .section-title {
+        @apply font-display text-3xl tracking-wide text-cg-white sm:text-4xl;
+    }
+
+    .section-kicker {
+        @apply mb-2 text-xs font-bold uppercase tracking-[0.25em] text-cg-red;
+    }
+
+    .nav-link {
+        @apply relative text-sm font-medium text-cg-muted transition hover:text-cg-white;
+    }
+
+    .nav-link-active {
+        @apply text-cg-white;
+    }
+
+    .nav-link-active::after {
+        content: '';
+        @apply absolute -bottom-2 left-0 h-0.5 w-full rounded bg-cg-red;
+    }
+
+    .meta-dot::before {
+        content: '•';
+        @apply mx-2 text-cg-red;
+    }
+
+    .surface-grid {
+        background-image: linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+        background-size: 44px 44px;
+    }
+}
+
+/* ------------------------------------------------------------------ */
+/* Page-specific pieces                                                */
+/* ------------------------------------------------------------------ */
+
+/* Announcement marquee */
+@keyframes cg-marquee {
+    0%,
+    8% {
+        transform: translateX(0);
+    }
+    92%,
+    100% {
+        transform: translateX(var(--marquee-shift, -50%));
+    }
+}
+
+.cg-marquee-track {
+    animation: cg-marquee 22s ease-in-out infinite;
+}
+
+/* Hero slider */
+.cg-slide {
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.8s ease;
+}
+
+.cg-slide-active {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Poster card */
+.cg-poster {
+    @apply relative block aspect-[2/3] w-full overflow-hidden rounded-xl border border-cg-border-soft bg-cg-charcoal;
+    box-shadow: 0 18px 40px -18px rgba(0, 0, 0, 0.9);
+}
+
+.cg-poster img {
+    @apply h-full w-full object-cover transition duration-500;
+}
+
+.cg-poster-overlay {
+    @apply absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-black/95 via-black/25 to-transparent
+        p-4 opacity-0 transition duration-300;
+}
+
+.cg-card:hover .cg-poster img {
+    transform: scale(1.06);
+}
+
+.cg-card:hover .cg-poster-overlay {
+    @apply opacity-100;
+}
+
+/* Seat map */
+.cg-seat {
+    @apply flex h-9 w-9 cursor-pointer items-center justify-center rounded-md border text-[11px] font-bold
+        transition duration-150 sm:h-10 sm:w-10;
+}
+
+/* Available: green */
+.cg-seat-normal {
+    @apply border-emerald-700/50 bg-emerald-950/70 text-emerald-300 hover:border-emerald-400 hover:bg-emerald-600 hover:text-white;
+}
+
+/* Premium: blue */
+.cg-seat-premium {
+    @apply border-blue-700/50 bg-blue-950/70 text-blue-300 hover:border-blue-400 hover:bg-blue-600 hover:text-white;
+}
+
+/* VIP / recliner: purple */
+.cg-seat-recliner {
+    @apply border-purple-700/50 bg-purple-950/70 text-purple-300 hover:border-purple-400 hover:bg-purple-600 hover:text-white;
+}
+
+/* Selected: red */
+.cg-seat-selected {
+    @apply border-cg-red! bg-cg-red! text-white! shadow-[0_0_16px_rgba(229,9,20,0.55)]!;
+}
+
+/* Temporarily locked by another customer: yellow */
+.cg-seat-locked {
+    @apply cursor-not-allowed border-amber-400/60 bg-amber-500/25 text-amber-100;
+}
+
+/* Booked: grey */
+.cg-seat-booked {
+    @apply cursor-not-allowed border-white/10 bg-white/[0.06] text-white/25 line-through;
+}
+
+.cg-screen {
+    background: linear-gradient(180deg, rgba(229, 9, 20, 0.55), rgba(229, 9, 20, 0.05));
+    box-shadow: 0 0 34px rgba(229, 9, 20, 0.35);
+}
+
+/* Digital ticket */
+.cg-ticket {
+    background:
+        radial-gradient(circle at 0 50%, transparent 14px, var(--color-cg-card) 15px),
+        radial-gradient(circle at 100% 50%, transparent 14px, var(--color-cg-card) 15px);
+    background-repeat: no-repeat;
+    background-size: 51% 100%, 51% 100%;
+    background-position: left, right;
+}
+
+.cg-ticket-notch {
+    @apply absolute left-0 top-1/2 h-7 w-7 -translate-x-1/2 -translate-y-1/2 rounded-full bg-cg-black;
+}
+
+/* Progress steps */
+.cg-step-active {
+    @apply border-cg-red bg-cg-red text-white;
+}
+
+.cg-step-done {
+    @apply border-cg-red/50 bg-cg-red/15 text-cg-red;
+}
+
+.cg-step-idle {
+    @apply border-cg-border bg-cg-charcoal text-cg-dim;
+}
+
+/* Numbered dots in the booking progress bar */
+.cg-step-dot {
+    @apply flex h-8 w-8 shrink-0 items-center justify-center rounded-full border text-xs font-bold;
+}
+
+.cg-step-active-dot {
+    @apply border-cg-red bg-cg-red text-white shadow-[0_0_16px_rgba(229,9,20,0.55)];
+}
+
+.cg-step-todo {
+    @apply border-cg-border bg-cg-charcoal text-cg-dim;
+}
+
+.cg-step-dot.cg-step-done {
+    @apply border-cg-red bg-cg-red text-white;
+}
+
+/* Rating stars */
+.cg-star {
+    color: #f5a623;
+}
+
+/* Dropdown menus */
+.cg-dropdown {
+    @apply absolute right-0 z-50 mt-2 min-w-44 overflow-hidden rounded-lg border border-cg-border bg-cg-card
+        py-1 shadow-2xl shadow-black/60;
+}
+
+.cg-dropdown-item {
+    @apply block w-full px-4 py-2.5 text-left text-sm text-cg-muted transition hover:bg-white/5 hover:text-cg-white;
 }

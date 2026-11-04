@@ -1,0 +1,36 @@
+<?php
+
+namespace Tests\Feature\Http\Controllers;
+
+use App\Models\Movie;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
+
+class HomeControllerTest extends TestCase
+{
+    use RefreshDatabase;
+
+    public function test_homepage_renders_movie_text_in_the_selected_locale(): void
+    {
+        Movie::query()->create([
+            'title' => 'English title',
+            'title_np' => 'नेपाली शीर्षक',
+            'slug' => 'english-title',
+            'synopsis' => 'English synopsis',
+            'synopsis_np' => 'नेपाली कथासार',
+            'genres' => ['Drama'],
+            'duration_minutes' => 100,
+            'release_date' => '2025-01-01',
+            'poster_url' => '/img/poster.svg',
+            'is_now_showing' => true,
+            'is_featured' => true,
+            'is_active' => true,
+        ]);
+
+        $response = $this->withSession(['locale' => 'np'])->get('/');
+
+        $response->assertOk()
+            ->assertSee('नेपाली शीर्षक')
+            ->assertSee('नेपाली कथासार');
+    }
+}

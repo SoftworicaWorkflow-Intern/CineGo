@@ -1,0 +1,42 @@
+{
+    "name": "CineGo — Discover Movies. Book Your Seats.",
+    "short_name": "CineGo",
+    "description": "CineGo is Nepal's movie ticket booking app — browse movies, pick your cinema and book your seats in seconds.",
+    "lang": "en",
+    "dir": "ltr",
+    "start_url": "/",
+    "scope": "/",
+    "display": "standalone",
+    "orientation": "portrait",
+    "background_color": "#090909",
+    "theme_color": "#090909",
+    "categories": ["entertainment", "shopping"],
+    "icons": [
+        {
+            "src": "/img/icons/icon.svg",
+            "sizes": "any",
+            "type": "image/svg+xml",
+            "purpose": "any"
+        },
+        {
+            "src": "/img/icons/icon-maskable.svg",
+            "sizes": "any",
+            "type": "image/svg+xml",
+            "purpose": "maskable"
+        }
+    ],
+    "shortcuts": [
+        {
+            "name": "Browse movies",
+            "short_name": "Movies",
+            "url": "/movies",
+            "icons": [{ "src": "/img/icons/icon.svg", "sizes": "any", "type": "image/svg+xml" }]
+        },
+        {
+            "name": "My bookings",
+            "short_name": "Bookings",
+            "url": "/account/bookings",
+            "icons": [{ "src": "/img/icons/icon.svg", "sizes": "any", "type": "image/svg+xml" }]
+        }
+    ]
+}
