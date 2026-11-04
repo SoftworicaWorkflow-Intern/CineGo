@@ -59,25 +59,6 @@
 
         {{-- Right side --}}
         <div class="flex items-center gap-2 sm:gap-3">
-            {{-- Language selector --}}
-            <form action="{{ route('locale.set') }}" method="POST" class="hidden sm:block">
-                @csrf
-                <div class="flex h-10 items-center rounded-lg border border-cg-border bg-cg-charcoal/90 p-1 text-xs font-semibold">
-                    <button
-                        type="submit"
-                        name="locale"
-                        value="en"
-                        class="rounded-md px-2.5 py-1.5 transition {{ ($currentLocale ?? 'en') === 'en' ? 'bg-cg-red text-white' : 'text-cg-muted hover:text-cg-white' }}"
-                    >EN</button>
-                    <button
-                        type="submit"
-                        name="locale"
-                        value="np"
-                        class="rounded-md px-2.5 py-1.5 transition {{ ($currentLocale ?? 'en') === 'np' ? 'bg-cg-red text-white' : 'text-cg-muted hover:text-cg-white' }}"
-                    >नेपाली</button>
-                </div>
-            </form>
-
             {{-- Account --}}
             @auth
                 <div class="relative hidden lg:block" data-dropdown>
@@ -156,16 +137,6 @@
                     class="rounded-lg px-3 py-3 text-base font-medium transition {{ request()->routeIs($link['match']) ? 'bg-cg-red/10 text-cg-red' : 'text-cg-muted hover:bg-cg-charcoal hover:text-cg-white' }}"
                 >{{ $link['label'] }}</a>
             @endforeach
-
-            <div class="mt-3 flex flex-wrap items-center gap-3 border-t border-cg-border-soft pt-4">
-                <form action="{{ route('locale.set') }}" method="POST">
-                    @csrf
-                    <div class="flex h-11 items-center rounded-lg border border-cg-border bg-cg-charcoal p-1 text-xs font-semibold">
-                        <button type="submit" name="locale" value="en" class="rounded-md px-3 py-2 transition {{ ($currentLocale ?? 'en') === 'en' ? 'bg-cg-red text-white' : 'text-cg-muted' }}">EN</button>
-                        <button type="submit" name="locale" value="np" class="rounded-md px-3 py-2 transition {{ ($currentLocale ?? 'en') === 'np' ? 'bg-cg-red text-white' : 'text-cg-muted' }}">नेपाली</button>
-                    </div>
-                </form>
-            </div>
 
             <div class="mt-4 flex flex-col gap-2 border-t border-cg-border-soft pt-4">
                 @auth

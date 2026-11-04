@@ -15,9 +15,9 @@ use App\Http\Controllers\Admin\SettingsController as AdminSettingsController;
 use App\Http\Controllers\Admin\UpcomingController as AdminUpcomingController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BookingController;
-use App\Http\Controllers\CinemaController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\MovieController;
+use App\Http\Controllers\NewsletterSubscriptionController;
 use App\Http\Controllers\OfferController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\PaymentController;
@@ -48,8 +48,8 @@ Route::post('/movies/{movie:slug}/reviews', [MovieController::class, 'storeRevie
 Route::post('/movies/{movie:slug}/favorite', [AccountController::class, 'toggleFavorite'])
     ->middleware('auth')->name('movies.favorite');
 
-Route::get('/cinemas', [CinemaController::class, 'index'])->name('cinemas.index');
-Route::get('/cinemas/{cinema:slug}', [CinemaController::class, 'show'])->name('cinemas.show');
+Route::redirect('/cinemas', '/movies');
+Route::get('/cinemas/{path}', fn () => to_route('movies.index'))->where('path', '.*');
 
 Route::get('/offers', [OfferController::class, 'index'])->name('offers.index');
 Route::post('/offers/validate', [OfferController::class, 'validate'])->name('offers.validate');
@@ -57,6 +57,9 @@ Route::post('/offers/validate', [OfferController::class, 'validate'])->name('off
 Route::get('/about', [PageController::class, 'about'])->name('pages.about');
 Route::get('/contact', [PageController::class, 'contact'])->name('pages.contact');
 Route::post('/contact', [PageController::class, 'storeContact'])->name('pages.contact.store');
+Route::post('/newsletter-subscriptions', NewsletterSubscriptionController::class)
+    ->middleware('throttle:5,1')
+    ->name('newsletter-subscriptions.store');
 Route::get('/terms', [PageController::class, 'terms'])->name('pages.terms');
 Route::get('/privacy', [PageController::class, 'privacy'])->name('pages.privacy');
 Route::get('/refund-policy', [PageController::class, 'refund'])->name('pages.refund');

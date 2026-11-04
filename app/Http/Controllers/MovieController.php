@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Booking;
-use App\Models\Cinema;
 use App\Models\Movie;
 use App\Models\Review;
 use Illuminate\Contracts\View\View;
@@ -54,20 +53,8 @@ class MovieController extends Controller
         $movies = $query->paginate(12)->withQueryString();
 
         $allGenres = $this->allGenres();
-        $languages = Movie::query()->active()->select('language')->distinct()->orderBy('language')->pluck('language');
-        $years = Movie::query()->active()->selectRaw('DISTINCT strftime(\'%Y\', release_date) as year')
-            ->orderByDesc('year')->pluck('year')->filter()->values();
-        $cinemas = Cinema::query()->active()->with('city')->orderBy('name')->get();
 
-        return view('movies.index', compact(
-            'movies',
-            'tab',
-            'sort',
-            'allGenres',
-            'languages',
-            'years',
-            'cinemas',
-        ));
+        return view('movies.index', compact('movies', 'tab', 'sort', 'allGenres'));
     }
 
     /**
@@ -163,9 +150,9 @@ class MovieController extends Controller
 
         if (! empty($validated['show_date']) || ! empty($validated['show_time'])) {
             $query->whereHas('showtimes', function ($builder) use ($validated) {
-                $builder->active()
+                $builder->upcoming()
                     ->when($validated['show_date'] ?? null, fn ($showtimes, $date) => $showtimes->whereDate('show_date', $date))
-                    ->when($validated['show_time'] ?? null, fn ($showtimes, $time) => $showtimes->whereTime('start_time', $time));
+                    ->when($validated['show_time'] ?? null, fn ($showtimes, $time) => $showtimes->whereTime('start_time', $time.':00'));
             });
         }
 

@@ -130,6 +130,11 @@
         @apply btn bg-cg-red text-white hover:bg-cg-red-dark active:scale-[0.98];
     }
 
+    .btn-primary:not(:disabled):hover,
+    .btn-outline:not(:disabled):hover {
+        transform: scale(1.02);
+    }
+
     .btn-outline {
         @apply btn border border-cg-red bg-white text-cg-red hover:bg-cg-red/5;
     }
@@ -180,6 +185,30 @@
         @apply mb-2 text-xs font-bold uppercase tracking-[0.25em] text-cg-red;
     }
 
+    .footer-link {
+        @apply text-cg-muted transition-colors duration-200 hover:text-cg-red focus-visible:text-cg-red;
+    }
+
+    main [data-scroll-reveal] {
+        opacity: 0;
+        transform: translate3d(0, 24px, 0);
+        transition:
+            opacity 700ms ease-out,
+            transform 700ms ease-out;
+        transition-delay: var(--scroll-reveal-delay, 0ms);
+        will-change: opacity, transform;
+    }
+
+    main [data-scroll-reveal='zoom'] {
+        transform: translate3d(0, 18px, 0) scale(0.98);
+    }
+
+    main [data-scroll-revealed='true'] {
+        opacity: 1;
+        transform: translate3d(0, 0, 0) scale(1);
+        will-change: auto;
+    }
+
     .nav-link {
         @apply relative text-sm font-medium text-cg-muted transition hover:text-cg-red;
     }
@@ -205,6 +234,16 @@
     }
 }
 
+@media (prefers-reduced-motion: reduce) {
+    main [data-scroll-reveal] {
+        opacity: 1;
+        transform: none;
+        transition: none;
+        transition-delay: 0ms;
+        will-change: auto;
+    }
+}
+
 /* ------------------------------------------------------------------ */
 /* Page-specific pieces                                                */
 /* ------------------------------------------------------------------ */
@@ -225,16 +264,30 @@
     animation: cg-marquee 22s ease-in-out infinite;
 }
 
-/* Hero slider */
-.cg-slide {
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.8s ease;
+/* Full-screen featured movie hero */
+.cg-home-hero {
+    background-color: #090a0d;
 }
 
-.cg-slide-active {
+.cg-home-hero-art {
+    position: absolute;
+    inset: 0;
+    background-position: right 6% center;
+    background-repeat: no-repeat;
+    background-size: auto 92%;
+    opacity: 0;
+    transition: opacity 700ms ease-in-out;
+}
+
+.cg-home-hero-art-active {
     opacity: 1;
-    visibility: visible;
+}
+
+@media (max-width: 1023px) {
+    .cg-home-hero-art {
+        background-position: center 18%;
+        background-size: cover;
+    }
 }
 
 /* Poster card */

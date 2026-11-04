@@ -135,6 +135,137 @@ function initSliders() {
 }
 
 /**
+ * Let visitors choose a featured hero image without automatically advancing.
+ */
+function initHeroPagination() {
+    document.querySelectorAll('[data-hero-pagination]').forEach((hero) => {
+        const pages = Array.from(hero.querySelectorAll('[data-hero-page]'));
+        const artLayers = Array.from(hero.querySelectorAll('[data-hero-art]'));
+        const title = hero.querySelector('[data-hero-title]');
+        const synopsis = hero.querySelector('[data-hero-synopsis]');
+        const badges = hero.querySelector('[data-hero-badges]');
+        const metadata = hero.querySelector('[data-hero-metadata]');
+        const actions = hero.querySelector('[data-hero-actions]');
+        const bookLink = hero.querySelector('[data-hero-book-link]');
+        const duration = hero.querySelector('[data-hero-duration]');
+        const language = hero.querySelector('[data-hero-language]');
+        const releaseDate = hero.querySelector('[data-hero-release-date]');
+        const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        if (pages.length < 2 || artLayers.length < 2 || !title) return;
+
+        const interval = 7000;
+        let activeArtIndex = artLayers.findIndex((layer) => layer.classList.contains('cg-home-hero-art-active'));
+        let timer = null;
+        let selection = 0;
+
+        const stop = () => {
+            if (timer) {
+                window.clearInterval(timer);
+                timer = null;
+            }
+        };
+
+        const start = () => {
+            stop();
+            if (reducedMotion) return;
+
+            timer = window.setInterval(() => {
+                const activeIndex = pages.findIndex((page) => page.getAttribute('aria-current') === 'true');
+                show((activeIndex + 1) % pages.length);
+            }, interval);
+        };
+
+        const show = (index) => {
+            const page = pages[index];
+            const request = ++selection;
+            const image = new Image();
+
+            image.onload = () => {
+                if (request !== selection) return;
+
+                const nextArtIndex = (activeArtIndex + 1) % artLayers.length;
+                const currentArt = artLayers[activeArtIndex];
+                const nextArt = artLayers[nextArtIndex];
+                const hasDetails = page.dataset.heroDetails === 'true';
+                const pageSynopsis = page.dataset.heroSynopsis ?? '';
+
+                nextArt.style.backgroundImage = `url("${page.dataset.heroImage}")`;
+                nextArt.classList.add('cg-home-hero-art-active');
+                currentArt.classList.remove('cg-home-hero-art-active');
+                activeArtIndex = nextArtIndex;
+
+                hero.setAttribute('aria-label', `Featured movie: ${page.dataset.heroTitle}`);
+                title.textContent = page.dataset.heroTitle;
+
+                if (synopsis) {
+                    synopsis.textContent = pageSynopsis;
+                    synopsis.hidden = !pageSynopsis;
+                }
+
+                if (badges) badges.hidden = page.dataset.heroBadges !== 'true';
+                if (metadata) metadata.hidden = !hasDetails;
+
+                if (actions) {
+                    actions.hidden = !hasDetails;
+                }
+
+                if (hasDetails) {
+                    if (duration) duration.textContent = page.dataset.heroDuration;
+                    if (language) language.textContent = page.dataset.heroLanguage;
+                    if (releaseDate) releaseDate.textContent = page.dataset.heroReleaseDate;
+                    if (bookLink) {
+                        bookLink.href = page.dataset.heroBookUrl;
+                        bookLink.setAttribute('aria-label', `Book ${page.dataset.heroBookTitle} tickets`);
+                    }
+                }
+
+                pages.forEach((paginationPage) => {
+                    const isCurrent = paginationPage === page;
+                    const indicator = paginationPage.querySelector('[data-hero-indicator]');
+
+                    paginationPage.setAttribute('aria-current', String(isCurrent));
+                    indicator.classList.toggle('w-8', isCurrent);
+                    indicator.classList.toggle('w-3', !isCurrent);
+                    indicator.classList.toggle('bg-cg-red', isCurrent);
+                    indicator.classList.toggle('bg-white/45', !isCurrent);
+                });
+            };
+
+            image.onerror = () => {
+                console.error(`Unable to load hero image: ${page.dataset.heroImage}`);
+            };
+            image.src = page.dataset.heroImage;
+        };
+
+        pages.forEach((page, index) => {
+            page.addEventListener('click', () => {
+                show(index);
+                start();
+            });
+        });
+
+        hero.addEventListener('mouseenter', stop);
+        hero.addEventListener('mouseleave', () => {
+            if (!hero.contains(document.activeElement)) start();
+        });
+        hero.addEventListener('focusin', stop);
+        hero.addEventListener('focusout', (event) => {
+            if (!hero.contains(event.relatedTarget) && !hero.matches(':hover')) start();
+        });
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                stop();
+            } else {
+                start();
+            }
+        });
+
+        start();
+    });
+}
+
+/**
  * Open a trailer modal populated from data-trailer on the trigger element.
  */
 function initTrailers() {
@@ -194,6 +325,59 @@ function initConfirmForms() {
 }
 
 /**
+ * Reveal page content once it approaches the viewport.
+ */
+function initScrollReveal() {
+    if (
+        window.matchMedia('(prefers-reduced-motion: reduce)').matches ||
+        !('IntersectionObserver' in window) ||
+        document.querySelector('main[data-no-scroll-reveal]')
+    ) {
+        return;
+    }
+
+    const targets = new Set(
+        Array.from(document.querySelectorAll(
+            'main > section, main section, main article, main .cg-card, main .card, main form, main h1, main h2, main h3, main [class*="banner"], main img, footer > div',
+        )).filter((element) => !element.closest('[data-no-scroll-reveal]')),
+    );
+
+    document.querySelectorAll('main [data-slider], main [class*="banner"], main img').forEach((element) => {
+        element.dataset.scrollReveal = 'zoom';
+    });
+
+    document.querySelectorAll('main .grid').forEach((grid) => {
+        Array.from(grid.children)
+            .filter((child) => child.matches('article, .cg-card, .card'))
+            .forEach((card, index) => {
+                card.style.setProperty('--scroll-reveal-delay', `${Math.min(index * 100, 500)}ms`);
+            });
+    });
+
+    const observer = new IntersectionObserver(
+        (entries) => {
+            entries.forEach((entry) => {
+                if (!entry.isIntersecting) return;
+
+                entry.target.dataset.scrollRevealed = 'true';
+                observer.unobserve(entry.target);
+            });
+        },
+        {
+            threshold: 0.15,
+        },
+    );
+
+    targets.forEach((element) => {
+        if (!element.dataset.scrollReveal) {
+            element.dataset.scrollReveal = 'up';
+        }
+
+        observer.observe(element);
+    });
+}
+
+/**
  * Register the service worker (production builds only — the dev server
  * relies on network requests so HMR keeps working).
  */
@@ -213,7 +397,9 @@ document.addEventListener('DOMContentLoaded', () => {
     initPasswordToggles();
     initConfirmForms();
     initSliders();
+    initHeroPagination();
     initTrailers();
     initCopyButtons();
+    initScrollReveal();
     initServiceWorker();
 });

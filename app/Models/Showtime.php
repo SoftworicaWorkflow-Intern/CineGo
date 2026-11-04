@@ -86,8 +86,16 @@ class Showtime extends Model
      */
     public function scopeUpcoming(Builder $query): Builder
     {
+        $now = now();
+
         return $query->active()
-            ->where('show_date', '>=', now()->toDateString())
+            ->where(function (Builder $query) use ($now): void {
+                $query->whereDate('show_date', '>', $now->toDateString())
+                    ->orWhere(function (Builder $query) use ($now): void {
+                        $query->whereDate('show_date', $now->toDateString())
+                            ->whereTime('start_time', '>=', $now->format('H:i:s'));
+                    });
+            })
             ->orderBy('show_date')
             ->orderBy('start_time');
     }
@@ -111,11 +119,11 @@ class Showtime extends Model
 
     public function is_past(): bool
     {
-        if ($this->show_date->isFuture()) {
-            return false;
-        }
+        $now = now();
+        $showDate = $this->show_date->toDateString();
+        $today = $now->toDateString();
 
-        return $this->show_date->isPast()
-            || now()->format('H:i:s') > $this->start_time;
+        return $showDate < $today
+            || ($showDate === $today && $now->format('H:i:s') > $this->start_time);
     }
 }

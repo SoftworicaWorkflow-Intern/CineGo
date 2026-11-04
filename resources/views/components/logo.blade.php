@@ -2,7 +2,7 @@
 
 <span {{ $attributes->merge(['class' => 'inline-flex items-center gap-2.5']) }}>
     <img
-        src="{{ asset('img/cinego-logo.png') }}"
+        src="{{ asset('img/cinego-logo.png') }}?v=2"
         alt="CineGo"
         width="{{ (int) round($size * 930 / 185) }}"
         height="{{ $size }}"

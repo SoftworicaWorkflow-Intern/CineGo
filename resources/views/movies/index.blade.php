@@ -37,63 +37,37 @@
         </div>
 
         {{-- Filters --}}
-        <form action="{{ route('movies.index') }}" method="GET" class="card mb-8 grid gap-3 p-4 md:grid-cols-2 lg:grid-cols-4">
+        <form action="{{ route('movies.index') }}" method="GET" class="card mb-8 grid gap-3 p-4 sm:grid-cols-2 sm:p-5 lg:grid-cols-[minmax(0,2fr)_minmax(0,1.2fr)_minmax(0,1.2fr)_minmax(0,1.2fr)_auto_auto]">
             <input type="hidden" name="tab" value="{{ $tab ?? 'all' }}">
 
-            <div class="relative md:col-span-2 lg:col-span-1">
-                <x-icon name="search" :size="16" class="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-cg-red" />
-                <label class="sr-only" for="filter-q">{{ ui('search', 'Search') }}</label>
-                <input id="filter-q" type="search" name="q" value="{{ request('q') }}" placeholder="{{ ui('search', 'Search') }}…" class="input pl-10">
+            <div class="flex h-12 min-w-0 items-center gap-3 rounded-lg border border-cg-border bg-white px-3.5 transition focus-within:border-cg-red focus-within:ring-2 focus-within:ring-cg-red/30">
+                <x-icon name="search" :size="17" class="shrink-0 text-cg-red" />
+                <label class="sr-only" for="filter-q">{{ ui('search_movies', 'Search movies') }}</label>
+                <input id="filter-q" type="search" name="q" value="{{ request('q') }}" placeholder="{{ ui('search_movies', 'Search movies') }}" class="h-full min-h-0 w-full min-w-0 border-0 bg-transparent p-0 text-sm text-cg-white placeholder:text-cg-dim focus:border-transparent focus:outline-none focus:ring-0">
             </div>
 
             <label class="sr-only" for="filter-genre">{{ ui('genre', 'Genre') }}</label>
-            <select id="filter-genre" name="genre" class="input cursor-pointer">
+            <select id="filter-genre" name="genre" class="input h-12 min-h-12 cursor-pointer py-2.5">
                 <option value="">{{ ui('genre', 'Genre') }}</option>
                 @foreach ($allGenres as $genre)
                     <option value="{{ $genre }}" @selected(request('genre') === $genre)>{{ $genre }}</option>
                 @endforeach
             </select>
 
-            <label class="sr-only" for="filter-language">{{ ui('language_label', 'Language') }}</label>
-            <select id="filter-language" name="language" class="input cursor-pointer">
-                <option value="">{{ ui('language_label', 'Language') }}</option>
-                @foreach ($languages as $language)
-                    <option value="{{ $language }}" @selected(request('language') === $language)>{{ $language }}</option>
-                @endforeach
-            </select>
-
-            <label class="sr-only" for="filter-year">{{ ui('year', 'Year') }}</label>
-            <select id="filter-year" name="year" class="input cursor-pointer">
-                <option value="">{{ ui('year', 'Year') }}</option>
-                @foreach ($years as $year)
-                    <option value="{{ $year }}" @selected((string) request('year') === (string) $year)>{{ $year }}</option>
-                @endforeach
-            </select>
-
-            <label class="sr-only" for="filter-cinema">{{ ui('cinemas', 'Cinemas') }}</label>
-            <select id="filter-cinema" name="cinema" class="input cursor-pointer">
-                <option value="">{{ ui('cinemas', 'Cinemas') }}</option>
-                @foreach ($cinemas as $cinema)
-                    <option value="{{ $cinema->id }}" @selected((string) request('cinema') === (string) $cinema->id)>
-                        {{ $cinema->localised_name() }}
-                    </option>
-                @endforeach
-            </select>
-
-            <label class="sr-only" for="filter-sort">{{ ui('sort_by', 'Sort by') }}</label>
-            <select id="filter-sort" name="sort" class="input cursor-pointer">
-                <option value="latest" @selected(($sort ?? 'latest') === 'latest')>{{ ui('release_date', 'Release Date') }}</option>
-                <option value="title" @selected($sort === 'title')">{{ ui('movies', 'Movies') }} A–Z</option>
-                <option value="rating" @selected($sort === 'rating')>{{ ui('rating', 'Rating') }}</option>
-                <option value="duration" @selected($sort === 'duration')>{{ ui('duration', 'Duration') }}</option>
-            </select>
-
-            <div class="flex gap-2 md:col-span-2 lg:col-span-4">
-                <button type="submit" class="btn-primary flex-1">
-                    <x-icon name="filter" :size="16" /> {{ ui('apply', 'Apply') }}
-                </button>
-                <a href="{{ route('movies.index') }}" class="btn-ghost">{{ ui('clear_filters', 'Clear filters') }}</a>
+            <div>
+                <label class="sr-only" for="filter-date">{{ ui('select_date', 'Select date') }}</label>
+                <input id="filter-date" type="date" name="show_date" value="{{ request('show_date') }}" aria-label="{{ ui('select_date', 'Select date') }}" class="input h-12 min-h-12 py-2.5">
             </div>
+
+            <div>
+                <label class="sr-only" for="filter-time">{{ ui('show_time', 'Show time') }}</label>
+                <input id="filter-time" type="time" name="show_time" value="{{ request('show_time') }}" aria-label="{{ ui('show_time', 'Show time') }}" class="input h-12 min-h-12 py-2.5">
+            </div>
+
+            <button type="submit" class="btn-primary h-12 whitespace-nowrap px-5">
+                    <x-icon name="search" :size="16" /> {{ ui('search', 'Search') }}
+            </button>
+            <a href="{{ route('movies.index') }}" class="btn-ghost h-12 whitespace-nowrap px-4">{{ ui('clear_filters', 'Clear filters') }}</a>
         </form>
 
         <p class="mb-5 text-sm text-cg-muted">

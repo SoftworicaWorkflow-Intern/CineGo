@@ -18,7 +18,7 @@ class CinemaController extends Controller
 
         $query = Cinema::query()->active()->withCount([
             'halls',
-            'showtimes' => fn ($builder) => $builder->active()->where('show_date', '>=', now()->toDateString()),
+            'showtimes' => fn ($builder) => $builder->upcoming(),
         ])->with('city')->orderBy('name');
 
         if ($selectedCity) {
@@ -42,7 +42,7 @@ class CinemaController extends Controller
         $movies = Movie::query()
             ->active()
             ->whereHas('showtimes', function ($builder) use ($cinema) {
-                $builder->active()->where('cinema_id', $cinema->id)->where('show_date', '>=', now()->toDateString());
+                $builder->upcoming()->where('cinema_id', $cinema->id);
             })
             ->orderBy('title')
             ->get();

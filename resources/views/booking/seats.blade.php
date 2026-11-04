@@ -36,7 +36,7 @@
                 </div>
 
                 {{-- Seat map --}}
-                <div class="card p-4 sm:p-7">
+                <div class="card p-4 sm:p-7" data-no-scroll-reveal>
                     <div class="mb-5 flex flex-wrap items-center justify-between gap-3">
                         <h1 class="font-display text-2xl tracking-wide text-cg-white">{{ ui('step_select_seats', 'Select Seats') }}</h1>
                         <span class="inline-flex items-center gap-2 text-xs text-cg-muted">
@@ -117,10 +117,6 @@
                         <div class="flex justify-between gap-3">
                             <dt class="text-cg-muted">{{ ui('movies', 'Movie') }}</dt>
                             <dd class="text-right font-medium text-cg-white">{{ $showtime->movie->localised_title() }}</dd>
-                        </div>
-                        <div class="flex justify-between gap-3">
-                            <dt class="text-cg-muted">{{ ui('cinemas', 'Cinema') }}</dt>
-                            <dd class="text-right font-medium text-cg-white">{{ $showtime->cinema->localised_name() }}</dd>
                         </div>
                         <div class="flex justify-between gap-3">
                             <dt class="text-cg-muted">{{ ui('dates', 'Date') }}</dt>

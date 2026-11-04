@@ -57,20 +57,18 @@
         </p>
 
         <div class="flex gap-2 pt-1">
-            @if ($showBook && ! $isComingSoon)
+            @if ($showBook)
                 <a href="{{ $detailRoute }}#showtimes" class="btn-primary flex-1 justify-center px-3 py-2 text-xs">
                     {{ ui('book_tickets', 'Book Tickets') }}
                 </a>
             @endif
-            @if ($movie->trailer_url)
-                <button
-                    type="button"
-                    data-trailer="{{ $movie->trailer_url }}"
-                    class="{{ $showBook && ! $isComingSoon ? 'btn-outline flex-1' : 'btn-outline w-full' }} justify-center px-3 py-2 text-xs"
-                >
-                    <x-icon name="play" :size="13" /> {{ ui('watch_trailer', 'Watch Trailer') }}
-                </button>
-            @endif
+            <button
+                type="button"
+                @if ($movie->trailer_url) data-trailer="{{ $movie->trailer_url }}" @else disabled @endif
+                class="{{ $showBook ? 'btn-outline flex-1' : 'btn-outline w-full' }} justify-center px-3 py-2 text-xs"
+            >
+                <x-icon name="play" :size="13" /> {{ ui('watch_trailer', 'Watch Trailer') }}
+            </button>
         </div>
     </div>
 </article>

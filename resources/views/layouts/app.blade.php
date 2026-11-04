@@ -9,7 +9,7 @@
     <meta name="description" content="@yield('meta', 'CineGo — book movie tickets online across Nepal. Pick your cinema, choose your seats and get an instant QR ticket.')">
     <meta name="theme-color" content="#ffffff">
 
-    <link rel="icon" href="{{ asset('img/favicon.png') }}" type="image/svg+xml">
+    <link rel="icon" href="{{ asset('favicon.png') }}" type="image/png" sizes="96x96">
     <link rel="manifest" href="{{ asset('manifest.webmanifest') }}">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -20,7 +20,7 @@
 <body class="flex min-h-screen flex-col">
     @include('partials.header')
 
-    <main id="main-content" class="flex-1">
+    <main id="main-content" class="flex-1" @if (request()->routeIs('booking.seats')) data-no-scroll-reveal @endif>
         @yield('content')
     </main>
 

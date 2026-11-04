@@ -93,7 +93,6 @@
                         <li><a href="{{ route('pages.terms') }}" class="text-cg-muted transition hover:text-cg-red">{{ ui('terms', 'Terms & Conditions') }}</a></li>
                         <li><a href="{{ route('pages.privacy') }}" class="text-cg-muted transition hover:text-cg-red">{{ ui('privacy', 'Privacy Policy') }}</a></li>
                         <li><a href="{{ route('pages.refund') }}" class="text-cg-muted transition hover:text-cg-red">{{ ui('refund', 'Refund Policy') }}</a></li>
-                        <li><a href="{{ route('cinemas.index') }}" class="text-cg-muted transition hover:text-cg-red">{{ ui('cinemas', 'Cinemas') }}</a></li>
                     </ul>
                 </div>
             </aside>

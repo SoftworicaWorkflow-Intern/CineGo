@@ -332,8 +332,8 @@ class DatabaseSeeder extends Seeder
                 'sort_order' => 4,
             ],
             [
-                'title' => 'Aankha Phuley',
-                'title_np' => 'आँखा फुल्यो',
+                'title' => 'Gharjwai',
+                'title_np' => 'घरज्वाइँ',
                 'synopsis' => 'A blind comedian accidentally becomes the voice of a revolution — and discovers his punchlines are funnier than his sighted friends think.',
                 'synopsis_np' => 'दृष्टिहीन हास्यकलाकार आकस्मिक रूपमा क्रान्तिको आवाज बन्छ र आफ्नो हास्यकला अझ रमाइलो हुने पाउँछ।',
                 'genres' => ['Comedy', 'Drama'],

@@ -9,7 +9,7 @@
     <meta name="robots" content="noindex, nofollow">
     <meta name="theme-color" content="#ffffff">
 
-    <link rel="icon" href="{{ asset('img/favicon.png') }}" type="image/svg+xml">
+    <link rel="icon" href="{{ asset('favicon.png') }}" type="image/png" sizes="96x96">
     @vite(['resources/css/app.css', 'resources/js/app.js', 'resources/js/admin.js'])
 </head>
 <body class="flex min-h-screen flex-col bg-cg-black">

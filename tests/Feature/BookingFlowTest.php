@@ -71,7 +71,31 @@ class BookingFlowTest extends TestCase
 
         $this->get(route('booking.seats', $showtime))
             ->assertOk()
+            ->assertSee($showtime->movie->title)
+            ->assertSee('data-no-scroll-reveal', false)
+            ->assertSee('id="seat-form"', false)
+            ->assertSee('aria-label="A1 — Available"', false)
+            ->assertDontSee('<dt class="text-cg-muted">Cinemas</dt>', false);
+    }
+
+    public function test_todays_showtime_opens_the_seat_map_only_before_it_starts(): void
+    {
+        $this->travelTo(now()->setTime(16, 0));
+
+        $showtime = $this->makeShowtime();
+        $showtime->update([
+            'show_date' => today()->toDateString(),
+            'start_time' => '17:00:00',
+        ]);
+
+        $this->get(route('booking.seats', $showtime))
+            ->assertOk()
             ->assertSee($showtime->movie->title);
+
+        $showtime->update(['start_time' => '15:00:00']);
+
+        $this->get(route('booking.seats', $showtime))
+            ->assertNotFound();
     }
 
     public function test_selecting_no_seats_is_rejected(): void

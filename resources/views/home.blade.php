@@ -4,111 +4,127 @@
 
 @section('content')
     {{-- ============================================================
-         Section 2: Hero slider
+         Section 2: Featured movie hero
     ============================================================ --}}
     @if ($featured->isNotEmpty())
+        @php($movie = $featured->first())
         <section
-            data-slider
-            data-interval="6500"
-            class="relative h-[78vh] min-h-[520px] w-full overflow-hidden sm:min-h-[560px]"
-            aria-label="Featured movies"
+            class="cg-home-hero relative flex min-h-[100vh] min-h-[100svh] w-full items-end overflow-hidden bg-cover bg-center bg-no-repeat lg:items-center"
+            aria-label="Featured movie: {{ $movie->localised_title() }}"
+            data-no-scroll-reveal
+            data-hero-pagination
         >
-            @foreach ($featured as $index => $movie)
-                <div
-                    data-slide
-                    class="cg-slide absolute inset-0 {{ $index === 0 ? 'cg-slide-active' : '' }}"
-                    aria-hidden="{{ $index === 0 ? 'false' : 'true' }}"
-                >
-                    <img
-                        src="{{ $movie->banner_url ?? $movie->poster_url }}"
-                        alt="{{ $movie->localised_title() }}"
-                        class="h-full w-full object-cover object-center"
-                        {{ $index === 0 ? '' : 'fetchpriority="low"' }}
-                    >
-                    <div class="absolute inset-0 bg-gradient-to-r from-white/95 via-white/75 to-transparent"></div>
-                    <div class="absolute inset-0 bg-gradient-to-t from-white/90 via-transparent to-white/40"></div>
+            <div
+                class="cg-home-hero-art cg-home-hero-art-active"
+                aria-hidden="true"
+                style="background-image: url('{{ asset('img/hero/ghar-jwai.png') }}')"
+                data-hero-art
+            ></div>
+            <div class="cg-home-hero-art" aria-hidden="true" data-hero-art></div>
+            <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-black/10 lg:bg-gradient-to-r lg:from-black/80 lg:via-black/45 lg:to-transparent"></div>
 
-                    <div class="container-page absolute inset-0 flex items-center">
-                        <div class="max-w-2xl pb-16 pt-10">
-                            <div class="mb-4 flex flex-wrap items-center gap-2">
-                                @if ($movie->rating)
-                                    <span class="badge-dark">
-                                        <x-icon name="star" :size="12" class="cg-star" />
-                                        {{ number_format($movie->rating, 1) }}
-                                    </span>
-                                @endif
-                                @if ($movie->certificate)
-                                    <span class="badge-dark">{{ $movie->certificate }}</span>
-                                @endif
-                                <span class="badge-red">{{ $movie->genre_label() }}</span>
-                            </div>
+            <div class="container-page relative z-10 w-full py-16 sm:py-20 lg:py-24">
+                <div class="max-w-2xl">
+                    <div class="mb-4 flex flex-wrap items-center gap-2" data-hero-badges>
+                        @if ($movie->rating)
+                            <span class="badge-dark">
+                                <x-icon name="star" :size="12" class="cg-star" />
+                                {{ number_format($movie->rating, 1) }}
+                            </span>
+                        @endif
+                        @if ($movie->certificate)
+                            <span class="badge-dark">{{ $movie->certificate }}</span>
+                        @endif
+                        <span class="badge-red">{{ $movie->genre_label() }}</span>
+                    </div>
 
-                            <h1 class="font-display text-5xl leading-[0.95] tracking-wide text-cg-white sm:text-6xl lg:text-7xl">
-                                {{ $movie->localised_title() }}
-                            </h1>
+                    <h1 class="font-display text-5xl leading-[0.95] tracking-wide text-white sm:text-6xl lg:text-7xl" data-hero-title>
+                        {{ $movie->localised_title() }}
+                    </h1>
 
-                            <div class="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-cg-muted">
-                                <span class="inline-flex items-center gap-1.5">
-                                    <x-icon name="clock" :size="15" class="text-cg-red" />{{ $movie->duration_label() }}
-                                </span>
-                                <span class="inline-flex items-center gap-1.5">
-                                    <x-icon name="globe" :size="15" class="text-cg-red" />{{ $movie->language }}
-                                </span>
-                                <span class="inline-flex items-center gap-1.5">
-                                    <x-icon name="calendar" :size="15" class="text-cg-red" />{{ $movie->release_date?->format('M j, Y') }}
-                                </span>
-                            </div>
+                    <div class="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-white/85" data-hero-metadata>
+                        <span class="inline-flex items-center gap-1.5">
+                            <x-icon name="clock" :size="15" class="text-cg-red" /><span data-hero-duration>{{ $movie->duration_label() }}</span>
+                        </span>
+                        <span class="inline-flex items-center gap-1.5">
+                            <x-icon name="globe" :size="15" class="text-cg-red" /><span data-hero-language>{{ $movie->language }}</span>
+                        </span>
+                        <span class="inline-flex items-center gap-1.5">
+                            <x-icon name="calendar" :size="15" class="text-cg-red" /><span data-hero-release-date>{{ $movie->release_date?->format('M j, Y') }}</span>
+                        </span>
+                    </div>
 
-                            <p class="mt-4 line-clamp-3 max-w-xl text-sm leading-relaxed text-cg-muted sm:text-base">
-                                {{ $movie->localised_synopsis() }}
-                            </p>
+                    <p class="mt-4 line-clamp-3 max-w-xl text-sm leading-relaxed text-white/85 sm:text-base" data-hero-synopsis>
+                        {{ $movie->localised_synopsis() }}
+                    </p>
 
-                            <div class="mt-7 flex flex-wrap gap-3">
-                                <a href="{{ route('movies.show', $movie) }}#showtimes" class="btn-primary btn-lg">
-                                    <x-icon name="ticket" :size="18" /> {{ ui('hero_book', 'Book Tickets') }}
-                                </a>
-                                @if ($movie->trailer_url)
-                                    <button type="button" data-trailer="{{ $movie->trailer_url }}" class="btn-outline btn-lg">
-                                        <x-icon name="play" :size="17" /> {{ ui('watch_trailer', 'Watch Trailer') }}
-                                    </button>
-                                @endif
-                            </div>
-                        </div>
+                    <div class="mt-7 flex flex-wrap gap-3" data-hero-actions>
+                        <a href="{{ route('movies.show', $movie) }}#showtimes" class="btn-primary btn-lg" data-hero-book-link aria-label="Book {{ $movie->localised_title() }} tickets">
+                            <x-icon name="ticket" :size="18" /> {{ ui('hero_book', 'Book Tickets') }}
+                        </a>
+                        @if ($movie->trailer_url)
+                            <button type="button" data-trailer="{{ $movie->trailer_url }}" class="btn-outline btn-lg">
+                                <x-icon name="play" :size="17" /> {{ ui('watch_trailer', 'Watch Trailer') }}
+                            </button>
+                        @endif
                     </div>
                 </div>
-            @endforeach
 
-            {{-- Manual navigation --}}
-            @if ($featured->count() > 1)
-                <button
-                    type="button"
-                    data-slide-prev
-                    aria-label="Previous slide"
-                    class="absolute left-3 top-1/2 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-cg-border bg-white/90 text-cg-white shadow-sm backdrop-blur transition hover:border-cg-red hover:bg-cg-red hover:text-white sm:flex"
-                >
-                    <x-icon name="arrow-left" :size="18" />
-                </button>
-                <button
-                    type="button"
-                    data-slide-next
-                    aria-label="Next slide"
-                    class="absolute right-3 top-1/2 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-cg-border bg-white/90 text-cg-white shadow-sm backdrop-blur transition hover:border-cg-red hover:bg-cg-red hover:text-white sm:flex"
-                >
-                    <x-icon name="arrow-right" :size="18" />
-                </button>
-
-                <div class="absolute bottom-6 left-1/2 flex -translate-x-1/2 items-center gap-2.5">
-                    @foreach ($featured as $index => $movie)
-                        <button
-                            type="button"
-                            data-slide-dot
-                            aria-label="Go to slide {{ $index + 1 }}"
-                            aria-current="{{ $index === 0 ? 'true' : 'false' }}"
-                            class="h-2.5 rounded-full transition-all {{ $index === 0 ? 'w-8 bg-cg-red' : 'w-2.5 bg-cg-border' }}"
-                        ></button>
-                    @endforeach
-                </div>
-            @endif
+                <nav class="mt-10 flex items-center gap-2" aria-label="Featured movie pagination">
+                    <button
+                        type="button"
+                        class="group flex h-11 items-center"
+                        aria-label="Show {{ $movie->localised_title() }}"
+                        aria-current="true"
+                        data-hero-page
+                        data-hero-image="{{ asset('img/hero/ghar-jwai.png') }}"
+                        data-hero-title="{{ $movie->localised_title() }}"
+                        data-hero-synopsis="{{ $movie->localised_synopsis() }}"
+                        data-hero-details="true"
+                        data-hero-badges="true"
+                        data-hero-duration="{{ $movie->duration_label() }}"
+                        data-hero-language="{{ $movie->language }}"
+                        data-hero-release-date="{{ $movie->release_date?->format('M j, Y') }}"
+                        data-hero-book-url="{{ route('movies.show', $movie) }}#showtimes"
+                        data-hero-book-title="{{ $movie->localised_title() }}"
+                    >
+                        <span class="h-1 w-8 rounded-full bg-cg-red transition-all duration-300" data-hero-indicator></span>
+                    </button>
+                    <button
+                        type="button"
+                        class="group flex h-11 items-center"
+                        aria-label="Show Unko Sweater"
+                        aria-current="false"
+                        data-hero-page
+                        data-hero-image="{{ asset('img/hero/unko-sweater.png') }}"
+                        data-hero-title="Unko Sweater"
+                        data-hero-synopsis="Against a Himalayan winter, a hand-knit sweater weaves together love, longing, and the feeling of home."
+                        data-hero-details="true"
+                        data-hero-badges="false"
+                        data-hero-duration="1h 48m"
+                        data-hero-language="Nepali"
+                        data-hero-release-date="Nov 2, 2026"
+                        data-hero-book-url="{{ route('movies.show', $movie) }}#showtimes"
+                        data-hero-book-title="Gharjwai"
+                    >
+                        <span class="h-1 w-3 rounded-full bg-white/45 transition-all duration-300 group-hover:bg-white/75" data-hero-indicator></span>
+                    </button>
+                    <button
+                        type="button"
+                        class="group flex h-11 items-center"
+                        aria-label="Show Bha"
+                        aria-current="false"
+                        data-hero-page
+                        data-hero-image="{{ asset('img/hero/bha.png') }}"
+                        data-hero-title="Bha"
+                        data-hero-synopsis="A gripping Nepali drama of courage and destiny, where the past shapes every choice and every journey."
+                        data-hero-details="false"
+                        data-hero-badges="false"
+                    >
+                        <span class="h-1 w-3 rounded-full bg-white/45 transition-all duration-300 group-hover:bg-white/75" data-hero-indicator></span>
+                    </button>
+                </nav>
+            </div>
         </section>
     @endif
 
@@ -121,8 +137,8 @@
             method="GET"
             class="card grid items-center gap-3 p-4 sm:p-5 md:grid-cols-[2fr_1fr_1fr_1fr_auto]"
         >
-            <div class="relative flex h-11 min-h-11 items-center">
-                <x-icon name="search" :size="17" class="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-cg-red" />
+            <div class="flex h-11 min-h-11 items-center gap-3 rounded-lg border border-cg-border bg-white px-3.5 transition focus-within:border-cg-red focus-within:ring-2 focus-within:ring-cg-red/30">
+                <x-icon name="search" :size="17" class="shrink-0 text-cg-red" />
                 <label class="sr-only" for="home-search">{{ ui('search_movies', 'Search movies') }}</label>
                 <input
                     id="home-search"
@@ -130,7 +146,7 @@
                     name="q"
                     value="{{ request('q') }}"
                     placeholder="{{ ui('search_placeholder', 'Search movies') }}"
-                    class="input h-11 min-h-11 w-full py-2.5 pl-10"
+                    class="h-full min-h-0 w-full border-0 bg-transparent p-0 text-sm text-cg-white placeholder:text-cg-dim focus:border-transparent focus:outline-none focus:ring-0"
                 >
             </div>
 
