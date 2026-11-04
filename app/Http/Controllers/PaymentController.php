@@ -29,6 +29,7 @@ class PaymentController extends Controller
         return view('booking.payment', [
             'payment' => $payment,
             'booking' => $payment->booking,
+            'showtime' => $payment->booking->showtime,
             'providerLabel' => $payment->provider_label(),
         ]);
     }

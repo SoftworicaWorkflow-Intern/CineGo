@@ -43,7 +43,7 @@
                 {{ ui('about_p3', 'We started CineGo because booking a movie ticket in Nepal still meant standing in line — or juggling phone calls with the box office. Our team of developers and cinema fans set out to build the simplest possible booking experience: one clean website, one short flow, one digital ticket.') }}
             </p>
             <p>
-                {{ ui('about_p4', 'Today CineGo connects audiences with cinemas in Kathmandu, Pokhara, Chitwan and beyond, in English and Nepali, on any device. We are just getting started.') }}
+                {{ ui('about_p4', 'Today CineGo connects audiences with Kawasoti in English and Nepali, on any device. We are just getting started.') }}
             </p>
 
             <div class="flex flex-wrap gap-3 pt-2">
@@ -82,7 +82,7 @@
                 <h2 class="mb-3 font-semibold text-cg-white">{{ ui('contact_details', 'Contact details') }}</h2>
                 <p class="flex items-start gap-2 text-sm text-cg-muted">
                     <x-icon name="map-pin" :size="15" class="mt-0.5 shrink-0 text-cg-red" />
-                    Jamal, Kathmandu 44600, Nepal
+                    Kawasoti-3, Nepal
                 </p>
                 <p class="mt-2.5 flex items-center gap-2 text-sm text-cg-muted">
                     <x-icon name="phone" :size="15" class="shrink-0 text-cg-red" />

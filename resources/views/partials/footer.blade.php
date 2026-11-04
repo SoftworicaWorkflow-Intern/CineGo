@@ -56,7 +56,7 @@
             <ul class="space-y-3.5 text-sm text-cg-muted">
                 <li class="flex items-start gap-2.5">
                     <x-icon name="map-pin" :size="16" class="mt-0.5 text-cg-red" />
-                    <span>Jamal, Kathmandu 44600, Nepal</span>
+                    <span>Kawasoti-3, Nepal</span>
                 </li>
                 <li class="flex items-center gap-2.5">
                     <x-icon name="phone" :size="16" class="text-cg-red" />

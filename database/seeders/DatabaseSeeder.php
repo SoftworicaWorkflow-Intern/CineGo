@@ -248,10 +248,10 @@ class DatabaseSeeder extends Seeder
     {
         $movies = [
             [
-                'title' => 'Kathmandu Nights',
-                'title_np' => 'काठमाडौँ नाइट्स',
-                'synopsis' => 'A relentless crime reporter and a street-smart detective race through Kathmandu\'s neon alleys to expose a smuggling ring before the city wakes up.',
-                'synopsis_np' => 'संवाददाता र पुलिस अधिकारी काठमाडौँको नियोन गल्लीहरूमा शहर जाग्नुअघि तस्करी गिरोह पर्दाफास गर्न दौडिन्छन्।',
+                'title' => 'Kawasoti Nights',
+                'title_np' => 'कावासोती नाइट्स',
+                'synopsis' => 'A relentless crime reporter and a street-smart detective race through Kawasoti\'s neon alleys to expose a smuggling ring before the city wakes up.',
+                'synopsis_np' => 'संवाददाता र पुलिस अधिकारी कावासोतीका नियोन गल्लीहरूमा शहर जाग्नुअघि तस्करी गिरोह पर्दाफास गर्न दौडिन्छन्।',
                 'genres' => ['Thriller', 'Action'],
                 'duration_minutes' => 128,
                 'language' => 'Nepali',
@@ -657,8 +657,8 @@ class DatabaseSeeder extends Seeder
         ]);
 
         Announcement::create([
-            'message' => '🎬 Kathmandu Nights & Shikhar now playing at a screen near you',
-            'message_np' => '🎬 काठमाडौँ नाइट्स र शिखर तपाईंको नजिकैको स्क्रिनमा',
+            'message' => '🎬 Kawasoti Nights & Shikhar now playing at a screen near you',
+            'message_np' => '🎬 कावासोती नाइट्स र शिखर तपाईंको नजिकैको स्क्रिनमा',
             'link' => '/movies',
             'is_active' => true,
             'sort_order' => 2,
@@ -676,7 +676,7 @@ class DatabaseSeeder extends Seeder
     private function seedReviews(): void
     {
         $reviews = [
-            [0, 1, 5, 'Best thriller from Nepal this year', 'The night sequences in Kathmandu are shot like a dream. Kept me on the edge the whole time.'],
+            [0, 1, 5, 'Best thriller from Nepal this year', 'The night sequences in Kawasoti are shot like a dream. Kept me on the edge the whole time.'],
             [0, 2, 4, 'Great pacing', 'Second half drags a little but the climax more than makes up for it.'],
             [1, 2, 5, 'Quietly powerful', 'I did not expect a mountain film to make me cry. The soundtrack is unreal.'],
             [4, 1, 4, 'Genuinely funny', 'The blind comedian bit about traffic police had the whole hall laughing.'],

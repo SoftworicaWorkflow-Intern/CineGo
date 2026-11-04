@@ -36,7 +36,7 @@ class MovieFactory extends Factory
             'banner_url' => '/img/banners/banner-'.fake()->numberBetween(1, 4).'.svg',
             'trailer_url' => null,
             'director' => fake()->name(),
-            'cast' => fake()->names(3)->implode(', '),
+            'cast' => collect(range(1, 3))->map(fn () => fake()->name())->implode(', '),
             'is_now_showing' => true,
             'is_coming_soon' => false,
             'is_featured' => false,

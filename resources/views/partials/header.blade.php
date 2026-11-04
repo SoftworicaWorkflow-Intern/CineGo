@@ -1,7 +1,6 @@
 @php($navLinks = [
     ['route' => 'home', 'label' => ui('home', 'Home'), 'match' => 'home'],
     ['route' => 'movies.index', 'label' => ui('movies', 'Movies'), 'match' => 'movies.*'],
-    ['route' => 'cinemas.index', 'label' => ui('cinemas', 'Cinemas'), 'match' => 'cinemas.*'],
     ['route' => 'offers.index', 'label' => ui('offers', 'Offers'), 'match' => 'offers.*'],
     ['route' => 'pages.about', 'label' => ui('about', 'About Us'), 'match' => 'pages.about'],
     ['route' => 'pages.contact', 'label' => ui('contact', 'Contact'), 'match' => 'pages.contact'],
@@ -45,8 +44,8 @@
     <div class="container-page flex h-16 items-center justify-between gap-3 sm:h-[72px]">
         {{-- Logo --}}
         <a href="{{ route('home') }}" class="shrink-0" aria-label="CineGo home">
-            <x-logo :size="34" class="sm:hidden" />
-            <x-logo :size="38" class="hidden sm:inline-flex" />
+            <x-logo :size="24" class="sm:hidden" />
+            <x-logo :size="28" class="hidden sm:inline-flex" />
         </a>
 
         {{-- Desktop navigation --}}
@@ -61,28 +60,6 @@
 
         {{-- Right side --}}
         <div class="flex items-center gap-2 sm:gap-3">
-            {{-- City selector --}}
-            <form action="{{ route('city.set') }}" method="POST" data-autosubmit class="hidden md:block">
-                @csrf
-                <label class="sr-only" for="header-city">{{ ui('select_city', 'Select City') }}</label>
-                <div class="relative">
-                    <x-icon name="map-pin" :size="15" class="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-cg-red" />
-                    <select
-                        id="header-city"
-                        name="city_id"
-                        class="h-10 max-w-40 cursor-pointer appearance-none rounded-lg border border-cg-border bg-cg-charcoal/90 py-1 pl-8 pr-7 text-xs text-cg-white transition hover:border-cg-red focus:border-cg-red focus:outline-none sm:max-w-44"
-                    >
-                        <option value="">{{ ui('all_cities', 'All Cities') }}</option>
-                        @foreach ($cities as $city)
-                            <option value="{{ $city->id }}" @selected($currentCity?->id === $city->id)>
-                                {{ $city->display_name() }}
-                            </option>
-                        @endforeach
-                    </select>
-                    <x-icon name="chevron-down" :size="13" class="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-cg-dim" />
-                </div>
-            </form>
-
             {{-- Language selector --}}
             <form action="{{ route('locale.set') }}" method="POST" class="hidden sm:block">
                 @csrf
@@ -182,23 +159,6 @@
             @endforeach
 
             <div class="mt-3 flex flex-wrap items-center gap-3 border-t border-cg-border-soft pt-4">
-                <form action="{{ route('city.set') }}" method="POST" data-autosubmit class="flex-1">
-                    @csrf
-                    <label class="sr-only" for="mobile-city">{{ ui('select_city', 'Select City') }}</label>
-                    <select
-                        id="mobile-city"
-                        name="city_id"
-                        class="input h-11 min-h-11"
-                    >
-                        <option value="">{{ ui('all_cities', 'All Cities') }}</option>
-                        @foreach ($cities as $city)
-                            <option value="{{ $city->id }}" @selected($currentCity?->id === $city->id)>
-                                {{ $city->display_name() }}
-                            </option>
-                        @endforeach
-                    </select>
-                </form>
-
                 <form action="{{ route('locale.set') }}" method="POST">
                     @csrf
                     <div class="flex h-11 items-center rounded-lg border border-cg-border bg-cg-charcoal p-1 text-xs font-semibold">

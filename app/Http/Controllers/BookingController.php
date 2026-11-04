@@ -14,6 +14,7 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\Response;
 
 class BookingController extends Controller
@@ -247,7 +248,13 @@ class BookingController extends Controller
 
     private function holder(): string
     {
-        return session()->getId();
+        // A stable per-session token — the session id itself may regenerate
+        // (e.g. on login), which would orphan any seats held under it.
+        if (! session()->has('seat_holder')) {
+            session()->put('seat_holder', (string) Str::uuid());
+        }
+
+        return (string) session()->get('seat_holder');
     }
 
     /**

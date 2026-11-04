@@ -139,40 +139,20 @@
 
                     @foreach ($dateKeys as $index => $dateKey)
                         <div data-date-panel="{{ $dateKey }}" class="{{ $index === 0 ? '' : 'hidden' }}">
-                            <div class="space-y-4">
-                                @foreach ($groupedShowtimes[$dateKey]->groupBy(fn ($showtime) => $showtime->cinema_id) as $cinemaShowtimes)
-                                    @php($cinema = $cinemaShowtimes->first()->cinema)
-                                    <div class="card p-4 sm:p-5">
-                                        <div class="mb-3 flex flex-wrap items-center justify-between gap-2">
-                                            <div>
-                                                <h3 class="font-semibold text-cg-white">
-                                                    <a href="{{ route('cinemas.show', $cinema) }}" class="transition hover:text-cg-red">
-                                                        {{ $cinema->localised_name() }}
-                                                    </a>
-                                                </h3>
-                                                <p class="flex items-center gap-1.5 text-xs text-cg-muted">
-                                                    <x-icon name="map-pin" :size="13" class="text-cg-red" />
-                                                    {{ $cinema->localised_address() }}
-                                                </p>
-                                            </div>
-                                            <span class="badge-dark">{{ $cinema->city?->display_name() }}</span>
-                                        </div>
-
-                                        <div class="grid grid-cols-2 gap-2.5 sm:grid-cols-3 md:grid-cols-4">
-                                            @foreach ($cinemaShowtimes->sortBy('start_time') as $showtime)
-                                                <a
-                                                    href="{{ route('booking.seats', $showtime) }}"
-                                                    class="group flex flex-col items-center rounded-lg border border-cg-border bg-cg-charcoal px-3 py-2.5 transition hover:border-cg-red hover:bg-cg-red/10"
-                                                >
-                                                    <span class="text-sm font-bold text-cg-white">{{ $showtime->start_time_label() }}</span>
-                                                    <span class="mt-0.5 text-[11px] text-cg-dim">
-                                                        {{ $showtime->format }} · {{ $showtime->language }} · Rs. {{ number_format($showtime->price_normal) }}
-                                                    </span>
-                                                </a>
-                                            @endforeach
-                                        </div>
-                                    </div>
-                                @endforeach
+                            <div class="card p-4 sm:p-5">
+                                <div class="grid grid-cols-2 gap-2.5 sm:grid-cols-3 md:grid-cols-4">
+                                    @foreach ($groupedShowtimes[$dateKey]->sortBy('start_time') as $showtime)
+                                        <a
+                                            href="{{ route('booking.seats', $showtime) }}"
+                                            class="group flex flex-col items-center rounded-lg border border-cg-border bg-cg-charcoal px-3 py-2.5 transition hover:border-cg-red hover:bg-cg-red/10"
+                                        >
+                                            <span class="text-sm font-bold text-cg-white">{{ $showtime->start_time_label() }}</span>
+                                            <span class="mt-0.5 text-[11px] text-cg-dim">
+                                                {{ $showtime->format }} · {{ $showtime->language }} · Rs. {{ number_format($showtime->price_normal) }}
+                                            </span>
+                                        </a>
+                                    @endforeach
+                                </div>
                             </div>
                         </div>
                     @endforeach

@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>@hasSection('title')@yield('title') · CineGo@elseCineGo · Discover Movies. Book Your Seats.@endif</title>
+    <title>@hasSection('title') @yield('title') · CineGo @else CineGo · Discover Movies. Book Your Seats. @endif</title>
     <meta name="description" content="@yield('meta', 'CineGo — book movie tickets online across Nepal. Pick your cinema, choose your seats and get an instant QR ticket.')">
     <meta name="theme-color" content="#090909">
 

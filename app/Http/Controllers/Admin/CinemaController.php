@@ -12,11 +12,22 @@ use Illuminate\Support\Str;
 
 class CinemaController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
-        $cinemas = Cinema::query()->with('city')->withCount('halls')->orderBy('name')->get();
+        $term = $request->query('q');
 
-        return view('admin.cinemas.index', compact('cinemas'));
+        $cinemas = Cinema::query()
+            ->with('city')
+            ->withCount('halls')
+            ->when($term, fn ($query) => $query->where(function ($builder) use ($term) {
+                $builder->where('name', 'like', '%'.$term.'%')
+                    ->orWhere('address', 'like', '%'.$term.'%');
+            }))
+            ->orderBy('name')
+            ->paginate(15)
+            ->withQueryString();
+
+        return view('admin.cinemas.index', compact('cinemas', 'term'));
     }
 
     public function create(): View

@@ -248,7 +248,7 @@ return [
     'about_p1' => 'CineGo is a modern movie ticket booking platform built for Nepali cinema lovers. We make it simple to discover what is playing, find the nearest hall and lock in your favourite seats — all from your phone.',
     'about_p2' => 'Every branch, showtime and seat you see on CineGo comes straight from our cinema partners in real time. There are no printed queues and no guesswork: choose a movie, choose a showtime, choose your seats, pay with eSewa, Khalti or card, and your QR ticket is ready instantly.',
     'about_p3' => 'We started CineGo because booking a movie ticket in Nepal still meant standing in line — or juggling phone calls with the box office. Our team of developers and cinema fans set out to build the simplest possible booking experience: one clean website, one short flow, one digital ticket.',
-    'about_p4' => 'Today CineGo connects audiences with cinemas in Kathmandu, Pokhara, Chitwan and beyond, in English and Nepali, on any device. We are just getting started.',
+    'about_p4' => 'Today CineGo connects audiences with Kawasoti in English and Nepali, on any device. We are just getting started.',
     'about_stat1' => 'Cinema halls',
     'about_stat2' => 'Tickets booked',
     'about_stat3' => 'Cities across Nepal',

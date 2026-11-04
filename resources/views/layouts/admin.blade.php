@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>@hasSection('title')@yield('title') · CineGo Admin@elseCineGo Admin@endif</title>
+    <title>@hasSection('title')@yield('title') · CineGo Admin @else CineGo Admin @endif</title>
     <meta name="robots" content="noindex, nofollow">
     <meta name="theme-color" content="#090909">
 

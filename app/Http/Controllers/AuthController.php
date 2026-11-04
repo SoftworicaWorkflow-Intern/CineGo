@@ -47,7 +47,7 @@ class AuthController extends Controller
 
         $this->syncPreferences($request->user());
 
-        return intended(route('home'));
+        return redirect()->intended(route('home'));
     }
 
     /**

@@ -82,7 +82,7 @@
                         </span>
                         <span>
                             <span class="block text-sm font-medium text-cg-white">{{ ui('find_us', 'Find us') }}</span>
-                            <span class="text-xs text-cg-dim">Jamal, Kathmandu 44600, Nepal</span>
+                            <span class="text-xs text-cg-dim">Kawasoti-3, Nepal</span>
                         </span>
                     </div>
                 </div>

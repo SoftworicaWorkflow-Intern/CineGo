@@ -76,11 +76,13 @@
                 </div>
             </div>
 
-            <p class="mt-5 text-center text-sm text-cg-muted">
-                <a href="{{ route('booking.seats', $showtime) }}" class="font-medium text-cg-red hover:underline">
-                    ← {{ ui('back_to_seats', 'Back to seat selection') }}
-                </a>
-            </p>
+            @if ($showtime)
+                <p class="mt-5 text-center text-sm text-cg-muted">
+                    <a href="{{ route('booking.seats', $showtime) }}" class="font-medium text-cg-red hover:underline">
+                        ← {{ ui('back_to_seats', 'Back to seat selection') }}
+                    </a>
+                </p>
+            @endif
         </div>
     </div>
 

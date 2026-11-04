@@ -138,7 +138,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
 
     Route::resource('showtimes', AdminShowtimeController::class)->except(['show']);
     Route::resource('offers', AdminOfferController::class)->except(['show']);
-    Route::resource('announcements', AdminAnnouncementController::class)->except(['index', 'create', 'edit', 'show']);
+    Route::resource('announcements', AdminAnnouncementController::class)->except(['create', 'edit', 'show']);
 
     Route::get('/bookings', [AdminBookingController::class, 'index'])->name('bookings.index');
     Route::get('/bookings/{booking}', [AdminBookingController::class, 'show'])->name('bookings.show');
