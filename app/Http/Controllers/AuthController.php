@@ -47,7 +47,9 @@ class AuthController extends Controller
 
         $this->syncPreferences($request->user());
 
-        return redirect()->intended(route('home'));
+        return $request->user()->is_admin
+            ? redirect()->route('admin.dashboard')
+            : redirect()->intended(route('home'));
     }
 
     /**

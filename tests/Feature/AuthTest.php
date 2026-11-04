@@ -55,6 +55,18 @@ class AuthTest extends TestCase
         $this->assertGuest();
     }
 
+    public function test_admin_is_redirected_to_the_admin_dashboard_after_login(): void
+    {
+        $admin = User::factory()->create(['is_admin' => true]);
+
+        $this->post('/login', [
+            'email' => $admin->email,
+            'password' => 'password',
+        ])->assertRedirect(route('admin.dashboard'));
+
+        $this->assertAuthenticatedAs($admin);
+    }
+
     public function test_login_with_wrong_password_fails(): void
     {
         $user = User::factory()->create();

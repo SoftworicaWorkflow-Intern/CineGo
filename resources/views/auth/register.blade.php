@@ -31,7 +31,7 @@
                     <input id="register-phone" type="tel" name="phone" value="{{ old('phone') }}" class="input" autocomplete="tel" maxlength="20" placeholder="98XXXXXXXX">
                 </div>
 
-                <div>
+                <!-- <div>
                     <label class="label" for="register-city">{{ ui('select_city', 'Select City') }}</label>
                     <select id="register-city" name="city_id" class="input cursor-pointer">
                         <option value="">{{ ui('all_cities', 'All Cities') }}</option>
@@ -41,7 +41,7 @@
                             </option>
                         @endforeach
                     </select>
-                </div>
+                </div> -->
 
                 <div>
                     <label class="label" for="register-password">{{ ui('new_password', 'Password') }}</label>
