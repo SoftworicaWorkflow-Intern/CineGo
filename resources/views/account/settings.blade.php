@@ -72,17 +72,19 @@
                     @endforeach
                 </div>
 
-                <div>
-                    <label class="label" for="settings-city">{{ ui('select_city', 'Preferred city') }}</label>
-                    <select id="settings-city" name="city_id" class="input cursor-pointer">
-                        <option value="">{{ ui('all_cities', 'All Cities') }}</option>
-                        @foreach (\App\Models\City::active()->orderBy('name')->get() as $city)
-                            <option value="{{ $city->id }}" @selected((string) old('city_id', $user->city_id) === (string) $city->id)>
-                                {{ $city->display_name() }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
+                @unless ($user->is_admin)
+                    <div>
+                        <label class="label" for="settings-city">{{ ui('select_city', 'Preferred city') }}</label>
+                        <select id="settings-city" name="city_id" class="input cursor-pointer">
+                            <option value="">{{ ui('all_cities', 'All Cities') }}</option>
+                            @foreach (\App\Models\City::active()->orderBy('name')->get() as $city)
+                                <option value="{{ $city->id }}" @selected((string) old('city_id', $user->city_id) === (string) $city->id)>
+                                    {{ $city->display_name() }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                @endunless
 
                 <p class="flex items-start gap-2 text-xs text-cg-dim">
                     <x-icon name="info" :size="14" class="mt-0.5 shrink-0 text-cg-red" />
