@@ -1,9 +1,8 @@
 @php($navLinks = [
     ['route' => 'home', 'label' => ui('home', 'Home'), 'match' => 'home'],
     ['route' => 'movies.index', 'label' => ui('movies', 'Movies'), 'match' => 'movies.*'],
-    ['route' => 'offers.index', 'label' => ui('offers', 'Offers'), 'match' => 'offers.*'],
     ['route' => 'pages.about', 'label' => ui('about', 'About Us'), 'match' => 'pages.about'],
-    ['route' => 'pages.contact', 'label' => ui('contact', 'Contact'), 'match' => 'pages.contact'],
+    ['route' => 'pages.contact', 'label' => ui('contact_us', 'Contact Us'), 'match' => 'pages.contact'],
 ])
 
 {{-- Announcement bar --}}

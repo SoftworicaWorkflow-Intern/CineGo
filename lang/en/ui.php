@@ -77,6 +77,7 @@ return [
     'special_offers_sub' => 'Save more with our deals and promo codes.',
     'why_title' => 'Why Choose CineGo?',
     'why_sub' => 'Booking a ticket should take less than a minute.',
+    'why_description' => 'Everything you need for a smooth and enjoyable movie booking experience.',
     'announcements' => 'Announcements',
     'explore_movies' => 'Explore Movies',
     'search_placeholder' => 'Search movie',
@@ -88,17 +89,17 @@ return [
 
     // Why choose us
     'why_1_title' => 'Easy online booking',
-    'why_1_text' => 'A clear, guided flow — pick a movie, pick seats, done.',
+    'why_1_text' => 'Choose your movie and seats in a few simple steps.',
     'why_2_title' => 'Secure payment',
-    'why_2_text' => 'eSewa, Khalti and card payments verified on our server.',
+    'why_2_text' => 'Pay confidently with eSewa, Khalti or your card.',
     'why_3_title' => 'Instant digital tickets',
-    'why_3_text' => 'Your QR ticket appears immediately after confirmation.',
+    'why_3_text' => 'Get your QR ticket as soon as your booking is confirmed.',
     'why_4_title' => 'Convenient seat selection',
-    'why_4_text' => 'See exactly which seats are free before you pay.',
+    'why_4_text' => 'View available seats and choose the ones you prefer.',
     'why_5_title' => 'Multiple cinema branches',
-    'why_5_text' => 'CineGo halls across Nepal, filtered by your city.',
+    'why_5_text' => 'Find convenient CineGo locations across Nepal.',
     'why_6_title' => 'English & Nepali support',
-    'why_6_text' => 'Use the website in English or नेपाली, your choice.',
+    'why_6_text' => 'Book in the language you prefer: English or Nepali.',
 
     // Booking flow
     'step_select_cinema' => 'Select Cinema',
@@ -239,6 +240,7 @@ return [
     'crafted' => 'Crafted for Nepali cinema lovers.',
 
     // Contact / static pages
+    'contact_us' => 'Contact Us',
     'contact_title' => 'Contact us',
     'contact_sub' => 'Questions about a booking? We usually reply within a day.',
     'subject' => 'Subject',

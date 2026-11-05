@@ -22,10 +22,17 @@ class PublicPagesTest extends TestCase
             ->assertSee('href="'.asset('favicon.png').'"', false)
             ->assertSee('type="image/png" sizes="96x96"', false)
             ->assertSee(ui('footer_tagline', 'Your Movie. Your Moment. Your CineGo.'), false)
+            ->assertSee(ui('contact_us', 'Contact Us'), false)
+            ->assertSee('img/softworica.png', false)
+            ->assertSee('Designed &amp; developed by', false)
             ->assertSee(route('newsletter-subscriptions.store'), false)
             ->assertSee(ui('newsletter_title', 'Stay Updated with CineGo'), false)
             ->assertSee(route('movies.index', ['tab' => 'now_showing']), false)
             ->assertSee(route('movies.index', ['tab' => 'coming_soon']), false)
+            ->assertDontSee('href="'.route('offers.index').'"', false)
+            ->assertDontSee('How to Book Tickets')
+            ->assertDontSee('Payment Methods')
+            ->assertDontSee('Crafted for Nepali cinema lovers.')
             ->assertDontSee('href="/cinemas"', false)
             ->assertSee('Kawasoti-3, Nepal')
             ->assertSee('support@cinego.com.np');
@@ -44,68 +51,111 @@ class PublicPagesTest extends TestCase
 
         $this->get('/')
             ->assertOk()
-            ->assertSee('img/hero/ghar-jwai.png', false)
-            ->assertSee('img/hero/unko-sweater.png', false)
-            ->assertSee('img/hero/bha.png', false)
-            ->assertSee('Against a Himalayan winter, a hand-knit sweater weaves together love, longing, and the feeling of home.')
-            ->assertSee('A gripping Nepali drama of courage and destiny, where the past shapes every choice and every journey.')
-            ->assertSee('data-hero-duration="1h 48m"', false)
-            ->assertSee('data-hero-language="Nepali"', false)
-            ->assertSee('data-hero-release-date="Nov 2, 2026"', false)
-            ->assertSee('data-hero-book-title="Gharjwai"', false)
+            ->assertSee('img/hero/ghar-jwai-hd.jpg', false)
+            ->assertSee('img/hero/unko-sweater-hd.jpg', false)
+            ->assertSee('img/hero/bha-hd.jpg', false)
             ->assertSee('min-h-[100vh] min-h-[100svh]', false)
-            ->assertSee('bg-cover bg-center bg-no-repeat', false)
-            ->assertSee($movie->localised_title())
-            ->assertSee('Book Tickets')
-            ->assertSee('data-no-scroll-reveal', false)
+            ->assertSee('cg-home-hero-art cg-home-hero-art-active', false)
             ->assertSee('data-hero-pagination', false)
+            ->assertDontSee('data-hero-actions', false)
+            ->assertDontSee('data-hero-synopsis', false)
+            ->assertDontSee($movie->localised_synopsis())
+            ->assertSee('data-no-scroll-reveal', false)
             ->assertSee('data-hero-page', false)
             ->assertDontSee('data-slider', false)
             ->assertDontSee('data-hero-poster-slider', false);
     }
 
-    public function test_homepage_search_uses_a_short_movie_placeholder(): void
+    public function test_homepage_omits_the_movie_search_form(): void
     {
         $this->get('/')
             ->assertOk()
-            ->assertSee('placeholder="Search movie"', false)
-            ->assertDontSee('genre, language or cinema');
+            ->assertDontSee('id="home-search"', false)
+            ->assertDontSee('id="home-genre"', false)
+            ->assertDontSee('id="home-date"', false)
+            ->assertDontSee('id="home-time"', false);
     }
 
-    public function test_homepage_shows_a_trailer_action_for_each_movie(): void
+    public function test_homepage_shows_one_now_playing_movie_without_rating_or_trailer(): void
     {
-        $movieWithTrailer = Movie::factory()->create([
-            'title' => 'Movie with trailer',
-            'trailer_url' => 'https://www.youtube.com/embed/example',
+        $featuredMovie = Movie::factory()->nowShowing()->create([
+            'title' => 'Homepage Featured Film',
+            'slug' => 'homepage-featured-film',
+            'release_date' => '2026-10-10',
+            'rating' => 7.9,
+            'trailer_url' => 'https://www.youtube.com/embed/homepage-film',
             'is_featured' => false,
         ]);
-        $movieWithoutTrailer = Movie::factory()->create([
-            'title' => 'Movie without trailer',
-            'trailer_url' => null,
+        Movie::factory()->nowShowing()->create([
+            'title' => 'Extra Homepage Film',
+            'slug' => 'extra-homepage-film',
+            'release_date' => '2026-10-09',
             'is_featured' => false,
         ]);
 
         $response = $this->get('/');
 
         $response->assertOk()
-            ->assertSee('data-trailer="https://www.youtube.com/embed/example"', false)
-            ->assertSee('Watch Trailer')
-            ->assertSee('disabled', false)
-            ->assertSee($movieWithTrailer->title)
-            ->assertSee($movieWithoutTrailer->title);
+            ->assertSee($featuredMovie->title)
+            ->assertDontSee('Extra Homepage Film')
+            ->assertDontSee('data-trailer="https://www.youtube.com/embed/homepage-film"', false)
+            ->assertDontSee('Watch Trailer')
+            ->assertDontSee('7.9');
+    }
+
+    public function test_homepage_shows_all_six_features_in_english_and_nepali(): void
+    {
+        $this->get('/')
+            ->assertOk()
+            ->assertSee('Everything you need for a smooth and enjoyable movie booking experience.')
+            ->assertSee('Easy online booking')
+            ->assertSee('Secure payment')
+            ->assertSee('Instant digital tickets')
+            ->assertSee('Convenient seat selection')
+            ->assertSee('Multiple cinema branches')
+            ->assertSee('English & Nepali support')
+            ->assertSee('grid gap-4 sm:grid-cols-2 lg:grid-cols-3', false)
+            ->assertSee('rounded-[20px]', false);
+
+        $this->withSession(['locale' => 'np'])->get('/')
+            ->assertOk()
+            ->assertSee('चलचित्र टिकट बुकिङ सहज र रमाइलो बनाउन आवश्यक सबै कुरा।')
+            ->assertSee('सजिलो अनलाइन बुकिङ')
+            ->assertSee('सुरक्षित भुक्तानी')
+            ->assertSee('तुरुन्तै डिजिटल टिकट')
+            ->assertSee('सुविधाजनक सिट छनोट')
+            ->assertSee('धेरै सिनेमा शाखाहरू')
+            ->assertSee('अंग्रेजी र नेपाली सहयोग');
+    }
+
+    public function test_homepage_now_playing_omits_shikhar_and_maya_django(): void
+    {
+        Movie::factory()->nowShowing()->create([
+            'title' => 'Shikhar',
+            'slug' => 'shikhar',
+        ]);
+        Movie::factory()->nowShowing()->create([
+            'title' => 'Maya Django',
+            'slug' => 'maya-django',
+        ]);
+
+        $this->get('/')
+            ->assertOk()
+            ->assertDontSee('Shikhar')
+            ->assertDontSee('Maya Django');
     }
 
     public function test_movies_page_shows_booking_and_trailer_actions_for_coming_soon_movies(): void
     {
         $movie = Movie::factory()->comingSoon()->create([
             'title' => 'Coming Soon with Trailer',
-            'trailer_url' => 'https://www.youtube.com/embed/coming-soon',
+            'trailer_url' => 'https://www.youtube.com/watch?v=coming-soon',
         ]);
 
         $this->get(route('movies.index'))
             ->assertOk()
             ->assertSee('href="'.route('movies.show', $movie).'#showtimes"', false)
-            ->assertSee('data-trailer="https://www.youtube.com/embed/coming-soon"', false)
+            ->assertSee('data-trailer="https://www.youtube.com/watch?v=coming-soon"', false)
             ->assertSee('Book Tickets')
             ->assertSee('Watch Trailer');
     }
@@ -177,14 +227,14 @@ class PublicPagesTest extends TestCase
             ->assertDontSee('href="/cinemas"', false);
     }
 
-    public function test_about_page_shows_kawasoti_location(): void
+    public function test_about_page_shows_kawasoti_location_without_a_map(): void
     {
         $this->get('/about')
             ->assertOk()
             ->assertSee('Today CineGo connects audiences with Kawasoti in English and Nepali, on any device. We are just getting started.')
             ->assertSee('Kawasoti-3, Nepal')
-            ->assertSee('https://maps.google.com/maps?q=Kawasoti-3%2C%20Nepal', false)
-            ->assertSee('title="Map showing Kawasoti-3, Nepal"', false)
+            ->assertDontSee('https://maps.google.com/maps?q=Kawasoti-3%2C%20Nepal', false)
+            ->assertDontSee('title="Map showing Kawasoti-3, Nepal"', false)
             ->assertDontSee('Jamal, Kathmandu 44600, Nepal');
     }
 
@@ -208,6 +258,19 @@ class PublicPagesTest extends TestCase
         }
     }
 
+    public function test_contact_page_shows_google_map_below_the_contact_panels(): void
+    {
+        $response = $this->get('/contact')->assertOk();
+        $html = $response->getContent();
+        $quickLinksPosition = strpos($html, ui('quick_links', 'Quick links'));
+        $mapPosition = strpos($html, 'title="Map showing Kawasoti-3, Nepal"');
+
+        $this->assertNotFalse($quickLinksPosition);
+        $this->assertNotFalse($mapPosition);
+        $this->assertGreaterThan($quickLinksPosition, $mapPosition);
+        $response->assertSee('https://maps.google.com/maps?q=Kawasoti-3%2C%20Nepal&output=embed', false);
+    }
+
     public function test_movie_detail_page_renders(): void
     {
         $movie = Movie::factory()->create();
@@ -229,9 +292,13 @@ class PublicPagesTest extends TestCase
             ->assertOk()
             ->assertSee($movie->title)
             ->assertSee('4:00 PM')
+            ->assertSee('<summary data-showtime-option', false)
+            ->assertSee($cinema->localised_name())
+            ->assertSee($hall->name)
             ->assertSee(route('booking.seats', $showtime))
             ->assertSee('href="'.route('booking.seats', $showtime).'" class="btn-primary btn-block"', false)
-            ->assertDontSee($cinema->name)
+            ->assertDontSee('data-booking-link', false)
+            ->assertDontSee('>Dates</p>', false)
             ->assertDontSee('42 Hidden Street')
             ->assertDontSee('Hidden City');
     }
@@ -259,9 +326,11 @@ class PublicPagesTest extends TestCase
 
         $this->get(route('movies.show', $movie))
             ->assertOk()
-            ->assertSee('data-booking-link href="'.route('booking.seats', $firstShowtime).'"', false)
-            ->assertSee('data-booking-url="'.route('booking.seats', $firstShowtime).'"', false)
-            ->assertSee('data-booking-url="'.route('booking.seats', $secondShowtime).'"', false);
+            ->assertSee('<summary data-showtime-option', false)
+            ->assertSee('href="'.route('booking.seats', $firstShowtime).'" class="btn-primary btn-block"', false)
+            ->assertSee('href="'.route('booking.seats', $secondShowtime).'" class="btn-primary btn-block"', false)
+            ->assertDontSee('href="'.route('booking.seats', $firstShowtime).'" class="group flex', false)
+            ->assertDontSee('href="'.route('booking.seats', $secondShowtime).'" class="group flex', false);
     }
 
     public function test_movie_detail_does_not_link_to_showtimes_that_started_today(): void

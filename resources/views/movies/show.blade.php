@@ -4,7 +4,6 @@
 @section('meta', \Illuminate\Support\Str::limit(strip_tags($movie->localised_synopsis()), 155))
 
 @php($dateKeys = $groupedShowtimes->keys()->values())
-@php($firstShowtime = $groupedShowtimes->isEmpty() ? null : $groupedShowtimes->first()->sortBy('start_time')->first())
 
 @section('content')
     {{-- Backdrop --}}
@@ -140,21 +139,28 @@
                         @php($dayShowtimes = $groupedShowtimes[$dateKey]->sortBy('start_time'))
                         <div
                             data-date-panel="{{ $dateKey }}"
-                            data-booking-url="{{ route('booking.seats', $dayShowtimes->first()) }}"
                             class="{{ $index === 0 ? '' : 'hidden' }}"
                         >
                             <div class="card p-4 sm:p-5">
                                 <div class="grid grid-cols-2 gap-2.5 sm:grid-cols-3 md:grid-cols-4">
                                     @foreach ($dayShowtimes as $showtime)
-                                        <a
-                                            href="{{ route('booking.seats', $showtime) }}"
-                                            class="group flex flex-col items-center rounded-lg border border-cg-border bg-cg-charcoal px-3 py-2.5 transition hover:border-cg-red hover:bg-cg-red/10"
-                                        >
-                                            <span class="text-sm font-bold text-cg-white">{{ $showtime->start_time_label() }}</span>
-                                            <span class="mt-0.5 text-[11px] text-cg-dim">
-                                                {{ $showtime->format }} · {{ $showtime->language }} · Rs. {{ number_format($showtime->price_normal) }}
-                                            </span>
-                                        </a>
+                                        <details class="rounded-lg border border-cg-border bg-cg-charcoal transition hover:border-cg-red">
+                                            <summary data-showtime-option class="cursor-pointer px-3 py-2.5 text-center">
+                                                <span class="block text-sm font-bold text-cg-white">{{ $showtime->start_time_label() }}</span>
+                                                <span class="mt-0.5 block text-[11px] text-cg-dim">
+                                                    {{ $showtime->format }} · {{ $showtime->language }} · Rs. {{ number_format($showtime->price_normal) }}
+                                                </span>
+                                            </summary>
+                                            <div class="space-y-3 border-t border-cg-border px-3 py-3 text-center">
+                                                <div class="text-xs text-cg-muted">
+                                                    <p class="font-medium text-cg-white">{{ $showtime->cinema->localised_name() }} · {{ $showtime->hall->name }}</p>
+                                                    <p>{{ \Illuminate\Support\Carbon::parse($dateKey)->format('D, M j, Y') }} · {{ $showtime->start_time_label() }}</p>
+                                                </div>
+                                                <a href="{{ route('booking.seats', $showtime) }}" class="btn-primary btn-block">
+                                                    {{ ui('proceed_to_seats', 'Continue to seats') }}
+                                                </a>
+                                            </div>
+                                        </details>
                                     @endforeach
                                 </div>
                             </div>
@@ -270,31 +276,9 @@
                     </span>
                 </div>
 
-                @if ($dateKeys->isNotEmpty())
-                    <div class="rounded-lg border border-cg-border bg-cg-charcoal p-3 text-sm text-cg-muted">
-                        <p class="mb-1.5 text-xs uppercase tracking-wide text-cg-dim">{{ ui('dates', 'Dates') }}</p>
-                        <div class="flex flex-wrap gap-1.5">
-                            @foreach ($dateKeys as $dateKey)
-                                <button
-                                    type="button"
-                                    data-date-chip="{{ $dateKey }}"
-                                    aria-selected="{{ $index === 0 ? 'true' : 'false' }}"
-                                    class="rounded-md border border-cg-border px-2.5 py-1.5 text-xs text-cg-white transition hover:border-cg-red"
-                                >{{ \Illuminate\Support\Carbon::parse($dateKey)->format('M j') }}</button>
-                            @endforeach
-                        </div>
-                    </div>
-                @endif
-
-                @if ($firstShowtime)
-                    <a data-booking-link href="{{ route('booking.seats', $firstShowtime) }}" class="btn-primary btn-block">
-                        {{ ui('proceed_to_seats', 'Choose your seats') }}
-                    </a>
-                @else
-                    <button type="button" class="btn-primary btn-block cursor-not-allowed opacity-60" disabled>
-                        {{ ui('proceed_to_seats', 'Choose your seats') }}
-                    </button>
-                @endif
+                <a href="#showtimes" class="btn-primary btn-block">
+                    {{ ui('choose_showtime', 'Choose a showtime') }}
+                </a>
 
                 <p class="flex items-start gap-2 text-xs text-cg-dim">
                     <x-icon name="info" :size="14" class="mt-0.5 shrink-0 text-cg-red" />
@@ -326,7 +310,6 @@
         (function () {
             var chips = document.querySelectorAll('[data-date-chip]');
             var panels = document.querySelectorAll('[data-date-panel]');
-            var bookingLink = document.querySelector('[data-booking-link]');
             if (!chips.length) return;
 
             chips.forEach(function (chip) {
@@ -336,13 +319,6 @@
                     panels.forEach(function (panel) {
                         panel.classList.toggle('hidden', panel.getAttribute('data-date-panel') !== date);
                     });
-
-                    var activePanel = Array.from(panels).find(function (panel) {
-                        return panel.getAttribute('data-date-panel') === date;
-                    });
-                    if (bookingLink && activePanel) {
-                        bookingLink.href = activePanel.getAttribute('data-booking-url');
-                    }
 
                     chips.forEach(function (other) {
                         var active = other.getAttribute('data-date-chip') === date;

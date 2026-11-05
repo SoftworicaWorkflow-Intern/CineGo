@@ -94,24 +94,6 @@
                 </p>
             </div>
 
-            <div class="card overflow-hidden">
-                <iframe
-                    src="https://maps.google.com/maps?q=Kawasoti-3%2C%20Nepal&output=embed"
-                    title="Map showing Kawasoti-3, Nepal"
-                    class="h-64 w-full border-0"
-                    loading="lazy"
-                    referrerpolicy="no-referrer-when-downgrade"
-                    allowfullscreen
-                ></iframe>
-                <a
-                    href="https://www.google.com/maps/search/?api=1&query=Kawasoti-3%2C%20Nepal"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="flex items-center justify-center gap-2 border-t border-cg-border-soft px-4 py-3 text-sm font-semibold text-cg-red transition hover:bg-cg-red/5"
-                >
-                    <x-icon name="map-pin" :size="16" /> {{ ui('directions', 'Get directions') }}
-                </a>
-            </div>
         </aside>
     </div>
 @endsection

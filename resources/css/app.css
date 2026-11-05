@@ -272,9 +272,9 @@
 .cg-home-hero-art {
     position: absolute;
     inset: 0;
-    background-position: right 6% center;
+    background-position: center;
     background-repeat: no-repeat;
-    background-size: auto 92%;
+    background-size: cover;
     opacity: 0;
     transition: opacity 700ms ease-in-out;
 }
@@ -283,10 +283,9 @@
     opacity: 1;
 }
 
-@media (max-width: 1023px) {
+@media (prefers-reduced-motion: reduce) {
     .cg-home-hero-art {
-        background-position: center 18%;
-        background-size: cover;
+        transition: none;
     }
 }
 

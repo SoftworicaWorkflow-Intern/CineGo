@@ -152,7 +152,7 @@ function initHeroPagination() {
         const releaseDate = hero.querySelector('[data-hero-release-date]');
         const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-        if (pages.length < 2 || artLayers.length < 2 || !title) return;
+        if (pages.length < 2 || artLayers.length < 2) return;
 
         const interval = 7000;
         let activeArtIndex = artLayers.findIndex((layer) => layer.classList.contains('cg-home-hero-art-active'));
@@ -195,8 +195,8 @@ function initHeroPagination() {
                 currentArt.classList.remove('cg-home-hero-art-active');
                 activeArtIndex = nextArtIndex;
 
-                hero.setAttribute('aria-label', `Featured movie: ${page.dataset.heroTitle}`);
-                title.textContent = page.dataset.heroTitle;
+                hero.setAttribute('aria-label', `Featured movie: ${page.dataset.heroLabel}`);
+                if (title) title.textContent = page.dataset.heroTitle;
 
                 if (synopsis) {
                     synopsis.textContent = pageSynopsis;
@@ -275,9 +275,46 @@ function initTrailers() {
 
     document.querySelectorAll('[data-trailer]').forEach((trigger) => {
         trigger.addEventListener('click', () => {
-            const url = trigger.dataset.trailer;
-            if (!url || !frame) return;
-            frame.src = `${url}${url.includes('?') ? '&' : '?'}autoplay=1`;
+            const trailerUrl = trigger.dataset.trailer;
+            if (!trailerUrl || !frame) return;
+
+            let url;
+            try {
+                url = new URL(trailerUrl);
+            } catch (error) {
+                console.error('Unable to open invalid trailer URL:', trailerUrl, error);
+                return;
+            }
+
+            const hostname = url.hostname.toLowerCase().replace(/^www\./, '');
+            const isYouTube = hostname === 'youtu.be' || hostname.endsWith('youtube.com') || hostname.endsWith('youtube-nocookie.com');
+            const isVimeo = hostname === 'vimeo.com' || hostname === 'player.vimeo.com';
+
+            if (isYouTube) {
+                const videoId = hostname === 'youtu.be'
+                    ? url.pathname.split('/').filter(Boolean)[0]
+                    : url.searchParams.get('v') ?? url.pathname.match(/^\/(?:embed|shorts|live)\/([^/]+)/)?.[1];
+
+                if (!videoId || !/^[\w-]+$/.test(videoId)) {
+                    console.error('Unable to open trailer without a valid YouTube video ID:', trailerUrl);
+                    return;
+                }
+
+                url = new URL(`https://www.youtube.com/embed/${encodeURIComponent(videoId)}`);
+                url.searchParams.set('origin', window.location.origin);
+            } else if (isVimeo) {
+                const videoId = url.pathname.match(/\/(?:video\/)?(\d+)/)?.[1];
+
+                if (!videoId) {
+                    console.error('Unable to open trailer without a valid Vimeo video ID:', trailerUrl);
+                    return;
+                }
+
+                url = new URL(`https://player.vimeo.com/video/${videoId}`);
+            }
+
+            url.searchParams.set('autoplay', '1');
+            frame.src = url.toString();
             modal.classList.remove('hidden');
         });
     });

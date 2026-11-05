@@ -31,6 +31,9 @@ class HomeControllerTest extends TestCase
 
         $response->assertOk()
             ->assertSee('नेपाली शीर्षक')
-            ->assertSee('नेपाली कथासार');
+            ->assertDontSee('English title')
+            ->assertSee('सजिलो अनलाइन बुकिङ')
+            ->assertSee('चलचित्र टिकट बुकिङ सहज र रमाइलो बनाउन आवश्यक सबै कुरा।')
+            ->assertDontSee('नेपाली कथासार');
     }
 }

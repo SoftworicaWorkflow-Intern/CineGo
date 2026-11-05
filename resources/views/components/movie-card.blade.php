@@ -1,4 +1,4 @@
-@props(['movie', 'showBook' => true])
+@props(['movie', 'showBook' => true, 'showTrailer' => true, 'showRating' => true])
 
 @php
     $detailRoute = route('movies.show', $movie);
@@ -19,7 +19,7 @@
             @if ($movie->certificate)
                 <span class="badge-dark">{{ $movie->certificate }}</span>
             @endif
-            @if ($movie->rating)
+            @if ($showRating && $movie->rating)
                 <span class="badge-dark">
                     <x-icon name="star" :size="12" class="cg-star" />
                     {{ number_format($movie->rating, 1) }}
@@ -62,13 +62,15 @@
                     {{ ui('book_tickets', 'Book Tickets') }}
                 </a>
             @endif
-            <button
-                type="button"
-                @if ($movie->trailer_url) data-trailer="{{ $movie->trailer_url }}" @else disabled @endif
-                class="{{ $showBook ? 'btn-outline flex-1' : 'btn-outline w-full' }} justify-center px-3 py-2 text-xs"
-            >
-                <x-icon name="play" :size="13" /> {{ ui('watch_trailer', 'Watch Trailer') }}
-            </button>
+            @if ($showTrailer)
+                <button
+                    type="button"
+                    @if ($movie->trailer_url) data-trailer="{{ $movie->trailer_url }}" @else disabled @endif
+                    class="{{ $showBook ? 'btn-outline flex-1' : 'btn-outline w-full' }} justify-center px-3 py-2 text-xs"
+                >
+                    <x-icon name="play" :size="13" /> {{ ui('watch_trailer', 'Watch Trailer') }}
+                </button>
+            @endif
         </div>
     </div>
 </article>
