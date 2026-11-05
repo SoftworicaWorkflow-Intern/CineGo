@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends(auth()->user()->is_admin ? 'layouts.admin' : 'layouts.app')
 
 @section('title', ui('dashboard', 'Dashboard'))
 
