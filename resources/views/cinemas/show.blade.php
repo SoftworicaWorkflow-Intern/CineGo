@@ -119,7 +119,7 @@
                                                     >
                                                         <span class="text-sm font-bold text-cg-white">{{ $showtime->start_time_label() }}</span>
                                                         <span class="text-[11px] text-cg-dim">
-                                                            {{ $showtime->hall->name }} · {{ $showtime->format }} · Rs. {{ number_format($showtime->price_normal) }}
+                                                            {{ $showtime->format }} · Rs. {{ number_format($showtime->price_normal) }}
                                                         </span>
                                                     </a>
                                                 @endforeach

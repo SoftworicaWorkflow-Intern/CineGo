@@ -47,7 +47,7 @@
                             <h2 class="mt-1 font-display text-3xl leading-tight tracking-wide text-cg-white">
                                 {{ $booking->movie_title }}
                             </h2>
-                            <p class="mt-1 text-sm text-cg-muted">{{ $booking->cinema_name }} · {{ $booking->hall_name }} · {{ $booking->format }}</p>
+                            <p class="mt-1 text-sm text-cg-muted">{{ $booking->format }}</p>
                         </div>
 
                         <div class="flex flex-col items-end gap-2">

@@ -144,7 +144,6 @@
                                             </summary>
                                             <div class="space-y-3 border-t border-cg-border px-3 py-3 text-center">
                                                 <div class="text-xs text-cg-muted">
-                                                    <p class="font-medium text-cg-white">{{ $showtime->cinema->localised_name() }} · {{ $showtime->hall->name }}</p>
                                                     <p>{{ \Illuminate\Support\Carbon::parse($dateKey)->format('D, M j, Y') }} · {{ $showtime->start_time_label() }}</p>
                                                 </div>
                                                 <a href="{{ route('booking.seats', $showtime) }}" class="btn-primary btn-block">

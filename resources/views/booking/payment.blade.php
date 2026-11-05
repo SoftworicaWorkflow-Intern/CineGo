@@ -36,10 +36,6 @@
                             <dd class="text-right font-medium text-cg-white">{{ $booking->movie_title }}</dd>
                         </div>
                         <div class="flex justify-between gap-3">
-                            <dt class="text-cg-muted">{{ ui('cinemas', 'Cinema') }}</dt>
-                            <dd class="text-right font-medium text-cg-white">{{ $booking->cinema_name }} · {{ $booking->hall_name }}</dd>
-                        </div>
-                        <div class="flex justify-between gap-3">
                             <dt class="text-cg-muted">{{ ui('dates', 'Date & time') }}</dt>
                             <dd class="text-right font-medium text-cg-white">
                                 {{ $booking->show_date->format('D, M j, Y') }} · {{ \Illuminate\Support\Str::of($booking->start_time)->substr(0, 5) }}

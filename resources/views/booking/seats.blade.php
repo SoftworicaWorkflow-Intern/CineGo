@@ -24,7 +24,6 @@
                             {{ $showtime->movie->localised_title() }}
                         </a>
                         <p class="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-cg-muted sm:text-sm">
-                            <span class="inline-flex items-center gap-1.5"><x-icon name="armchair" :size="14" class="text-cg-red" />{{ $showtime->cinema->localised_name() }} · {{ $showtime->hall->name }}</span>
                             <span class="inline-flex items-center gap-1.5"><x-icon name="calendar" :size="14" class="text-cg-red" />{{ $showtime->show_date->format('D, M j, Y') }}</span>
                             <span class="inline-flex items-center gap-1.5"><x-icon name="clock" :size="14" class="text-cg-red" />{{ $showtime->start_time_label() }}</span>
                             <span class="badge-dark">{{ $showtime->format }}</span>

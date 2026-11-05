@@ -146,12 +146,8 @@
 
                     <dl class="space-y-2 text-sm">
                         <div class="flex justify-between gap-3">
-                            <dt class="text-cg-muted">{{ ui('cinemas', 'Cinema') }}</dt>
-                            <dd class="text-right font-medium text-cg-white">{{ $showtime->cinema->localised_name() }}</dd>
-                        </div>
-                        <div class="flex justify-between gap-3">
-                            <dt class="text-cg-muted">{{ ui('screens', 'Screen') }}</dt>
-                            <dd class="text-right font-medium text-cg-white">{{ $showtime->hall->name }} · {{ $showtime->format }}</dd>
+                            <dt class="text-cg-muted">{{ ui('format', 'Format') }}</dt>
+                            <dd class="text-right font-medium text-cg-white">{{ $showtime->format }}</dd>
                         </div>
                         <div class="flex justify-between gap-3">
                             <dt class="text-cg-muted">{{ ui('dates', 'Date') }}</dt>

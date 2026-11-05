@@ -160,20 +160,14 @@ class PublicPagesTest extends TestCase
             ->assertSee('Watch Trailer');
     }
 
-    public function test_movies_page_shows_only_movie_genre_date_and_showtime_filters(): void
+    public function test_movies_page_has_no_filter_bar(): void
     {
         $this->get(route('movies.index'))
             ->assertOk()
-            ->assertSee('placeholder="Search movies"', false)
-            ->assertSee('name="genre"', false)
-            ->assertSee('type="date" name="show_date"', false)
-            ->assertSee('type="time" name="show_time"', false)
-            ->assertSee('lg:grid-cols-[minmax(0,2fr)_minmax(0,1.2fr)_minmax(0,1.2fr)_minmax(0,1.2fr)_auto_auto]', false)
-            ->assertSee('class="btn-primary h-12 whitespace-nowrap px-5"', false)
-            ->assertDontSee('name="language"', false)
-            ->assertDontSee('name="year"', false)
-            ->assertDontSee('name="cinema"', false)
-            ->assertDontSee('name="sort"', false);
+            ->assertDontSee('placeholder="Search movies"', false)
+            ->assertDontSee('name="genre"', false)
+            ->assertDontSee('type="date" name="show_date"', false)
+            ->assertDontSee('type="time" name="show_time"', false);
     }
 
     public function test_movie_filters_match_genre_date_and_showtime(): void
@@ -293,8 +287,8 @@ class PublicPagesTest extends TestCase
             ->assertSee($movie->title)
             ->assertSee('4:00 PM')
             ->assertSee('<summary data-showtime-option', false)
-            ->assertSee($cinema->localised_name())
-            ->assertSee($hall->name)
+            ->assertDontSee($cinema->localised_name())
+            ->assertDontSee($hall->name)
             ->assertSee(route('booking.seats', $showtime))
             ->assertSee('href="'.route('booking.seats', $showtime).'" class="btn-primary btn-block"', false)
             ->assertDontSee('data-booking-link', false)
