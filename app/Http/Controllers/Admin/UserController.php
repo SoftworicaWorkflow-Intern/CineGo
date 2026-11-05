@@ -17,6 +17,7 @@ class UserController extends Controller
         $term = $request->query('q');
 
         $users = User::query()
+            ->where('is_admin', false)
             ->withCount('bookings')
             ->when($term, function ($query) use ($term) {
                 $query->where(function ($builder) use ($term) {
