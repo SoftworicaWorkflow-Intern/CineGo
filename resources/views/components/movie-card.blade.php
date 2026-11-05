@@ -1,4 +1,4 @@
-@props(['movie', 'showBook' => true, 'showTrailer' => true, 'showRating' => true])
+@props(['movie', 'showBook' => true, 'showTrailer' => true])
 
 @php
     $detailRoute = route('movies.show', $movie);
@@ -18,12 +18,6 @@
         <div class="absolute inset-x-0 top-0 flex items-start justify-between p-3">
             @if ($movie->certificate)
                 <span class="badge-dark">{{ $movie->certificate }}</span>
-            @endif
-            @if ($showRating && $movie->rating)
-                <span class="badge-dark">
-                    <x-icon name="star" :size="12" class="cg-star" />
-                    {{ number_format($movie->rating, 1) }}
-                </span>
             @endif
             @if ($movie->is_featured && $movie->is_now_showing)
                 <span class="badge-red absolute left-3 top-3">{{ ui('now_showing', 'Now Showing') }}</span>

@@ -64,9 +64,9 @@
                 :subtitle="ui('now_showing_sub', 'Book your favourite movies playing this week.')"
             />
 
-            <div class="grid max-w-xs grid-cols-1 gap-4 sm:max-w-sm">
+            <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6 lg:gap-5">
                 @foreach ($nowShowing as $movie)
-                    <x-movie-card :movie="$movie" :show-trailer="false" :show-rating="false" />
+                    <x-movie-card :movie="$movie" :show-trailer="false" />
                 @endforeach
             </div>
         </section>
@@ -84,7 +84,7 @@
 
             <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6 lg:gap-5">
                 @foreach ($comingSoon as $movie)
-                    <x-movie-card :movie="$movie" :show-book="false" :show-rating="false" />
+                    <x-movie-card :movie="$movie" :show-book="false" />
                 @endforeach
             </div>
         </section>

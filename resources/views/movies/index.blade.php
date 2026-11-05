@@ -8,7 +8,6 @@
         'now_showing' => ui('now_showing', 'Now Showing'),
         'coming_soon' => ui('coming_soon', 'Coming Soon'),
         'popular' => ui('popular', 'Popular'),
-        'top_rated' => ui('top_rated', 'Top Rated'),
     ];
 
     $currentQuery = request()->query();
