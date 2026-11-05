@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends(auth()->user()->is_admin ? 'layouts.admin' : 'layouts.app')
 
 @section('title', ui('account_settings', 'Account settings'))
 
@@ -27,7 +27,7 @@
                     <label class="label" for="current-password">{{ ui('current_password', 'Current password') }}</label>
                     <div class="relative">
                         <input id="current-password" type="password" name="current_password" class="input pr-11" required autocomplete="current-password">
-                        <button type="button" data-password-toggle="current-password" class="absolute inset-y-0 right-0 flex w-11 items-center justify-center text-cg-dim hover:text-cg-white" aria-label="{{ ui('show_password', 'Show password') }}"><x-icon name="eye" :size="17" /></button>
+                        <button type="button" data-password-toggle="current-password" class="absolute inset-y-0 right-0 flex w-11 items-center justify-center text-cg-dim hover:text-cg-white" aria-label="{{ ui('show_password', 'Show password') }}"><x-icon name="eye-off" :size="17" /></button>
                     </div>
                 </div>
 
@@ -35,7 +35,7 @@
                     <label class="label" for="new-password">{{ ui('new_password', 'New password') }}</label>
                     <div class="relative">
                         <input id="new-password" type="password" name="password" class="input pr-11" required autocomplete="new-password">
-                        <button type="button" data-password-toggle="new-password" class="absolute inset-y-0 right-0 flex w-11 items-center justify-center text-cg-dim hover:text-cg-white" aria-label="{{ ui('show_password', 'Show password') }}"><x-icon name="eye" :size="17" /></button>
+                        <button type="button" data-password-toggle="new-password" class="absolute inset-y-0 right-0 flex w-11 items-center justify-center text-cg-dim hover:text-cg-white" aria-label="{{ ui('show_password', 'Show password') }}"><x-icon name="eye-off" :size="17" /></button>
                     </div>
                     <p class="mt-1.5 text-xs text-cg-dim">{{ ui('password_hint', 'At least 8 characters.') }}</p>
                 </div>
@@ -44,7 +44,7 @@
                     <label class="label" for="confirm-password">{{ ui('confirm_password', 'Confirm password') }}</label>
                     <div class="relative">
                         <input id="confirm-password" type="password" name="password_confirmation" class="input pr-11" required autocomplete="new-password">
-                        <button type="button" data-password-toggle="confirm-password" class="absolute inset-y-0 right-0 flex w-11 items-center justify-center text-cg-dim hover:text-cg-white" aria-label="{{ ui('show_password', 'Show password') }}"><x-icon name="eye" :size="17" /></button>
+                        <button type="button" data-password-toggle="confirm-password" class="absolute inset-y-0 right-0 flex w-11 items-center justify-center text-cg-dim hover:text-cg-white" aria-label="{{ ui('show_password', 'Show password') }}"><x-icon name="eye-off" :size="17" /></button>
                     </div>
                 </div>
 

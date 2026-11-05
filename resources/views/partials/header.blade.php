@@ -43,7 +43,9 @@
     <div class="container-page flex h-16 items-center justify-between gap-3 sm:h-[72px]">
         {{-- Logo --}}
         <a href="{{ route('home') }}" class="shrink-0" aria-label="CineGo home">
-            <x-logo :size="24" class="sm:hidden" />
+            <span class="flex h-8 w-8 items-center justify-center overflow-hidden sm:hidden">
+                <x-logo :size="24" class="max-w-none" />
+            </span>
             <x-logo :size="28" class="hidden sm:inline-flex" />
         </a>
 
@@ -74,26 +76,9 @@
                     </button>
 
                     <div id="account-menu" data-dropdown-menu class="cg-dropdown hidden">
-                        <a href="{{ route('account.dashboard') }}" class="cg-dropdown-item flex items-center gap-2.5">
-                            <x-icon name="dashboard" :size="16" /> {{ ui('dashboard', 'Dashboard') }}
-                        </a>
-                        <a href="{{ route('account.bookings') }}" class="cg-dropdown-item flex items-center gap-2.5">
-                            <x-icon name="ticket" :size="16" /> {{ ui('my_bookings', 'My Bookings') }}
-                        </a>
-                        <a href="{{ route('account.favorites') }}" class="cg-dropdown-item flex items-center gap-2.5">
-                            <x-icon name="heart" :size="16" /> {{ ui('favorite_movies', 'Favourite movies') }}
-                        </a>
                         <a href="{{ route('account.notifications') }}" class="cg-dropdown-item flex items-center gap-2.5">
                             <x-icon name="bell" :size="16" /> {{ ui('notifications', 'Notifications') }}
                         </a>
-                        <a href="{{ route('account.settings') }}" class="cg-dropdown-item flex items-center gap-2.5">
-                            <x-icon name="settings" :size="16" /> {{ ui('account_settings', 'Account settings') }}
-                        </a>
-                        @if (auth()->user()->is_admin)
-                            <a href="{{ route('admin.dashboard') }}" class="cg-dropdown-item flex items-center gap-2.5 border-t border-cg-border text-cg-red">
-                                <x-icon name="zap" :size="16" /> {{ ui('admin_panel', 'Admin panel') }}
-                            </a>
-                        @endif
                         <form action="{{ route('logout') }}" method="POST">
                             @csrf
                             <button type="submit" class="cg-dropdown-item flex w-full items-center gap-2.5 border-t border-cg-border">

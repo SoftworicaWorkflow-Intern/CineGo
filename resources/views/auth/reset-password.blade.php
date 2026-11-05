@@ -27,7 +27,7 @@
                     <label class="label" for="reset-password">{{ ui('new_password', 'New password') }}</label>
                     <div class="relative">
                         <input id="reset-password" type="password" name="password" class="input pr-11" autocomplete="new-password" required>
-                        <button type="button" data-password-toggle="reset-password" class="absolute inset-y-0 right-0 flex w-11 items-center justify-center text-cg-dim hover:text-cg-white" aria-label="{{ ui('show_password', 'Show password') }}"><x-icon name="eye" :size="17" /></button>
+                        <button type="button" data-password-toggle="reset-password" class="absolute inset-y-0 right-0 flex w-11 items-center justify-center text-cg-dim hover:text-cg-white" aria-label="{{ ui('show_password', 'Show password') }}"><x-icon name="eye-off" :size="17" /></button>
                     </div>
                     <p class="mt-1.5 text-xs text-cg-dim">{{ ui('password_hint', 'At least 8 characters.') }}</p>
                 </div>
@@ -36,7 +36,7 @@
                     <label class="label" for="reset-password-confirmation">{{ ui('confirm_password', 'Confirm password') }}</label>
                     <div class="relative">
                         <input id="reset-password-confirmation" type="password" name="password_confirmation" class="input pr-11" autocomplete="new-password" required>
-                        <button type="button" data-password-toggle="reset-password-confirmation" class="absolute inset-y-0 right-0 flex w-11 items-center justify-center text-cg-dim hover:text-cg-white" aria-label="{{ ui('show_password', 'Show password') }}"><x-icon name="eye" :size="17" /></button>
+                        <button type="button" data-password-toggle="reset-password-confirmation" class="absolute inset-y-0 right-0 flex w-11 items-center justify-center text-cg-dim hover:text-cg-white" aria-label="{{ ui('show_password', 'Show password') }}"><x-icon name="eye-off" :size="17" /></button>
                     </div>
                 </div>
 

@@ -24,13 +24,13 @@
             @endforeach
         </div>
 
-        <form action="{{ route('admin.bookings.index') }}" method="GET" class="flex gap-2">
+        <form action="{{ route('admin.bookings.index') }}" method="GET" class="flex items-center gap-2">
             @if ($status)<input type="hidden" name="status" value="{{ $status }}">@endif
-            <div class="relative">
+            <div class="relative flex h-11 min-h-11 items-center">
                 <x-icon name="search" :size="16" class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-cg-red" />
-                <input type="search" name="q" value="{{ $term }}" placeholder="{{ ui('search_booking_hint', 'Code, name, phone, movie…') }}" class="input h-11 min-h-11 pl-9 sm:w-64">
+                <input type="search" name="q" value="{{ $term }}" placeholder="{{ ui('search_booking_hint', 'Code, name, phone, movie…') }}" class="input h-11 min-h-0 pl-9 sm:w-64">
             </div>
-            <button type="submit" class="btn-outline px-4">{{ ui('search', 'Search') }}</button>
+            <button type="submit" class="btn-outline h-11 min-h-11 px-4">{{ ui('search', 'Search') }}</button>
         </form>
     </div>
 

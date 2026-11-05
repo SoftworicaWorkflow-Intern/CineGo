@@ -37,11 +37,9 @@
                 @php
                     $adminLinks = [
                         ['route' => 'admin.dashboard', 'label' => ui('dashboard', 'Dashboard'), 'icon' => 'dashboard', 'match' => 'admin.dashboard'],
-                        ['route' => 'admin.upcoming.index', 'label' => ui('upcoming', 'Upcoming'), 'icon' => 'calendar', 'match' => 'admin.upcoming.*'],
                         ['route' => 'admin.showtimes.index', 'label' => ui('showtimes_for', 'Showtime'), 'icon' => 'clock', 'match' => 'admin.showtimes.*'],
                         ['route' => 'admin.bookings.index', 'label' => ui('bookings', 'Bookings'), 'icon' => 'ticket', 'match' => 'admin.bookings.*'],
                         ['route' => 'admin.movies.index', 'label' => ui('movies', 'Movies'), 'icon' => 'film', 'match' => 'admin.movies.*'],
-                        ['route' => 'admin.offers.index', 'label' => ui('offers', 'Offers'), 'icon' => 'tag', 'match' => 'admin.offers.*'],
                         ['route' => 'admin.announcements.index', 'label' => ui('announcements', 'Announcements'), 'icon' => 'bell', 'match' => 'admin.announcements.*'],
                         ['route' => 'admin.messages.index', 'label' => ui('contact', 'Messages'), 'icon' => 'mail', 'match' => 'admin.messages.*'],
                         ['route' => 'admin.users.index', 'label' => ui('customers', 'Customers'), 'icon' => 'users', 'match' => 'admin.users.*'],

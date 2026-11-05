@@ -18,13 +18,17 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="flex min-h-screen flex-col">
-    @include('partials.header')
+    @unless (request()->routeIs('login', 'register'))
+        @include('partials.header')
+    @endunless
 
     <main id="main-content" class="flex-1" @if (request()->routeIs('booking.seats')) data-no-scroll-reveal @endif>
         @yield('content')
     </main>
 
-    @include('partials.footer')
+    @unless (request()->routeIs('login', 'register'))
+        @include('partials.footer')
+    @endunless
     @include('partials.flash')
     @include('partials.trailer-modal')
 

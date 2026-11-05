@@ -12,12 +12,12 @@
         </a>
     </div>
 
-    <form action="{{ route('admin.upcoming.index') }}" method="GET" class="mb-5 flex gap-2">
-        <div class="relative">
+    <form action="{{ route('admin.upcoming.index') }}" method="GET" class="mb-5 flex items-center gap-2">
+        <div class="relative flex h-11 min-h-11 items-center">
             <x-icon name="search" :size="16" class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-cg-red" />
-            <input type="search" name="q" value="{{ $term }}" placeholder="{{ ui('search', 'Search') }}…" class="input h-11 min-h-11 pl-9 sm:w-72">
+            <input type="search" name="q" value="{{ $term }}" placeholder="{{ ui('search', 'Search') }}…" class="input h-11 min-h-0 pl-9 sm:w-72">
         </div>
-        <button type="submit" class="btn-outline px-4">{{ ui('search', 'Search') }}</button>
+        <button type="submit" class="btn-outline h-11 min-h-11 px-4">{{ ui('search', 'Search') }}</button>
     </form>
 
     <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
