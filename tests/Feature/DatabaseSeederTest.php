@@ -3,9 +3,11 @@
 namespace Tests\Feature;
 
 use App\Models\Cinema;
+use App\Models\City;
 use App\Models\Movie;
 use App\Models\Showtime;
 use App\Models\User;
+use Database\Seeders\DatabaseSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
@@ -36,6 +38,32 @@ class DatabaseSeederTest extends TestCase
             'email' => 'admin@cinego.com.np',
             'is_admin' => true,
         ]);
+    }
+
+    public function test_seeding_preserves_an_existing_city_without_creating_a_duplicate(): void
+    {
+        $city = City::query()->create([
+            'name' => 'Existing Kathmandu',
+            'name_np' => 'काठमाडौं',
+            'slug' => 'kathmandu',
+            'is_active' => true,
+            'sort_order' => 10,
+        ]);
+
+        $this->seed();
+
+        $this->assertDatabaseCount('cities', 7);
+        $this->assertSame('Existing Kathmandu', $city->fresh()->name);
+    }
+
+    public function test_seeding_skips_demo_records_in_production(): void
+    {
+        $this->app['env'] = 'production';
+
+        $this->app->make(DatabaseSeeder::class)->run();
+
+        $this->assertDatabaseCount('users', 0);
+        $this->assertDatabaseCount('cities', 0);
     }
 
     public function test_seeding_includes_kawasoti_demo_showtimes(): void

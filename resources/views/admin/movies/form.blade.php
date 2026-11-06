@@ -55,6 +55,10 @@
 
                 <div class="grid gap-4 sm:grid-cols-2">
                     <div>
+                        <label class="label" for="release_date">{{ ui('release_date', 'Release date') }} *</label>
+                        <input id="release_date" type="date" name="release_date" value="{{ old('release_date', $movie->release_date?->toDateString() ?? today()->toDateString()) }}" class="input" required>
+                    </div>
+                    <div>
                         <label class="label" for="certificate">{{ ui('certificate', 'Certificate') }}</label>
                         <input id="certificate" type="text" name="certificate" value="{{ old('certificate', $movie->certificate) }}" class="input" maxlength="10" placeholder="UA / A / G">
                     </div>

@@ -43,6 +43,12 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        if (app()->isProduction()) {
+            $this->command?->warn('DatabaseSeeder contains demo data and was skipped in production.');
+
+            return;
+        }
+
         $this->seedUsers();
         $this->seedCities();
         $this->seedCinemas();
@@ -106,7 +112,10 @@ class DatabaseSeeder extends Seeder
         ];
 
         foreach ($cities as $city) {
-            City::create($city + ['slug' => Str::slug($city['name']), 'is_active' => true]);
+            City::query()->firstOrCreate(
+                ['slug' => Str::slug($city['name'])],
+                $city + ['is_active' => true],
+            );
         }
     }
 

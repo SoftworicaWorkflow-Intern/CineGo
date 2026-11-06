@@ -23,7 +23,7 @@
             <div class="pointer-events-none absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-black/80 to-transparent" aria-hidden="true"></div>
 
             <div class="container-page relative z-[1] flex min-h-[min(760px,100svh)] items-center py-16 sm:py-20">
-                <div class="flex max-w-4xl items-center gap-5 sm:gap-8" data-hero-content>
+                <div class="flex max-w-4xl items-center gap-5 sm:gap-8 lg:-translate-x-8" data-hero-content>
                     <img
                         src="{{ $heroMovie->poster_url }}"
                         alt="{{ $heroMovie->localised_title() }}"
