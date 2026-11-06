@@ -2,10 +2,6 @@
 
 @section('title', $showtime->exists ? ui('edit_showtime', 'Edit showtime') : ui('add_showtime', 'Add showtime'))
 
-@php
-    $selectedHallId = (string) old('hall_id', $showtime->hall_id);
-@endphp
-
 @section('content')
     <div class="mb-5">
         <a href="{{ route('admin.showtimes.index') }}" class="btn-ghost px-3 py-2 text-sm">
@@ -33,23 +29,6 @@
                             <option value="{{ $movie->id }}" @selected((string) old('movie_id', $showtime->movie_id) === (string) $movie->id)>
                                 {{ $movie->localised_title() }}
                             </option>
-                        @endforeach
-                    </select>
-                </div>
-
-                <div>
-                    <label class="label" for="hall_id">{{ ui('screens', 'Screen') }} *</label>
-                    <select id="hall_id" name="hall_id" class="input cursor-pointer" required>
-                        <option value="">{{ ui('choose_screen', 'Choose a screen…') }}</option>
-                        @foreach ($cinemas as $cinema)
-                            @foreach ($cinema->halls as $hall)
-                                <option
-                                    value="{{ $hall->id }}"
-                                    @selected($selectedHallId === (string) $hall->id)
-                                >
-                                    {{ $cinema->localised_name() }} · {{ $hall->name }}
-                                </option>
-                            @endforeach
                         @endforeach
                     </select>
                 </div>

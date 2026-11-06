@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Hall;
 use App\Models\Movie;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -42,11 +43,14 @@ class AdminAccessTest extends TestCase
         $this->actingAs($admin)->get('/admin/cinemas')->assertNotFound();
         $this->actingAs($admin)->get('/admin/announcements')->assertNotFound();
         $showtimes = $this->actingAs($admin)->get('/admin/showtimes');
-        $showtimes->assertOk()->assertDontSee('All cinemas');
+        $showtimes->assertOk()
+            ->assertDontSee('All cinemas')
+            ->assertDontSee('Screen');
         $showtimeForm = $this->actingAs($admin)->get('/admin/showtimes/create');
         $showtimeForm
             ->assertOk()
             ->assertDontSee('Choose a cinema')
+            ->assertDontSee('Choose a screen')
             ->assertSee('id="start_time"', false)
             ->assertSee('step="60"', false);
         $this->actingAs($admin)->get('/admin/bookings')->assertOk();
@@ -93,5 +97,32 @@ class AdminAccessTest extends TestCase
         $posterUrl = Movie::query()->where('title', 'Uploaded Poster Movie')->value('poster_url');
 
         Storage::disk('public')->assertExists(Str::after($posterUrl, '/storage/'));
+    }
+
+    public function test_admin_showtime_uses_the_first_active_hall_without_a_screen_field(): void
+    {
+        $admin = User::factory()->create(['is_admin' => true]);
+        $movie = Movie::factory()->create();
+        $hall = Hall::factory()->create();
+
+        $response = $this->actingAs($admin)->post(route('admin.showtimes.store'), [
+            'movie_id' => $movie->id,
+            'show_date' => now()->addDay()->toDateString(),
+            'start_time' => '19:00',
+            'format' => '2D',
+            'language' => $movie->language,
+            'price_normal' => 450,
+            'price_premium' => 650,
+            'price_recliner' => 850,
+            'is_active' => true,
+        ]);
+
+        $response->assertRedirect(route('admin.showtimes.index'));
+        $this->assertDatabaseHas('showtimes', [
+            'movie_id' => $movie->id,
+            'hall_id' => $hall->id,
+            'cinema_id' => $hall->cinema_id,
+            'start_time' => '19:00:00',
+        ]);
     }
 }

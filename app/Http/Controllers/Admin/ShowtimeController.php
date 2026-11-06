@@ -3,20 +3,20 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Cinema;
 use App\Models\Hall;
 use App\Models\Movie;
 use App\Models\Showtime;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 
 class ShowtimeController extends Controller
 {
     public function index(Request $request): View
     {
         $showtimes = Showtime::query()
-            ->with(['movie', 'hall'])
+            ->with('movie')
             ->upcoming()
             ->latest('show_date')
             ->paginate(20)
@@ -30,7 +30,6 @@ class ShowtimeController extends Controller
         return view('admin.showtimes.form', [
             'showtime' => new Showtime,
             'movies' => Movie::active()->orderBy('title')->get(),
-            'cinemas' => Cinema::active()->with('halls')->orderBy('name')->get(),
         ]);
     }
 
@@ -47,13 +46,12 @@ class ShowtimeController extends Controller
         return view('admin.showtimes.form', [
             'showtime' => $showtime,
             'movies' => Movie::active()->orderBy('title')->get(),
-            'cinemas' => Cinema::active()->with('halls')->orderBy('name')->get(),
         ]);
     }
 
     public function update(Request $request, Showtime $showtime): RedirectResponse
     {
-        $showtime->update($this->validated($request, $showtime->id));
+        $showtime->update($this->validated($request, $showtime));
 
         return redirect()->route('admin.showtimes.index')
             ->with('success', ui('admin_showtime_updated', 'Showtime updated.'));
@@ -70,11 +68,10 @@ class ShowtimeController extends Controller
     /**
      * @return array<string, mixed>
      */
-    private function validated(Request $request, ?int $ignoreId = null): array
+    private function validated(Request $request, ?Showtime $showtime = null): array
     {
         $validated = $request->validate([
             'movie_id' => 'required|integer|exists:movies,id',
-            'hall_id' => 'required|integer|exists:halls,id',
             'show_date' => 'required|date|after_or_equal:today',
             'start_time' => 'required|date_format:H:i',
             'format' => 'required|in:2D,3D,IMAX,4DX',
@@ -85,23 +82,34 @@ class ShowtimeController extends Controller
             'is_active' => 'nullable|boolean',
         ], [
             'movie_id.required' => ui('validation_movie', 'Please choose a movie.'),
-            'hall_id.required' => ui('validation_hall', 'Please choose a screen.'),
             'show_date.after_or_equal' => ui('validation_future_date', 'The show date cannot be in the past.'),
             'price_normal.required' => ui('validation_price', 'Please enter the ticket price.'),
         ]);
 
-        $hall = Hall::findOrFail($validated['hall_id']);
+        $hall = $showtime?->hall;
+
+        if ($hall === null) {
+            $hall = Hall::query()->active()->orderBy('id')->first();
+        }
+
+        if ($hall === null) {
+            throw ValidationException::withMessages([
+                'movie_id' => ui('validation_hall', 'No active screen is available for this showtime.'),
+            ]);
+        }
+
+        $validated['hall_id'] = $hall->id;
         $validated['cinema_id'] = $hall->cinema_id;
 
         $duplicate = Showtime::query()
             ->where('hall_id', $validated['hall_id'])
             ->where('show_date', $validated['show_date'])
             ->where('start_time', $validated['start_time'].':00')
-            ->when($ignoreId, fn ($query) => $query->whereKeyNot($ignoreId))
+            ->when($showtime, fn ($query) => $query->whereKeyNot($showtime->id))
             ->exists();
 
         if ($duplicate) {
-            abort(back()->withErrors(['start_time' => ui('validation_duplicate_show', 'That screen already has a show at this time.')]));
+            abort(back()->withErrors(['start_time' => ui('validation_duplicate_show', 'That hall already has a show at this time.')]));
         }
 
         $validated['start_time'] = $validated['start_time'].':00';

@@ -4,12 +4,12 @@
 
 @section('content')
     <div class="mb-5 flex flex-wrap items-center justify-between gap-3">
-        <form action="{{ route('admin.movies.index') }}" method="GET" class="flex w-full items-center justify-center gap-2 sm:w-auto">
-            <div class="relative h-9 min-w-0 flex-1 sm:w-56 sm:flex-none">
-                <x-icon name="search" :size="14" class="pointer-events-none absolute left-2.5 top-1/2 z-10 -translate-y-1/2 text-cg-red" />
-                <input type="search" name="q" value="{{ $term }}" placeholder="{{ ui('search', 'Search') }}…" class="input h-9 !min-h-9 min-w-0 py-2 pl-8 text-xs">
+        <form action="{{ route('admin.movies.index') }}" method="GET" class="flex w-full flex-col items-stretch justify-center gap-3 sm:w-auto sm:flex-row sm:items-center">
+            <div class="relative h-12 min-w-0 w-full sm:w-56 sm:flex-none">
+                <x-icon name="search" :size="16" class="pointer-events-none absolute left-3 top-1/2 z-10 -translate-y-1/2 text-cg-red" />
+                <input type="search" name="q" value="{{ $term }}" placeholder="{{ ui('search', 'Search') }}…" class="input h-12 !min-h-12 min-w-0 py-3 pl-11 text-sm">
             </div>
-            <button type="submit" class="btn-outline h-9 min-h-9 px-3 text-xs">{{ ui('search', 'Search') }}</button>
+            <button type="submit" class="btn-outline h-12 min-h-12 w-full whitespace-nowrap px-4 text-sm sm:w-auto">{{ ui('search', 'Search') }}</button>
         </form>
 
         <a href="{{ route('admin.movies.create') }}" class="btn-primary">

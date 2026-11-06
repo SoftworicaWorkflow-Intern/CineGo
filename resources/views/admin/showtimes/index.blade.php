@@ -10,13 +10,12 @@
     </div>
 
     <div class="card overflow-x-auto overflow-y-hidden">
-        <table class="w-full min-w-[760px] text-sm">
+        <table class="w-full min-w-[680px] text-sm">
             <thead>
                 <tr class="border-b border-cg-border-soft text-left text-xs uppercase tracking-wide text-cg-dim">
                     <th class="px-5 py-4 font-bold text-black">{{ ui('date', 'Date') }}</th>
                     <th class="px-5 py-4 font-bold text-black">{{ ui('times', 'Time') }}</th>
                     <th class="px-5 py-4 font-bold text-black">{{ ui('movies', 'Movie') }}</th>
-                    <th class="px-5 py-4 font-bold text-black">{{ ui('screens', 'Screen') }}</th>
                     <th class="px-5 py-4 font-bold text-black">{{ ui('format', 'Format') }}</th>
                     <th class="px-5 py-4 font-bold text-black">{{ ui('prices', 'Prices') }}</th>
                     <th class="px-5 py-4 text-right font-bold text-black">{{ ui('actions', 'Actions') }}</th>
@@ -33,7 +32,6 @@
                         </td>
                         <td class="px-5 py-4 font-mono text-cg-white">{{ $showtime->start_time_label() }}</td>
                         <td class="px-5 py-4 text-cg-muted">{{ $showtime->movie?->localised_title() }}</td>
-                        <td class="px-5 py-4 text-cg-muted">{{ $showtime->hall?->name }}</td>
                         <td class="px-5 py-4"><span class="badge-dark">{{ $showtime->format }}</span></td>
                         <td class="px-5 py-4 text-xs text-cg-dim">
                             N {{ number_format($showtime->price_normal) }} ·
@@ -58,7 +56,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="7" class="px-5 py-10 text-center text-cg-muted">
+                        <td colspan="6" class="px-5 py-10 text-center text-cg-muted">
                             {{ ui('no_showtimes', 'No showtimes scheduled.') }}
                             <a href="{{ route('admin.showtimes.create') }}" class="font-semibold text-cg-red hover:underline">
                                 {{ ui('add_showtime', 'Add showtime') }}
