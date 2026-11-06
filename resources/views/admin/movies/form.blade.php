@@ -5,7 +5,7 @@
 @php
     $allGenres = ['Action', 'Comedy', 'Drama', 'Romance', 'Horror', 'Thriller', 'Animation', 'Adventure', 'Family', 'Sci-Fi', 'Fantasy', 'Mystery', 'Biography', 'Documentary', 'Musical', 'War', 'History', 'Sport'];
     $selectedGenres = old('genres', $movie->genres ?? []);
-    $languages = ['Nepali', 'Hindi', 'English', 'Korean', 'Chinese'];
+    $languages = ['Hindi', 'English', 'Korean', 'Chinese'];
 @endphp
 
 @section('content')
@@ -32,15 +32,9 @@
             <section class="card space-y-4 p-5 sm:p-6">
                 <h2 class="font-semibold text-cg-white">{{ ui('basics', 'Basics') }}</h2>
 
-                <div class="grid gap-4 sm:grid-cols-2">
-                    <div>
-                        <label class="label" for="title">{{ ui('title', 'Title') }} *</label>
-                        <input id="title" type="text" name="title" value="{{ old('title', $movie->title) }}" class="input" required maxlength="160">
-                    </div>
-                    <div>
-                        <label class="label" for="title_np">{{ ui('title_np', 'Title (नेपाली)') }}</label>
-                        <input id="title_np" type="text" name="title_np" value="{{ old('title_np', $movie->title_np) }}" class="input" maxlength="160">
-                    </div>
+                <div>
+                    <label class="label" for="title">{{ ui('title', 'Title') }} *</label>
+                    <input id="title" type="text" name="title" value="{{ old('title', $movie->title) }}" class="input" required maxlength="160">
                 </div>
 
                 <div class="grid gap-4 sm:grid-cols-3">
@@ -62,18 +56,10 @@
                     </div>
                 </div>
 
-                <div class="grid gap-4 sm:grid-cols-3">
+                <div class="grid gap-4 sm:grid-cols-2">
                     <div>
                         <label class="label" for="certificate">{{ ui('certificate', 'Certificate') }}</label>
                         <input id="certificate" type="text" name="certificate" value="{{ old('certificate', $movie->certificate) }}" class="input" maxlength="10" placeholder="UA / A / G">
-                    </div>
-                    <div>
-                        <label class="label" for="rating">{{ ui('rating', 'Rating') }} /10</label>
-                        <input id="rating" type="number" name="rating" step="0.1" min="0" max="10" value="{{ old('rating', $movie->rating) }}" class="input" placeholder="7.8">
-                    </div>
-                    <div>
-                        <label class="label" for="sort_order">{{ ui('sort_order', 'Sort order') }}</label>
-                        <input id="sort_order" type="number" name="sort_order" value="{{ old('sort_order', $movie->sort_order ?? 0) }}" class="input">
                     </div>
                 </div>
             </section>
@@ -98,10 +84,6 @@
                 <div>
                     <label class="label" for="synopsis">English</label>
                     <textarea id="synopsis" name="synopsis" rows="5" class="input resize-y" required maxlength="4000">{{ old('synopsis', $movie->synopsis) }}</textarea>
-                </div>
-                <div>
-                    <label class="label" for="synopsis_np">नेपाली</label>
-                    <textarea id="synopsis_np" name="synopsis_np" rows="5" class="input resize-y" maxlength="4000">{{ old('synopsis_np', $movie->synopsis_np) }}</textarea>
                 </div>
             </section>
 
@@ -133,31 +115,9 @@
                 </div>
 
                 <div>
-                    <label class="label" for="banner_url">{{ ui('banner', 'Banner path') }}</label>
-                    <input id="banner_url" type="text" name="banner_url" value="{{ old('banner_url', $movie->banner_url) }}" class="input" maxlength="300" placeholder="/img/banners/banner-1.svg">
-                </div>
-
-                <div>
                     <label class="label" for="trailer_url">{{ ui('trailer', 'Trailer embed URL') }}</label>
                     <input id="trailer_url" type="text" name="trailer_url" value="{{ old('trailer_url', $movie->trailer_url) }}" class="input" maxlength="300" placeholder="https://www.youtube.com/embed/…">
                 </div>
-            </section>
-
-            <section class="card space-y-3 p-5">
-                <h2 class="font-semibold text-cg-white">{{ ui('visibility', 'Visibility') }}</h2>
-
-                @foreach ([
-                    'is_now_showing' => ui('now_showing', 'Now Showing'),
-                    'is_coming_soon' => ui('coming_soon', 'Coming Soon'),
-                    'is_featured' => ui('featured_hero', 'Featured in hero slider'),
-                    'is_active' => ui('active', 'Active (visible on site)'),
-                ] as $field => $label)
-                    <label class="flex cursor-pointer items-center gap-3 rounded-lg border border-cg-border bg-cg-charcoal px-3.5 py-3 transition hover:border-cg-red">
-                        <input type="checkbox" name="{{ $field }}" value="1" class="h-4 w-4 rounded border-cg-border bg-cg-charcoal accent-cg-red"
-                            @checked(old($field, $movie->{$field} ?? ($field === 'is_active' || $field === 'is_now_showing')))>
-                        <span class="text-sm text-cg-white">{{ $label }}</span>
-                    </label>
-                @endforeach
             </section>
 
             <button type="submit" class="btn-primary btn-lg btn-block">

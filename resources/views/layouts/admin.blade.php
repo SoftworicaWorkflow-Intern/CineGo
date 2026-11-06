@@ -33,13 +33,13 @@
                 </button>
             </div>
 
-            <nav class="flex flex-col gap-1 p-3" aria-label="Admin">
+            <nav class="flex flex-col gap-1 p-3 pb-20" aria-label="Admin">
                 @php
                     $adminLinks = [
                         ['route' => 'admin.dashboard', 'label' => ui('dashboard', 'Dashboard'), 'icon' => 'dashboard', 'match' => 'admin.dashboard'],
+                        ['route' => 'admin.movies.index', 'label' => ui('movies', 'Movies'), 'icon' => 'film', 'match' => 'admin.movies.*'],
                         ['route' => 'admin.showtimes.index', 'label' => ui('showtimes_for', 'Showtime'), 'icon' => 'clock', 'match' => 'admin.showtimes.*'],
                         ['route' => 'admin.bookings.index', 'label' => ui('bookings', 'Bookings'), 'icon' => 'ticket', 'match' => 'admin.bookings.*'],
-                        ['route' => 'admin.movies.index', 'label' => ui('movies', 'Movies'), 'icon' => 'film', 'match' => 'admin.movies.*'],
                         ['route' => 'admin.announcements.index', 'label' => ui('announcements', 'Announcements'), 'icon' => 'bell', 'match' => 'admin.announcements.*'],
                         ['route' => 'admin.messages.index', 'label' => ui('contact', 'Messages'), 'icon' => 'mail', 'match' => 'admin.messages.*'],
                         ['route' => 'admin.users.index', 'label' => ui('customers', 'Customers'), 'icon' => 'users', 'match' => 'admin.users.*'],
@@ -60,10 +60,7 @@
                 @endforeach
             </nav>
 
-            <div class="mt-4 border-t border-cg-border-soft p-3">
-                <a href="{{ route('home') }}" data-sidebar-link class="flex items-center gap-3 rounded-lg px-3.5 py-2.5 text-sm font-medium text-cg-muted transition hover:bg-cg-charcoal hover:text-cg-white">
-                    <x-icon name="eye" :size="17" /> <span data-sidebar-label>{{ ui('view_site', 'View site') }}</span>
-                </a>
+            <div class="absolute bottom-0 left-0 w-full border-t border-cg-border-soft bg-cg-black p-3">
                 <form action="{{ route('logout') }}" method="POST" data-admin-logout>
                     @csrf
                     <button type="submit" data-sidebar-link class="flex w-full items-center gap-3 rounded-lg px-3.5 py-2.5 text-sm font-medium text-cg-muted transition hover:bg-cg-charcoal hover:text-cg-white">

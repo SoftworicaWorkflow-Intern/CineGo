@@ -23,14 +23,20 @@ class AdminAccessTest extends TestCase
         $this->actingAs($customer)->get('/admin/movies')->assertForbidden();
     }
 
-    public function test_admin_can_access_the_dashboard_and_crud_pages(): void
+    public function test_admin_can_access_the_dashboard_and_crud_pages_except_cinemas(): void
     {
         $admin = User::factory()->create(['is_admin' => true]);
 
-        $this->actingAs($admin)->get('/admin')->assertOk();
+        $dashboard = $this->actingAs($admin)->get('/admin');
+        $dashboard->assertOk()->assertDontSee('Cinemas');
+
         $this->actingAs($admin)->get('/admin/movies')->assertOk();
-        $this->actingAs($admin)->get('/admin/cinemas')->assertOk();
-        $this->actingAs($admin)->get('/admin/showtimes')->assertOk();
+        $this->actingAs($admin)->get('/admin/cinemas')->assertNotFound();
+        $showtimes = $this->actingAs($admin)->get('/admin/showtimes');
+        $showtimes->assertOk()->assertDontSee('All cinemas');
+        $this->actingAs($admin)->get('/admin/showtimes/create')
+            ->assertOk()
+            ->assertDontSee('Choose a cinema');
         $this->actingAs($admin)->get('/admin/bookings')->assertOk();
     }
 }

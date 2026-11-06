@@ -48,7 +48,6 @@ class AnnouncementController extends Controller
     {
         $validated = $request->validate([
             'message' => 'required|string|max:200',
-            'message_np' => 'nullable|string|max:200',
             'link' => 'nullable|string|max:300',
             'sort_order' => 'nullable|integer',
             'is_active' => 'nullable|boolean',

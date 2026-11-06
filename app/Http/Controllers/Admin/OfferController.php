@@ -58,9 +58,7 @@ class OfferController extends Controller
     {
         $validated = $request->validate([
             'title' => 'required|string|max:120',
-            'title_np' => 'nullable|string|max:120',
             'description' => 'required|string|max:1000',
-            'description_np' => 'nullable|string|max:1000',
             'code' => 'nullable|string|max:40|unique:offers,code'.($ignoreId ? ','.$ignoreId : ''),
             'badge' => 'nullable|string|max:30',
             'discount_type' => 'required|in:percentage,fixed',

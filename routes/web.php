@@ -3,16 +3,14 @@
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\Admin\AnnouncementController as AdminAnnouncementController;
 use App\Http\Controllers\Admin\BookingController as AdminBookingController;
-use App\Http\Controllers\Admin\CinemaController as AdminCinemaController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
-use App\Http\Controllers\Admin\HallController as AdminHallController;
 use App\Http\Controllers\Admin\MessageController as AdminMessageController;
 use App\Http\Controllers\Admin\MovieController as AdminMovieController;
 use App\Http\Controllers\Admin\OfferController as AdminOfferController;
-use App\Http\Controllers\Admin\ShowtimeController as AdminShowtimeController;
-use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\SettingsController as AdminSettingsController;
+use App\Http\Controllers\Admin\ShowtimeController as AdminShowtimeController;
 use App\Http\Controllers\Admin\UpcomingController as AdminUpcomingController;
+use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\HomeController;
@@ -137,12 +135,6 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::get('/settings', [AdminSettingsController::class, 'index'])->name('settings.index');
 
     Route::resource('movies', AdminMovieController::class)->except(['show']);
-    Route::resource('cinemas', AdminCinemaController::class)->except(['show']);
-
-    Route::post('/halls', [AdminHallController::class, 'store'])->name('halls.store');
-    Route::put('/halls/{hall}', [AdminHallController::class, 'update'])->name('halls.update');
-    Route::delete('/halls/{hall}', [AdminHallController::class, 'destroy'])->name('halls.destroy');
-
     Route::resource('showtimes', AdminShowtimeController::class)->except(['show']);
     Route::resource('offers', AdminOfferController::class)->except(['show']);
     Route::resource('announcements', AdminAnnouncementController::class)->except(['create', 'edit', 'show']);

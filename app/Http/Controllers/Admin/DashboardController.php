@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Booking;
-use App\Models\Cinema;
 use App\Models\ContactMessage;
 use App\Models\Movie;
 use App\Models\Payment;
@@ -29,7 +28,6 @@ class DashboardController extends Controller
 
         $stats = [
             'movies' => Movie::query()->active()->count(),
-            'cinemas' => Cinema::query()->active()->count(),
             'showtimes_today' => Showtime::query()->active()->whereDate('show_date', today())->count(),
             'bookings_today' => $todayBookings,
             'bookings_total' => Booking::query()->count(),

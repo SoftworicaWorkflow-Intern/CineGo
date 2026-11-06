@@ -20,26 +20,14 @@
         <section class="card space-y-4 p-5 sm:p-6">
             <h2 class="font-semibold text-cg-white">{{ ui('offer_details', 'Offer details') }}</h2>
 
-            <div class="grid gap-4 sm:grid-cols-2">
-                <div>
-                    <label class="label" for="title">{{ ui('title', 'Title') }} *</label>
-                    <input id="title" type="text" name="title" value="{{ old('title', $offer->title) }}" class="input" required maxlength="120">
-                </div>
-                <div>
-                    <label class="label" for="title_np">{{ ui('title_np', 'Title (नेपाली)') }}</label>
-                    <input id="title_np" type="text" name="title_np" value="{{ old('title_np', $offer->title_np) }}" class="input" maxlength="120">
-                </div>
+            <div>
+                <label class="label" for="title">{{ ui('title', 'Title') }} *</label>
+                <input id="title" type="text" name="title" value="{{ old('title', $offer->title) }}" class="input" required maxlength="120">
             </div>
 
-            <div class="grid gap-4 sm:grid-cols-2">
-                <div>
-                    <label class="label" for="description">{{ ui('description', 'Description') }} *</label>
-                    <textarea id="description" name="description" rows="3" class="input resize-y" required maxlength="1000">{{ old('description', $offer->description) }}</textarea>
-                </div>
-                <div>
-                    <label class="label" for="description_np">{{ ui('description_np', 'Description (नेपाली)') }}</label>
-                    <textarea id="description_np" name="description_np" rows="3" class="input resize-y" maxlength="1000">{{ old('description_np', $offer->description_np) }}</textarea>
-                </div>
+            <div>
+                <label class="label" for="description">{{ ui('description', 'Description') }} *</label>
+                <textarea id="description" name="description" rows="3" class="input resize-y" required maxlength="1000">{{ old('description', $offer->description) }}</textarea>
             </div>
 
             <div class="grid gap-4 sm:grid-cols-3">

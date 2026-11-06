@@ -76,7 +76,7 @@
     "src": "_noto-sans-devanagari-700-normal-DcW8oEIt.woff2"
   },
   "resources/css/app.css": {
-    "file": "assets/app-BSkiwxcS.css",
+    "file": "assets/app-BEIGEklI.css",
     "name": "app",
     "names": [
       "app.css"
@@ -91,7 +91,7 @@
     "isEntry": true
   },
   "resources/js/app.js": {
-    "file": "assets/app-B8AwH6gf.js",
+    "file": "assets/app-Cw21GXt2.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true

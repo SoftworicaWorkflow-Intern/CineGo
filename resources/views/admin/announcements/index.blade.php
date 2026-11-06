@@ -20,11 +20,6 @@
                         placeholder="{{ ui('announcement_hint', 'e.g. 20% off on weekday morning shows') }}">
                 </div>
 
-                <div>
-                    <label class="label" for="ann-message-np">{{ ui('message_np', 'Message (नेपाली)') }}</label>
-                    <input id="ann-message-np" type="text" name="message_np" value="{{ old('message_np') }}" class="input" maxlength="200">
-                </div>
-
                 <div class="grid grid-cols-2 gap-3">
                     <div>
                         <label class="label" for="ann-link">{{ ui('link', 'Link') }}</label>
@@ -64,17 +59,10 @@
                             @endif
                         </div>
 
-                        <div class="grid gap-3 sm:grid-cols-2">
-                            <div>
-                                <label class="label" for="message-{{ $announcement->id }}">{{ ui('message', 'Message') }} *</label>
-                                <input id="message-{{ $announcement->id }}" type="text" name="message" value="{{ old("message.$announcement->id", $announcement->message) }}"
-                                    class="input" required maxlength="200">
-                            </div>
-                            <div>
-                                <label class="label" for="message-np-{{ $announcement->id }}">{{ ui('message_np', 'Message (नेपाली)') }}</label>
-                                <input id="message-np-{{ $announcement->id }}" type="text" name="message_np" value="{{ old("message_np.$announcement->id", $announcement->message_np) }}"
-                                    class="input" maxlength="200">
-                            </div>
+                        <div>
+                            <label class="label" for="message-{{ $announcement->id }}">{{ ui('message', 'Message') }} *</label>
+                            <input id="message-{{ $announcement->id }}" type="text" name="message" value="{{ old("message.$announcement->id", $announcement->message) }}"
+                                class="input" required maxlength="200">
                         </div>
 
                         <div class="grid gap-3 sm:grid-cols-3">

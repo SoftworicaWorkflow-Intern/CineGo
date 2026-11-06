@@ -68,26 +68,17 @@ class MovieController extends Controller
     {
         $validated = $request->validate([
             'title' => 'required|string|max:160',
-            'title_np' => 'nullable|string|max:160',
             'synopsis' => 'required|string|max:4000',
-            'synopsis_np' => 'nullable|string|max:4000',
             'genres' => 'required|array|min:1',
             'genres.*' => 'string|max:40',
             'duration_minutes' => 'required|integer|min:1|max:600',
             'language' => 'required|string|max:40',
             'release_date' => 'required|date',
             'certificate' => 'nullable|string|max:10',
-            'rating' => 'nullable|numeric|min:0|max:10',
             'poster_url' => 'required|string|max:300',
-            'banner_url' => 'nullable|string|max:300',
             'trailer_url' => 'nullable|string|max:300',
             'director' => 'nullable|string|max:120',
             'cast' => 'nullable|string|max:500',
-            'is_now_showing' => 'nullable|boolean',
-            'is_coming_soon' => 'nullable|boolean',
-            'is_featured' => 'nullable|boolean',
-            'is_active' => 'nullable|boolean',
-            'sort_order' => 'nullable|integer',
         ], [
             'title.required' => ui('validation_title', 'Please enter the movie title.'),
             'synopsis.required' => ui('validation_synopsis', 'Please enter a storyline.'),
@@ -96,10 +87,11 @@ class MovieController extends Controller
         ]);
 
         $validated['slug'] = $this->uniqueSlug($request->input('title'), $request->route('movie')?->id);
-        $validated['is_now_showing'] = $request->boolean('is_now_showing');
-        $validated['is_coming_soon'] = $request->boolean('is_coming_soon');
-        $validated['is_featured'] = $request->boolean('is_featured');
-        $validated['is_active'] = $request->boolean('is_active');
+        $movie = $request->route('movie');
+        $validated['is_now_showing'] = $movie instanceof Movie ? $movie->is_now_showing : true;
+        $validated['is_coming_soon'] = $movie instanceof Movie ? $movie->is_coming_soon : false;
+        $validated['is_featured'] = $movie instanceof Movie ? $movie->is_featured : false;
+        $validated['is_active'] = $movie instanceof Movie ? $movie->is_active : true;
 
         return $validated;
     }

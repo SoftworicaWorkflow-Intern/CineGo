@@ -3,7 +3,6 @@
 @section('title', $showtime->exists ? ui('edit_showtime', 'Edit showtime') : ui('add_showtime', 'Add showtime'))
 
 @php
-    $selectedCinemaId = (string) old('cinema_id', $showtime->cinema_id);
     $selectedHallId = (string) old('hall_id', $showtime->hall_id);
 @endphp
 
@@ -39,18 +38,6 @@
                 </div>
 
                 <div>
-                    <label class="label" for="cinema_id">{{ ui('cinemas', 'Cinema') }} *</label>
-                    <select id="cinema_id" name="cinema_id" class="input cursor-pointer" required>
-                        <option value="">{{ ui('choose_cinema', 'Choose a cinema…') }}</option>
-                        @foreach ($cinemas as $cinema)
-                            <option value="{{ $cinema->id }}" @selected($selectedCinemaId === (string) $cinema->id)>
-                                {{ $cinema->localised_name() }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
-
-                <div>
                     <label class="label" for="hall_id">{{ ui('screens', 'Screen') }} *</label>
                     <select id="hall_id" name="hall_id" class="input cursor-pointer" required>
                         <option value="">{{ ui('choose_screen', 'Choose a screen…') }}</option>
@@ -58,8 +45,6 @@
                             @foreach ($cinema->halls as $hall)
                                 <option
                                     value="{{ $hall->id }}"
-                                    data-cinema="{{ $cinema->id }}"
-                                    {{ $selectedHallId === (string) $hall->id ? '' : 'hidden' }}
                                     @selected($selectedHallId === (string) $hall->id)
                                 >
                                     {{ $cinema->localised_name() }} · {{ $hall->name }}
@@ -125,30 +110,4 @@
             {{ $showtime->exists ? ui('save', 'Save changes') : ui('create', 'Create showtime') }}
         </button>
     </form>
-
-    <script>
-        (function () {
-            var cinemaSelect = document.getElementById('cinema_id');
-            var hallSelect = document.getElementById('hall_id');
-            if (!cinemaSelect || !hallSelect) return;
-
-            function syncHalls() {
-                var cinemaId = cinemaSelect.value;
-                var current = hallSelect.value;
-
-                Array.from(hallSelect.options).forEach(function (option) {
-                    if (!option.dataset.cinema) return;
-                    option.hidden = option.dataset.cinema !== cinemaId;
-                });
-
-                var selected = hallSelect.querySelector('option:not([hidden]):not([value=""])');
-                if (!current || hallSelect.selectedOptions[0]?.hidden) {
-                    hallSelect.value = selected ? selected.value : '';
-                }
-            }
-
-            cinemaSelect.addEventListener('change', syncHalls);
-            syncHalls();
-        })();
-    </script>
 @endsection

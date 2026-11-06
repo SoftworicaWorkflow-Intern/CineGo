@@ -15,19 +15,14 @@ class ShowtimeController extends Controller
 {
     public function index(Request $request): View
     {
-        $cinemaId = $request->query('cinema');
-
         $showtimes = Showtime::query()
-            ->with(['movie', 'cinema', 'hall'])
-            ->when($cinemaId, fn ($query) => $query->where('cinema_id', $cinemaId))
+            ->with(['movie', 'hall'])
             ->upcoming()
             ->latest('show_date')
             ->paginate(20)
             ->withQueryString();
 
-        $cinemas = Cinema::active()->orderBy('name')->get();
-
-        return view('admin.showtimes.index', compact('showtimes', 'cinemas', 'cinemaId'));
+        return view('admin.showtimes.index', compact('showtimes'));
     }
 
     public function create(): View
@@ -79,7 +74,6 @@ class ShowtimeController extends Controller
     {
         $validated = $request->validate([
             'movie_id' => 'required|integer|exists:movies,id',
-            'cinema_id' => 'required|integer|exists:cinemas,id',
             'hall_id' => 'required|integer|exists:halls,id',
             'show_date' => 'required|date|after_or_equal:today',
             'start_time' => 'required|date_format:H:i',
@@ -97,10 +91,7 @@ class ShowtimeController extends Controller
         ]);
 
         $hall = Hall::findOrFail($validated['hall_id']);
-
-        if ($hall->cinema_id !== (int) $validated['cinema_id']) {
-            abort(back()->withErrors(['hall_id' => ui('validation_hall_mismatch', 'That screen belongs to a different branch.')]));
-        }
+        $validated['cinema_id'] = $hall->cinema_id;
 
         $duplicate = Showtime::query()
             ->where('hall_id', $validated['hall_id'])

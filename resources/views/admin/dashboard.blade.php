@@ -9,7 +9,7 @@
             ['icon' => 'ticket', 'value' => number_format($stats['bookings_total']), 'label' => ui('total_bookings', 'Total bookings'), 'sub' => '+'.number_format($stats['bookings_today']).' '.ui('today', 'today'), 'tone' => 'red'],
             ['icon' => 'wallet', 'value' => 'Rs. '.number_format($stats['revenue_month']), 'label' => ui('revenue_this_month', 'Revenue this month'), 'sub' => number_format($stats['tickets_sold']).' '.ui('tickets', 'tickets'), 'tone' => 'green'],
             ['icon' => 'clock', 'value' => number_format($stats['showtimes_today']), 'label' => ui('showtimes_today', 'Showtimes today'), 'sub' => number_format($stats['movies']).' '.ui('movies', 'Movies'), 'tone' => 'amber'],
-            ['icon' => 'mail', 'value' => number_format($stats['pending_messages']), 'label' => ui('unread_messages', 'Unread messages'), 'sub' => number_format($stats['cinemas']).' '.ui('cinemas', 'Cinemas'), 'tone' => 'purple'],
+            ['icon' => 'mail', 'value' => number_format($stats['pending_messages']), 'label' => ui('unread_messages', 'Unread messages'), 'sub' => ui('contact_messages', 'Contact messages'), 'tone' => 'purple'],
         ] as $stat)
             <div class="card flex items-start gap-4 p-5">
                 <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl
