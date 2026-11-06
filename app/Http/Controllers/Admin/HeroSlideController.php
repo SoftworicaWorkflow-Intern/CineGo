@@ -25,7 +25,11 @@ class HeroSlideController extends Controller
     public function index(): View
     {
         Gate::authorize('viewAny', HeroSlide::class);
-        $heroSlides = HeroSlide::query()->orderBy('display_order')->orderBy('id')->get();
+        $heroSlides = HeroSlide::query()
+            ->with('movie')
+            ->orderBy('display_order')
+            ->orderBy('id')
+            ->get();
 
         return view('admin.hero-sliders.index', compact('heroSlides'));
     }
@@ -36,39 +40,57 @@ class HeroSlideController extends Controller
 
         return view('admin.hero-sliders.form', [
             'heroSlide' => new HeroSlide(['status' => HeroSlide::STATUS_DRAFT]),
-            'movies' => Movie::query()->orderBy('title')->get(['id', 'title', 'title_np']),
+            'movies' => Movie::query()
+                ->comingSoon()
+                ->whereDoesntHave('heroSlides')
+                ->orderBy('title')
+                ->get(),
         ]);
     }
 
     public function store(StoreHeroSlideRequest $request): RedirectResponse
     {
         $data = Arr::except($request->validated(), ['desktop_image', 'mobile_image']);
+        $data['status'] ??= HeroSlide::STATUS_PUBLISHED;
+        $data['display_order'] = 0;
         $storedPaths = [];
 
         try {
             $data['desktop_image'] = $this->storeImage($request->file('desktop_image'), $storedPaths);
-            $data['mobile_image'] = $request->hasFile('mobile_image')
-                ? $this->storeImage($request->file('mobile_image'), $storedPaths)
-                : null;
 
-            $heroSlide = DB::transaction(fn (): HeroSlide => HeroSlide::query()->create($data));
+            if ($request->hasFile('mobile_image')) {
+                $data['mobile_image'] = $this->storeImage($request->file('mobile_image'), $storedPaths);
+            }
+
+            $heroSlide = DB::transaction(function () use ($data): HeroSlide {
+                HeroSlide::query()->increment('display_order');
+
+                return HeroSlide::query()->create($data);
+            });
         } catch (Throwable $exception) {
             $this->cleanupAfterFailure($storedPaths, $exception);
             throw $exception;
         }
 
         return redirect()->route('admin.hero-sliders.edit', $heroSlide)
-            ->with('success', 'Hero slide created.');
+            ->with('success', 'Hero banner created.');
     }
 
     public function edit(HeroSlide $heroSlide): View
     {
         Gate::authorize('update', $heroSlide);
+        $heroSlide->load('movie');
+        $movies = Movie::query()
+            ->comingSoon()
+            ->whereDoesntHave('heroSlides')
+            ->orderBy('title')
+            ->get();
 
-        return view('admin.hero-sliders.form', [
-            'heroSlide' => $heroSlide,
-            'movies' => Movie::query()->orderBy('title')->get(['id', 'title', 'title_np']),
-        ]);
+        if ($heroSlide->movie && ! $movies->contains('id', $heroSlide->movie_id)) {
+            $movies->prepend($heroSlide->movie);
+        }
+
+        return view('admin.hero-sliders.form', compact('heroSlide', 'movies'));
     }
 
     public function update(UpdateHeroSlideRequest $request, HeroSlide $heroSlide): RedirectResponse
@@ -108,7 +130,7 @@ class HeroSlideController extends Controller
         $this->deleteManagedFiles(array_values(array_diff($oldPaths, $heroSlide->uploaded_image_paths())));
 
         return redirect()->route('admin.hero-sliders.edit', $heroSlide)
-            ->with('success', 'Hero slide updated.');
+            ->with('success', 'Hero banner updated.');
     }
 
     public function destroy(HeroSlide $heroSlide): RedirectResponse
@@ -120,12 +142,13 @@ class HeroSlideController extends Controller
         $this->deleteManagedFiles($imagePaths);
 
         return redirect()->route('admin.hero-sliders.index')
-            ->with('success', 'Hero slide deleted.');
+            ->with('success', 'Hero banner deleted.');
     }
 
     public function preview(HeroSlide $heroSlide): View
     {
         Gate::authorize('view', $heroSlide);
+        $heroSlide->load('movie');
 
         return view('admin.hero-sliders.preview', compact('heroSlide'));
     }
@@ -140,8 +163,8 @@ class HeroSlideController extends Controller
         ]);
 
         return back()->with('success', $heroSlide->status === HeroSlide::STATUS_PUBLISHED
-            ? 'Hero slide published.'
-            : 'Hero slide unpublished.');
+            ? 'Hero banner activated.'
+            : 'Hero banner deactivated.');
     }
 
     public function reorder(ReorderHeroSlidesRequest $request): JsonResponse

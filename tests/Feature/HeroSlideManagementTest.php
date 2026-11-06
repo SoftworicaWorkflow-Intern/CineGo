@@ -14,65 +14,114 @@ class HeroSlideManagementTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_admin_can_create_update_preview_publish_and_delete_a_slide(): void
+    public function test_admin_can_create_update_preview_publish_and_delete_a_movie_banner(): void
     {
         Storage::fake('public');
         $admin = User::factory()->create(['is_admin' => true]);
-        $attributes = $this->slideAttributes();
+        $movie = Movie::factory()->comingSoon()->create(['title' => 'Linked movie', 'slug' => 'linked-movie']);
+        $attributes = $this->slideAttributes(['movie_id' => $movie->id]);
+        unset($attributes['status'], $attributes['display_order']);
 
         $response = $this->actingAs($admin)->post(route('admin.hero-sliders.store'), [
             ...$attributes,
             'desktop_image' => $this->pngFile('desktop.png', 1920, 1080),
-            'mobile_image' => $this->pngFile('mobile.png', 1080, 1350),
+            'mobile_image' => $this->pngFile('mobile.png', 600, 900),
         ]);
 
-        $slide = HeroSlide::query()->firstOrFail();
+        $slide = HeroSlide::query()->whereBelongsTo($movie)->firstOrFail();
         $response->assertRedirect(route('admin.hero-sliders.edit', $slide));
         $this->assertModelExists($slide);
         $this->assertDatabaseHas('hero_slides', [
             'id' => $slide->id,
-            'title_en' => 'The premiere',
-            'status' => 'draft',
+            'movie_id' => $movie->id,
+            'internal_title' => null,
+            'status' => 'published',
         ]);
-        Storage::disk('public')->assertExists([$slide->desktop_image, $slide->mobile_image]);
+        Storage::disk('public')->assertExists($slide->desktop_image);
+        Storage::disk('public')->assertExists($slide->mobile_image);
 
-        $this->actingAs($admin)->get(route('admin.hero-sliders.preview', $slide))->assertOk()->assertSee('The premiere');
+        $this->actingAs($admin)->get(route('admin.hero-sliders.preview', $slide))
+            ->assertOk()
+            ->assertSee('Linked movie')
+            ->assertSee(route('movies.show', $movie));
 
         $oldDesktopImage = $slide->desktop_image;
         $oldMobileImage = $slide->mobile_image;
+        $replacementMovie = Movie::factory()->comingSoon()->create(['title' => 'Replacement movie']);
+        $updateData = $this->slideAttributes([
+            'movie_id' => $replacementMovie->id,
+        ]);
+        unset(
+            $updateData['internal_title'],
+            $updateData['display_order'],
+            $updateData['status'],
+            $updateData['starts_at'],
+            $updateData['ends_at'],
+        );
         $this->actingAs($admin)->put(route('admin.hero-sliders.update', $slide), [
-            ...$this->slideAttributes([
-                'title_en' => 'A new premiere',
-                'status' => 'published',
-            ]),
+            ...$updateData,
             'desktop_image' => $this->pngFile('replacement.png', 1920, 1080),
-            'remove_mobile_image' => '1',
+            'mobile_image' => $this->pngFile('replacement-mobile.png', 600, 900),
         ])->assertRedirect(route('admin.hero-sliders.edit', $slide));
 
         $slide->refresh();
-        $this->assertSame('A new premiere', $slide->title_en);
+        $this->assertSame($replacementMovie->id, $slide->movie_id);
+        $this->assertNull($slide->internal_title);
         $this->assertSame('published', $slide->status);
-        $this->assertNull($slide->mobile_image);
-        Storage::disk('public')->assertMissing([$oldDesktopImage, $oldMobileImage]);
+        Storage::disk('public')->assertMissing($oldDesktopImage);
+        Storage::disk('public')->assertMissing($oldMobileImage);
         Storage::disk('public')->assertExists($slide->desktop_image);
+        Storage::disk('public')->assertExists($slide->mobile_image);
 
         $replacementImage = $slide->desktop_image;
-        $removeDesktopData = $this->slideAttributes(['status' => 'published']);
-        unset($removeDesktopData['desktop_image']);
+        $replacementMobileImage = $slide->mobile_image;
+        $removeImageData = $this->slideAttributes([
+            'movie_id' => $replacementMovie->id,
+            'internal_title' => 'Updated homepage feature',
+        ]);
+        unset(
+            $removeImageData['desktop_image'],
+            $removeImageData['internal_title'],
+            $removeImageData['display_order'],
+            $removeImageData['status'],
+            $removeImageData['starts_at'],
+            $removeImageData['ends_at'],
+        );
         $this->actingAs($admin)->put(route('admin.hero-sliders.update', $slide), [
-            ...$removeDesktopData,
+            ...$removeImageData,
             'remove_desktop_image' => '1',
         ])->assertRedirect(route('admin.hero-sliders.edit', $slide));
 
         $slide->refresh();
         $this->assertNull($slide->desktop_image);
+        $this->assertSame($replacementMobileImage, $slide->mobile_image);
         Storage::disk('public')->assertMissing($replacementImage);
+
+        $mobileRemovalData = $this->slideAttributes([
+            'movie_id' => $replacementMovie->id,
+            'internal_title' => 'Updated homepage feature',
+        ]);
+        unset(
+            $mobileRemovalData['desktop_image'],
+            $mobileRemovalData['internal_title'],
+            $mobileRemovalData['display_order'],
+            $mobileRemovalData['status'],
+            $mobileRemovalData['starts_at'],
+            $mobileRemovalData['ends_at'],
+        );
+        $this->actingAs($admin)->put(route('admin.hero-sliders.update', $slide), [
+            ...$mobileRemovalData,
+            'remove_mobile_image' => '1',
+        ])->assertRedirect(route('admin.hero-sliders.edit', $slide));
+
+        $slide->refresh();
+        $this->assertNull($slide->mobile_image);
+        Storage::disk('public')->assertMissing($replacementMobileImage);
 
         $this->actingAs($admin)->delete(route('admin.hero-sliders.destroy', $slide))
             ->assertRedirect(route('admin.hero-sliders.index'));
 
         $this->assertModelMissing($slide);
-        Storage::disk('public')->assertMissing($slide->desktop_image);
     }
 
     public function test_guests_and_customers_cannot_manage_hero_slides(): void
@@ -83,27 +132,138 @@ class HeroSlideManagementTest extends TestCase
         $this->actingAs($customer)->get(route('admin.hero-sliders.index'))->assertForbidden();
     }
 
-    public function test_admin_can_load_the_slide_dashboard_and_live_preview_form(): void
+    public function test_admin_sees_existing_movies_and_movie_backed_banner_preview(): void
     {
         $admin = User::factory()->create(['is_admin' => true]);
+        $movie = Movie::factory()->create(['title' => 'Available movie']);
+        $slide = HeroSlide::query()->create($this->slideAttributes([
+            'movie_id' => $movie->id,
+            'mobile_image' => 'hero-slides/legacy-mobile.jpg',
+            'ends_at' => now()->addDay(),
+        ]));
+        $existingEndDate = $slide->getRawOriginal('ends_at');
+
         $this->actingAs($admin)->get(route('admin.hero-sliders.index'))
             ->assertOk()
-            ->assertSee('Homepage slides')
+            ->assertSee('Homepage banners')
+            ->assertSee('Available movie')
             ->assertSeeInOrder(['Showtime', 'Hero Banner'])
             ->assertDontSee('Homepage Banners');
 
-        $this->actingAs($admin)->get(route('admin.hero-sliders.create'))
+        $this->actingAs($admin)->get(route('admin.hero-sliders.edit', $slide))
             ->assertOk()
-            ->assertSee('Desktop hero image')
-            ->assertSee('Live preview')
-            ->assertSee('नेपाली');
+            ->assertSee('Select Movie')
+            ->assertSee('Available movie')
+            ->assertSee('Choose a coming soon movie')
+            ->assertSee('Live banner preview')
+            ->assertSee('data-movie-select', false)
+            ->assertDontSee('data-preview-poster', false)
+            ->assertDontSee('data-poster=', false)
+            ->assertDontSee('internal_title')
+            ->assertDontSee('Mobile banner image')
+            ->assertDontSee('Display settings')
+            ->assertDontSee('name="mobile_image"', false)
+            ->assertDontSee('name="display_order"', false)
+            ->assertDontSee('name="status"', false)
+            ->assertDontSee('name="starts_at"', false)
+            ->assertDontSee('name="ends_at"', false)
+            ->assertDontSee('name="title_en"', false)
+            ->assertDontSee('name="description_en"', false)
+            ->assertDontSee('name="primary_button_url"', false)
+            ->assertDontSee('name="movie_title_en"', false);
+
+        $updateData = $this->slideAttributes([
+            'movie_id' => $movie->id,
+        ]);
+        unset(
+            $updateData['desktop_image'],
+            $updateData['internal_title'],
+            $updateData['mobile_image'],
+            $updateData['display_order'],
+            $updateData['status'],
+            $updateData['starts_at'],
+            $updateData['ends_at'],
+        );
+        $this->actingAs($admin)->put(route('admin.hero-sliders.update', $slide), [
+            ...$updateData,
+        ])->assertRedirect(route('admin.hero-sliders.edit', $slide));
+
+        $this->assertDatabaseHas('hero_slides', [
+            'id' => $slide->id,
+            'movie_id' => $movie->id,
+            'internal_title' => 'Homepage feature',
+            'mobile_image' => 'hero-slides/legacy-mobile.jpg',
+            'ends_at' => $existingEndDate,
+        ]);
+    }
+
+    public function test_admin_can_create_a_banner_from_an_existing_movie_without_duplicate_movie_fields(): void
+    {
+        Storage::fake('public');
+        $admin = User::factory()->create(['is_admin' => true]);
+        $existingMovie = Movie::factory()->create(['title' => 'Existing homepage movie']);
+        $existingSlide = HeroSlide::query()->create($this->slideAttributes([
+            'movie_id' => $existingMovie->id,
+            'desktop_image' => 'img/banners/existing.svg',
+            'status' => 'published',
+        ]));
+        $movie = Movie::factory()->comingSoon()->create(['title' => 'Existing catalogue movie']);
+
+        $response = $this->actingAs($admin)->post(route('admin.hero-sliders.store'), [
+            'movie_id' => $movie->id,
+            'desktop_image' => $this->pngFile('banner.png', 1920, 1080),
+        ]);
+
+        $slide = HeroSlide::query()->whereBelongsTo($movie)->firstOrFail();
+        $response->assertRedirect(route('admin.hero-sliders.edit', $slide));
+        $this->assertDatabaseHas('hero_slides', [
+            'id' => $slide->id,
+            'movie_id' => $movie->id,
+            'internal_title' => null,
+            'status' => 'published',
+            'display_order' => 0,
+            'starts_at' => null,
+            'ends_at' => null,
+        ]);
+        $this->assertDatabaseHas('hero_slides', [
+            'id' => $existingSlide->id,
+            'display_order' => 1,
+        ]);
+        $this->assertSame($movie->id, $slide->movie->id);
+        Storage::disk('public')->assertExists($slide->desktop_image);
+
+        $this->get(route('home'))
+            ->assertOk()
+            ->assertSee('data-hero-page', false)
+            ->assertSeeInOrder([
+                'data-hero-image="'.Storage::disk('public')->url($slide->desktop_image).'"',
+                'data-hero-image="'.asset('img/banners/existing.svg').'"',
+            ], false)
+            ->assertSee('Existing catalogue movie')
+            ->assertSee(route('movies.show', $movie));
+    }
+
+    public function test_movie_can_only_be_used_by_one_banner(): void
+    {
+        $admin = User::factory()->create(['is_admin' => true]);
+        $movie = Movie::factory()->comingSoon()->create();
+        HeroSlide::query()->create($this->slideAttributes(['movie_id' => $movie->id]));
+
+        $this->actingAs($admin)->from(route('admin.hero-sliders.create'))
+            ->post(route('admin.hero-sliders.store'), [
+                ...$this->slideAttributes(['movie_id' => $movie->id]),
+                'desktop_image' => $this->pngFile('duplicate.png', 1920, 1080),
+            ])
+            ->assertSessionHasErrors('movie_id');
+
+        $this->assertDatabaseCount('hero_slides', 1);
     }
 
     public function test_reorder_saves_the_order_only_when_all_slides_are_included(): void
     {
         $admin = User::factory()->create(['is_admin' => true]);
         $first = HeroSlide::query()->create($this->slideAttributes(['display_order' => 0]));
-        $second = HeroSlide::query()->create($this->slideAttributes(['display_order' => 1, 'title_en' => 'Second slide']));
+        $second = HeroSlide::query()->create($this->slideAttributes(['display_order' => 1]));
 
         $this->actingAs($admin)->postJson(route('admin.hero-sliders.reorder'), [
             'slide_ids' => [$second->id, $first->id],
@@ -117,9 +277,6 @@ class HeroSlideManagementTest extends TestCase
         ])->assertUnprocessable()->assertJson([
             'message' => 'The slide list changed. Reload the page and try again.',
         ]);
-
-        $this->assertSame(0, $second->fresh()->display_order);
-        $this->assertSame(1, $first->fresh()->display_order);
     }
 
     public function test_admin_can_publish_and_unpublish_a_slide(): void
@@ -136,47 +293,130 @@ class HeroSlideManagementTest extends TestCase
         $this->assertDatabaseHas('hero_slides', ['id' => $slide->id, 'status' => 'draft']);
     }
 
-    public function test_homepage_renders_only_published_slides_inside_their_schedule_in_order(): void
+    public function test_homepage_renders_scheduled_slides_in_order_with_current_movie_details_and_actions(): void
     {
         $this->travelTo(now()->setDate(2026, 11, 6)->setTime(12, 0));
+        $firstMovie = Movie::factory()->create([
+            'title' => 'Current movie title',
+            'synopsis' => 'Current movie synopsis',
+            'genres' => ['Drama', 'Mystery'],
+            'duration_minutes' => 110,
+            'language' => 'Nepali',
+            'release_date' => '2026-11-06',
+            'certificate' => 'U/A',
+            'trailer_url' => 'https://www.youtube.com/watch?v=abc123',
+            'slug' => 'current-movie',
+        ]);
+        $secondMovie = Movie::factory()->create([
+            'title' => 'Second movie title',
+            'slug' => 'second-movie',
+            'trailer_url' => null,
+        ]);
         HeroSlide::query()->create($this->slideAttributes([
-            'title_en' => 'First heading',
+            'movie_id' => $firstMovie->id,
+            'desktop_image' => 'img/banners/first.svg',
             'display_order' => 1,
             'status' => 'published',
             'starts_at' => now()->subHour(),
             'ends_at' => now()->addHour(),
         ]));
         HeroSlide::query()->create($this->slideAttributes([
-            'title_en' => 'Second heading',
+            'movie_id' => $secondMovie->id,
+            'desktop_image' => 'img/banners/second.svg',
             'display_order' => 2,
             'status' => 'published',
         ]));
+        $futureMovie = Movie::factory()->create(['title' => 'Future movie title']);
         HeroSlide::query()->create($this->slideAttributes([
-            'title_en' => 'Future heading',
+            'movie_id' => $futureMovie->id,
             'display_order' => 0,
             'status' => 'published',
             'starts_at' => now()->addDay(),
         ]));
+        $expiredMovie = Movie::factory()->create(['title' => 'Expired movie title']);
         HeroSlide::query()->create($this->slideAttributes([
-            'title_en' => 'Expired heading',
+            'movie_id' => $expiredMovie->id,
             'display_order' => 3,
             'status' => 'published',
             'ends_at' => now()->subDay(),
         ]));
+        $draftMovie = Movie::factory()->create(['title' => 'Draft movie title']);
         HeroSlide::query()->create($this->slideAttributes([
-            'title_en' => 'Draft heading',
+            'movie_id' => $draftMovie->id,
             'display_order' => 4,
             'status' => 'draft',
         ]));
 
-        $response = $this->get(route('home'));
+        $this->get(route('home'))
+            ->assertOk()
+            ->assertSeeInOrder([
+                'data-hero-title="Current movie title"',
+                'data-hero-title="Second movie title"',
+            ], false)
+            ->assertSee('Current movie synopsis')
+            ->assertSee('Drama, Mystery')
+            ->assertSee('1h 50m')
+            ->assertSee('Nepali')
+            ->assertSee('U/A')
+            ->assertSee('Nov 6, 2026')
+            ->assertSee('data-hero-trailer-url="https://www.youtube.com/watch?v=abc123"', false)
+            ->assertSee('data-hero-trailer-url=""', false)
+            ->assertSee(route('movies.show', $firstMovie))
+            ->assertDontSee('data-hero-title="Future movie title"', false)
+            ->assertDontSee('data-hero-title="Expired movie title"', false)
+            ->assertDontSee('data-hero-title="Draft movie title"', false);
+    }
 
-        $response->assertOk()
-            ->assertSeeInOrder(['data-hero-title="First heading"', 'data-hero-title="Second heading"'])
-            ->assertDontSee('Future heading')
-            ->assertDontSee('Expired heading')
-            ->assertDontSee('Draft heading')
-            ->assertSee('/movies/premiere');
+    public function test_movie_updates_are_reflected_in_the_homepage_banner_without_updating_the_banner(): void
+    {
+        $movie = Movie::factory()->create(['title' => 'Original title']);
+        $slide = HeroSlide::query()->create($this->slideAttributes([
+            'movie_id' => $movie->id,
+            'status' => 'published',
+        ]));
+
+        $movie->update([
+            'title' => 'Latest title from Movies',
+            'synopsis' => 'Latest synopsis from Movies',
+        ]);
+
+        $this->get(route('home'))
+            ->assertOk()
+            ->assertSee('Latest title from Movies')
+            ->assertSee('Latest synopsis from Movies')
+            ->assertDontSee('Original title');
+
+        $this->assertSame($movie->id, $slide->fresh()->movie_id);
+    }
+
+    public function test_homepage_uses_a_mobile_banner_on_small_screens_and_falls_back_to_desktop_image(): void
+    {
+        $mobileMovie = Movie::factory()->create(['slug' => 'mobile-banner-movie']);
+        HeroSlide::query()->create($this->slideAttributes([
+            'movie_id' => $mobileMovie->id,
+            'desktop_image' => 'img/banners/desktop.svg',
+            'mobile_image' => 'hero-slides/mobile.webp',
+            'status' => 'published',
+        ]));
+
+        $fallbackMovie = Movie::factory()->create(['slug' => 'fallback-banner-movie']);
+        HeroSlide::query()->create($this->slideAttributes([
+            'movie_id' => $fallbackMovie->id,
+            'desktop_image' => 'img/banners/fallback.svg',
+            'status' => 'published',
+            'display_order' => 1,
+        ]));
+
+        $this->get(route('home'))
+            ->assertOk()
+            ->assertSee(
+                'data-hero-mobile-image="'.Storage::disk('public')->url('hero-slides/mobile.webp').'"',
+                false
+            )
+            ->assertSee(
+                'data-hero-mobile-image="'.asset('img/banners/fallback.svg').'"',
+                false
+            );
     }
 
     public function test_unpublished_managed_slides_do_not_fall_back_to_featured_movies(): void
@@ -189,23 +429,23 @@ class HeroSlideManagementTest extends TestCase
 
         $this->get(route('home'))
             ->assertOk()
-            ->assertDontSee('data-hero-title="Legacy featured movie"', false);
+            ->assertDontSee('data-hero-page', false);
     }
 
-    public function test_invalid_image_dimensions_and_unsafe_button_urls_are_rejected(): void
+    public function test_desktop_banner_below_the_former_minimum_dimensions_is_accepted(): void
     {
+        Storage::fake('public');
         $admin = User::factory()->create(['is_admin' => true]);
-        $this->actingAs($admin)->from(route('admin.hero-sliders.create'))
-            ->post(route('admin.hero-sliders.store'), [
-                ...$this->slideAttributes(['primary_button_url' => 'javascript:alert(1)']),
-                'desktop_image' => $this->pngFile('small.png', 100, 50),
-            ])
-            ->assertSessionHasErrors([
-                'desktop_image' => 'The desktop image must be at least 1920 × 1080 pixels.',
-                'primary_button_url' => 'The destination must be a local path or an HTTP(S) URL.',
-            ]);
+        $movie = Movie::factory()->comingSoon()->create();
 
-        $this->assertDatabaseCount('hero_slides', 0);
+        $response = $this->actingAs($admin)->post(route('admin.hero-sliders.store'), [
+            ...$this->slideAttributes(['movie_id' => $movie->id]),
+            'desktop_image' => $this->pngFile('desktop-banner.png', 640, 100),
+        ]);
+
+        $slide = HeroSlide::query()->firstOrFail();
+        $response->assertRedirect(route('admin.hero-sliders.edit', $slide));
+        Storage::disk('public')->assertExists($slide->desktop_image);
     }
 
     public function test_publish_end_cannot_be_earlier_than_the_start(): void
@@ -226,17 +466,36 @@ class HeroSlideManagementTest extends TestCase
         $this->assertDatabaseCount('hero_slides', 0);
     }
 
-    public function test_homepage_escapes_administrator_supplied_slide_content(): void
+    public function test_admin_movie_selector_lists_only_available_upcoming_movies(): void
     {
-        HeroSlide::query()->create($this->slideAttributes([
-            'title_en' => '<script>alert(1)</script>',
-            'status' => 'published',
-        ]));
+        $admin = User::factory()->create(['is_admin' => true]);
+        $upcomingMovie = Movie::factory()->comingSoon()->create();
+        $nowShowingMovie = Movie::factory()->nowShowing()->create();
+        $inactiveUpcomingMovie = Movie::factory()->comingSoon()->create(['is_active' => false]);
+        $alreadyLinkedMovie = Movie::factory()->comingSoon()->create();
+        HeroSlide::query()->create($this->slideAttributes(['movie_id' => $alreadyLinkedMovie->id]));
 
-        $this->get(route('home'))
+        $this->actingAs($admin)->get(route('admin.hero-sliders.create'))
             ->assertOk()
-            ->assertSee('<script>alert(1)</script>')
-            ->assertDontSee('<script>alert(1)</script>', false);
+            ->assertSee('value="'.$upcomingMovie->id.'"', false)
+            ->assertDontSee('value="'.$nowShowingMovie->id.'"', false)
+            ->assertDontSee('value="'.$inactiveUpcomingMovie->id.'"', false)
+            ->assertDontSee('value="'.$alreadyLinkedMovie->id.'"', false);
+    }
+
+    public function test_admin_cannot_create_a_banner_for_a_non_upcoming_movie(): void
+    {
+        $admin = User::factory()->create(['is_admin' => true]);
+        $nowShowingMovie = Movie::factory()->nowShowing()->create();
+
+        $this->actingAs($admin)->from(route('admin.hero-sliders.create'))
+            ->post(route('admin.hero-sliders.store'), [
+                'movie_id' => $nowShowingMovie->id,
+                'desktop_image' => $this->pngFile('now-showing.png', 1920, 1080),
+            ])
+            ->assertSessionHasErrors('movie_id');
+
+        $this->assertDatabaseCount('hero_slides', 0);
     }
 
     /**
@@ -245,24 +504,10 @@ class HeroSlideManagementTest extends TestCase
     private function slideAttributes(array $overrides = []): array
     {
         return array_merge([
+            'movie_id' => Movie::factory()->comingSoon()->create()->id,
             'desktop_image' => 'img/banners/banner-1.svg',
-            'movie_title_en' => 'Premiere',
-            'movie_title_np' => null,
-            'title_en' => 'The premiere',
-            'title_np' => null,
-            'description_en' => 'A new story arrives in cinemas.',
-            'description_np' => null,
-            'label_en' => 'NOW SHOWING',
-            'label_np' => null,
-            'duration' => 110,
-            'language' => 'Nepali',
-            'release_date' => '2026-11-06',
-            'primary_button_text_en' => 'Book Tickets',
-            'primary_button_text_np' => null,
-            'primary_button_url' => '/movies/premiere',
-            'secondary_button_text_en' => 'Explore Movies',
-            'secondary_button_text_np' => null,
-            'secondary_button_url' => '/movies',
+            'mobile_image' => null,
+            'internal_title' => 'Homepage feature',
             'display_order' => 0,
             'status' => 'draft',
             'starts_at' => null,

@@ -101,25 +101,16 @@ function mountHeroSlideForm() {
     const form = document.querySelector('[data-hero-slide-form]');
     if (!form) return;
 
-    const inputs = Array.from(form.querySelectorAll('[data-image-upload]'));
-    const originalImageSources = new Map(
+    const movieSelect = form.querySelector('[data-movie-select]');
+    const previewFrame = form.querySelector('[data-movie-preview]');
+    const selectedImageUrls = new Map();
+    const savedImageSources = new Map(
         Array.from(form.querySelectorAll('[data-preview-image]')).map((image) => [
             image.dataset.previewImage,
             image.getAttribute('src') || '',
         ]),
     );
-    const selectedImageUrls = new Map();
-
-    const currentImageSource = (field) => {
-        const selectedSource = selectedImageUrls.get(field);
-        if (selectedSource) return selectedSource;
-
-        const removeCheckbox = form.querySelector(`[data-remove-image="${field}"]`);
-        if (removeCheckbox?.checked) return '';
-
-        const previewType = field === 'mobile_image' ? 'mobile' : 'desktop';
-        return originalImageSources.get(previewType) || '';
-    };
+    let previewMode = 'desktop';
 
     const displayImage = (image, source) => {
         if (!image) return;
@@ -128,54 +119,94 @@ function mountHeroSlideForm() {
         image.classList.toggle('block', Boolean(source));
     };
 
-    const setPreviewImage = (field, source) => {
-        const imageType = field === 'mobile_image' ? 'mobile' : 'desktop';
-        const previewImage = form.querySelector(`[data-preview-image="${imageType}"]`);
-        const thumbnail = form.querySelector(`[data-upload-thumbnail="${field}"]`);
+    const imageSource = (field) => {
+        const selectedSource = selectedImageUrls.get(field);
+        if (selectedSource) return selectedSource;
 
-        displayImage(thumbnail, source);
+        const removeCheckbox = form.querySelector(`[data-remove-image="${field}"]`);
+        if (removeCheckbox?.checked) return '';
 
-        displayImage(previewImage, source);
-        const mobilePreview = form.querySelector('[data-preview-image="mobile"]');
-        const mobileSource = currentImageSource('mobile_image') || currentImageSource('desktop_image');
-        displayImage(mobilePreview, mobileSource);
+        if (field === 'mobile_image') {
+            return savedImageSources.get('mobile') || imageSource('desktop_image');
+        }
+
+        return savedImageSources.get('desktop') || '';
+    };
+
+    const updatePreviewMode = (mode) => {
+        previewMode = mode;
+        if (previewFrame) {
+            previewFrame.classList.toggle('aspect-video', mode === 'desktop');
+            previewFrame.classList.toggle('w-full', mode === 'desktop');
+            previewFrame.classList.toggle('aspect-[9/16]', mode === 'mobile');
+            previewFrame.classList.toggle('max-w-[280px]', mode === 'mobile');
+        }
+
+        form.querySelectorAll('[data-preview-mode-toggle]').forEach((button) => {
+            const active = button.dataset.previewModeToggle === mode;
+            button.setAttribute('aria-pressed', String(active));
+            button.classList.toggle('bg-cg-red', active);
+            button.classList.toggle('text-white', active);
+            button.classList.toggle('text-cg-muted', !active);
+        });
+
+        form.querySelectorAll('[data-preview-image-layer]').forEach((image) => {
+            const isVisible = image.dataset.previewImage === mode;
+            const field = mode === 'desktop' ? 'desktop_image' : 'mobile_image';
+            const source = imageSource(field);
+            image.src = source;
+            image.classList.toggle('hidden', !isVisible);
+            image.classList.toggle('block', isVisible && Boolean(source));
+        });
     };
 
     const updateUpload = (input) => {
+        const field = input.dataset.imageUpload;
         const file = input.files[0];
-        const filename = form.querySelector(`[data-file-name="${input.dataset.imageUpload}"]`);
-        const removeCheckbox = form.querySelector(`[data-remove-image="${input.dataset.imageUpload}"]`);
+        const filename = form.querySelector(`[data-file-name="${field}"]`);
+        const removeCheckbox = form.querySelector(`[data-remove-image="${field}"]`);
+        const thumbnail = form.querySelector(`[data-upload-thumbnail="${field}"]`);
+        const previewImage = form.querySelector(`[data-preview-image="${field === 'desktop_image' ? 'desktop' : 'mobile'}"]`);
 
         if (file) {
-            const previousUrl = selectedImageUrls.get(input.dataset.imageUpload);
+            const previousUrl = selectedImageUrls.get(field);
             if (previousUrl) URL.revokeObjectURL(previousUrl);
 
             const previewUrl = URL.createObjectURL(file);
-            selectedImageUrls.set(input.dataset.imageUpload, previewUrl);
-            setPreviewImage(input.dataset.imageUpload, previewUrl);
-            filename.textContent = file.name;
+            selectedImageUrls.set(field, previewUrl);
+            displayImage(thumbnail, previewUrl);
+            displayImage(previewImage, previewUrl);
+            if (filename) filename.textContent = file.name;
             if (removeCheckbox) removeCheckbox.checked = false;
         } else {
-            const previousUrl = selectedImageUrls.get(input.dataset.imageUpload);
+            const previousUrl = selectedImageUrls.get(field);
             if (previousUrl) URL.revokeObjectURL(previousUrl);
-            selectedImageUrls.delete(input.dataset.imageUpload);
-            const originalSource = currentImageSource(input.dataset.imageUpload);
-            setPreviewImage(input.dataset.imageUpload, originalSource);
-            filename.textContent = originalSource ? 'Current image saved' : 'No image selected';
+            selectedImageUrls.delete(field);
+
+            const source = imageSource(field);
+            displayImage(thumbnail, field === 'mobile_image' && !savedImageSources.get('mobile') ? '' : source);
+            displayImage(previewImage, source);
+            if (filename) {
+                filename.textContent = source
+                    ? (field === 'mobile_image' && !savedImageSources.get('mobile') ? 'No mobile image; desktop image will be used' : 'Current image saved')
+                    : 'No image selected';
+            }
         }
+
+        updatePreviewMode(previewMode);
     };
 
-    inputs.forEach((input) => {
-        input.addEventListener('change', () => updateUpload(input));
-        const zone = input.closest('[data-drop-zone]');
-        const target = zone.querySelector('[data-drop-target]');
+    form.querySelectorAll('[data-image-upload]').forEach((imageInput) => {
+        imageInput.addEventListener('change', () => updateUpload(imageInput));
+        const zone = imageInput.closest('[data-drop-zone]');
+        const target = zone?.querySelector('[data-drop-target]');
 
-        target.addEventListener('dragover', (event) => {
+        target?.addEventListener('dragover', (event) => {
             event.preventDefault();
             target.classList.add('border-cg-red');
         });
-        target.addEventListener('dragleave', () => target.classList.remove('border-cg-red'));
-        target.addEventListener('drop', (event) => {
+        target?.addEventListener('dragleave', () => target.classList.remove('border-cg-red'));
+        target?.addEventListener('drop', (event) => {
             event.preventDefault();
             target.classList.remove('border-cg-red');
             const [file] = event.dataTransfer.files;
@@ -183,74 +214,64 @@ function mountHeroSlideForm() {
 
             const transfer = new DataTransfer();
             transfer.items.add(file);
-            input.files = transfer.files;
-            updateUpload(input);
+            imageInput.files = transfer.files;
+            updateUpload(imageInput);
         });
     });
 
     form.querySelectorAll('[data-remove-image]').forEach((checkbox) => {
         checkbox.addEventListener('change', () => {
             const input = form.querySelector(`[data-image-upload="${checkbox.dataset.removeImage}"]`);
-            if (checkbox.checked && !input.files.length) {
-                setPreviewImage(checkbox.dataset.removeImage, '');
-            } else if (!checkbox.checked && !input.files.length) {
-                updateUpload(input);
-            }
+            if (input) updateUpload(input);
         });
     });
-
-    let previewLocale = 'en';
-    const previewKeys = new Set();
-    form.querySelectorAll('[data-preview-text]').forEach((input) => {
-        const key = input.dataset.previewText;
-        previewKeys.add(key);
-        input.addEventListener('input', () => updatePreviewText(key));
-    });
-
-    function updatePreviewText(key) {
-        const inputsForKey = Array.from(form.querySelectorAll(`[data-preview-text="${key}"]`));
-        const englishInput = inputsForKey.find((input) => input.dataset.previewLocale !== 'np');
-        const nepaliInput = inputsForKey.find((input) => input.dataset.previewLocale === 'np');
-        const localizedValue = previewLocale === 'np' ? nepaliInput?.value.trim() : '';
-        const value = localizedValue || englishInput?.value.trim() || '';
-
-        form.querySelectorAll(`[data-preview-value="${key}"]`).forEach((preview) => {
-            preview.textContent = value;
-            if (key === 'secondary') preview.hidden = !value;
-        });
-    }
-
-    previewKeys.forEach((key) => updatePreviewText(key));
 
     form.querySelectorAll('[data-preview-mode-toggle]').forEach((button) => {
-        button.addEventListener('click', () => {
-            const selectedMode = button.dataset.previewModeToggle;
-            form.querySelectorAll('[data-preview-frame]').forEach((frame) => {
-                frame.classList.toggle('hidden', frame.dataset.previewFrame !== selectedMode);
-            });
-            form.querySelectorAll('[data-preview-mode-toggle]').forEach((toggle) => {
-                const isSelected = toggle === button;
-                toggle.setAttribute('aria-pressed', String(isSelected));
-                toggle.classList.toggle('bg-cg-red', isSelected);
-                toggle.classList.toggle('text-white', isSelected);
-                toggle.classList.toggle('text-cg-muted', !isSelected);
-            });
-        });
+        button.addEventListener('click', () => updatePreviewMode(button.dataset.previewModeToggle));
     });
+    updatePreviewMode(previewMode);
 
-    form.querySelectorAll('[data-preview-locale-toggle]').forEach((button) => {
-        button.addEventListener('click', () => {
-            previewLocale = button.dataset.previewLocaleToggle;
-            form.querySelectorAll('[data-preview-locale-toggle]').forEach((toggle) => {
-                const isSelected = toggle === button;
-                toggle.setAttribute('aria-pressed', String(isSelected));
-                toggle.classList.toggle('bg-cg-red', isSelected);
-                toggle.classList.toggle('text-white', isSelected);
-                toggle.classList.toggle('text-cg-muted', !isSelected);
-            });
-            previewKeys.forEach((key) => updatePreviewText(key));
-        });
-    });
+    const updateMoviePreview = () => {
+        if (!movieSelect) return;
+
+        const option = movieSelect.selectedOptions[0];
+        const hasMovie = Boolean(option?.value);
+        const localizedTitle = form.dataset.locale === 'np' && option?.dataset.titleNp
+            ? option.dataset.titleNp
+            : option?.dataset.titleEn;
+        const localizedSynopsis = form.dataset.locale === 'np' && option?.dataset.synopsisNp
+            ? option.dataset.synopsisNp
+            : option?.dataset.synopsisEn;
+        const setText = (selector, value) => {
+            const element = form.querySelector(selector);
+            if (element) element.textContent = value || '';
+        };
+        setText('[data-preview-label]', hasMovie ? 'Now Showing' : 'Select a movie');
+        setText('[data-preview-title]', localizedTitle || 'Movie title');
+        setText('[data-preview-genres]', option?.dataset.genres);
+        setText('[data-preview-duration]', option?.dataset.duration);
+        setText('[data-preview-language]', option?.dataset.language);
+        setText('[data-preview-certificate]', option?.dataset.certificate);
+        setText('[data-preview-release-date]', option?.dataset.releaseDate);
+        setText('[data-preview-synopsis]', localizedSynopsis);
+
+        const bookLink = form.querySelector('[data-preview-book]');
+        if (bookLink) bookLink.href = hasMovie ? option.dataset.movieUrl : '#';
+
+        const trailerLink = form.querySelector('[data-preview-trailer]');
+        if (trailerLink) {
+            const trailerUrl = option?.dataset.trailer || '';
+            trailerLink.href = trailerUrl || '#';
+            trailerLink.classList.toggle('hidden', !trailerUrl);
+            trailerLink.classList.toggle('inline-flex', Boolean(trailerUrl));
+        }
+
+        const certificateSeparator = form.querySelector('[data-preview-certificate-separator]');
+        if (certificateSeparator) certificateSeparator.classList.toggle('hidden', !option?.dataset.certificate);
+    };
+
+    movieSelect?.addEventListener('change', updateMoviePreview);
+    updateMoviePreview();
 }
 
 function mountHeroSlideReordering() {
