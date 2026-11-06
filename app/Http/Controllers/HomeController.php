@@ -15,6 +15,7 @@ class HomeController extends Controller
         $featured = Movie::query()
             ->featured()
             ->nowShowing()
+            ->orderBy('sort_order')
             ->orderByDesc('release_date')
             ->limit(5)
             ->get();

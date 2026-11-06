@@ -45,21 +45,19 @@ class PublicPagesTest extends TestCase
             ->assertSee('class="fixed inset-0 z-50 hidden flex items-center justify-center', false);
     }
 
-    public function test_homepage_uses_the_uploaded_poster_as_a_full_viewport_hero(): void
+    public function test_homepage_uses_featured_movies_for_hero_slides(): void
     {
         $movie = Movie::factory()->featured()->create();
 
         $this->get('/')
             ->assertOk()
-            ->assertSee('img/hero/ghar-jwai-hd.jpg', false)
-            ->assertSee('img/hero/unko-sweater-hd.jpg', false)
-            ->assertSee('img/hero/bha-hd.jpg', false)
-            ->assertSee('min-h-[100vh] min-h-[100svh]', false)
+            ->assertSee($movie->banner_url, false)
+            ->assertSee('min-h-[min(760px,100svh)]', false)
             ->assertSee('cg-home-hero-art cg-home-hero-art-active', false)
             ->assertSee('data-hero-pagination', false)
-            ->assertDontSee('data-hero-actions', false)
-            ->assertDontSee('data-hero-synopsis', false)
-            ->assertDontSee($movie->localised_synopsis())
+            ->assertSee('data-hero-actions', false)
+            ->assertSee('data-hero-synopsis', false)
+            ->assertSee($movie->localised_synopsis())
             ->assertSee('data-no-scroll-reveal', false)
             ->assertSee('data-hero-page', false)
             ->assertDontSee('data-slider', false)
@@ -225,6 +223,12 @@ class PublicPagesTest extends TestCase
     {
         $this->get('/about')
             ->assertOk()
+            ->assertSee('img/about/cinema-screen.png')
+            ->assertSee('img/about/cinema-hall.png')
+            ->assertSee('What we stand for')
+            ->assertDontSee('Cinema halls')
+            ->assertDontSee('Tickets booked')
+            ->assertDontSee('Cities across Nepal')
             ->assertSee('Today CineGo connects audiences with Kawasoti in English and Nepali, on any device. We are just getting started.')
             ->assertSee('Kawasoti-3, Nepal')
             ->assertDontSee('https://maps.google.com/maps?q=Kawasoti-3%2C%20Nepal', false)

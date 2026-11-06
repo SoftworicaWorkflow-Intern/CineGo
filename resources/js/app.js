@@ -135,7 +135,7 @@ function initSliders() {
 }
 
 /**
- * Let visitors choose a featured hero image without automatically advancing.
+ * Rotate featured movie images and let visitors choose a slide.
  */
 function initHeroPagination() {
     document.querySelectorAll('[data-hero-pagination]').forEach((hero) => {

@@ -4,8 +4,10 @@
 
 @section('content')
     @if ($featured->isNotEmpty())
+        @php($heroMovie = $featured->first())
+        @php($heroImage = $heroMovie->banner_url ?: $heroMovie->poster_url)
         <section
-            class="cg-home-hero relative min-h-[100vh] min-h-[100svh] w-full overflow-hidden"
+            class="cg-home-hero relative min-h-[min(760px,100svh)] w-full overflow-hidden"
             aria-label="Featured movies"
             data-no-scroll-reveal
             data-hero-pagination
@@ -13,45 +15,76 @@
             <div
                 class="cg-home-hero-art cg-home-hero-art-active"
                 aria-hidden="true"
-                style="background-image: url('{{ asset('img/hero/ghar-jwai-hd.jpg') }}')"
+                style="background-image: url('{{ $heroImage }}')"
                 data-hero-art
             ></div>
             <div class="cg-home-hero-art" aria-hidden="true" data-hero-art></div>
 
-            <nav class="absolute inset-x-0 bottom-5 z-10 flex items-center justify-center gap-2" aria-label="Featured movie images">
-                <button
-                    type="button"
-                    class="group flex h-11 items-center px-1"
-                    aria-label="Show Gharjwai image"
-                    aria-current="true"
-                    data-hero-page
-                    data-hero-image="{{ asset('img/hero/ghar-jwai-hd.jpg') }}"
-                    data-hero-label="Gharjwai"
-                >
-                    <span class="h-1 w-8 rounded-full bg-cg-red transition-all duration-300" data-hero-indicator></span>
-                </button>
-                <button
-                    type="button"
-                    class="group flex h-11 items-center px-1"
-                    aria-label="Show Unko Sweater image"
-                    aria-current="false"
-                    data-hero-page
-                    data-hero-image="{{ asset('img/hero/unko-sweater-hd.jpg') }}"
-                    data-hero-label="Unko Sweater"
-                >
-                    <span class="h-1 w-3 rounded-full bg-white/45 transition-all duration-300 group-hover:bg-white/75" data-hero-indicator></span>
-                </button>
-                <button
-                    type="button"
-                    class="group flex h-11 items-center px-1"
-                    aria-label="Show Bha image"
-                    aria-current="false"
-                    data-hero-page
-                    data-hero-image="{{ asset('img/hero/bha-hd.jpg') }}"
-                    data-hero-label="Bha"
-                >
-                    <span class="h-1 w-3 rounded-full bg-white/45 transition-all duration-300 group-hover:bg-white/75" data-hero-indicator></span>
-                </button>
+            <div class="pointer-events-none absolute inset-0 z-[1] bg-gradient-to-r from-black/85 via-black/55 to-black/10"></div>
+            <div class="pointer-events-none absolute inset-0 z-[1] bg-gradient-to-t from-black/55 via-transparent to-black/10"></div>
+
+            <div class="container-page relative z-[2] flex min-h-[min(760px,100svh)] items-center pb-20 pt-24 sm:pb-24">
+                <div class="max-w-3xl">
+                    <p class="mb-4 inline-flex items-center gap-2 rounded-full border border-white/25 bg-black/25 px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-white backdrop-blur-sm">
+                        <span class="h-2 w-2 rounded-full bg-cg-red"></span>
+                        {{ ui('now_showing', 'Now Showing') }}
+                    </p>
+                    <h1 class="font-display text-5xl leading-[0.98] text-white sm:text-6xl lg:text-7xl" data-hero-title>
+                        {{ $heroMovie->localised_title() }}
+                    </h1>
+                    <p class="mt-5 max-w-2xl text-sm leading-7 text-white/80 sm:text-base" data-hero-synopsis>
+                        {{ $heroMovie->localised_synopsis() }}
+                    </p>
+                    <div class="mt-5 flex flex-wrap items-center gap-2 text-xs font-medium text-white/80" data-hero-metadata>
+                        <span class="rounded-full border border-white/25 bg-black/25 px-3 py-1.5" data-hero-language>{{ $heroMovie->language }}</span>
+                        <span class="rounded-full border border-white/25 bg-black/25 px-3 py-1.5" data-hero-duration>{{ $heroMovie->duration_label() }}</span>
+                        @if ($heroMovie->certificate)
+                            <span class="rounded-full border border-white/25 bg-black/25 px-3 py-1.5">{{ $heroMovie->certificate }}</span>
+                        @endif
+                    </div>
+                    <div class="mt-8 flex flex-wrap gap-3" data-hero-actions>
+                        <a
+                            href="{{ route('movies.show', $heroMovie) }}"
+                            class="btn-primary btn-lg"
+                            data-hero-book-link
+                            data-hero-book-title="{{ $heroMovie->localised_title() }}"
+                        >
+                            <x-icon name="ticket" :size="18" />
+                            {{ ui('book_tickets', 'Book Tickets') }}
+                        </a>
+                        <a href="{{ route('movies.index') }}" class="btn-lg rounded-lg border border-white/35 bg-white/10 px-5 py-2.5 text-sm font-semibold text-white backdrop-blur-sm transition hover:bg-white/20">
+                            {{ ui('explore_movies', 'Explore Movies') }}
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <nav class="absolute inset-x-0 bottom-5 z-10 flex items-center justify-center gap-2" aria-label="Featured movies">
+                @foreach ($featured as $index => $movie)
+                    @php($image = $movie->banner_url ?: $movie->poster_url)
+                    <button
+                        type="button"
+                        class="group flex h-11 items-center px-1"
+                        aria-label="{{ ui('show_featured_movie', 'Show featured movie') }}: {{ $movie->localised_title() }}"
+                        aria-current="{{ $index === 0 ? 'true' : 'false' }}"
+                        data-hero-page
+                        data-hero-image="{{ $image }}"
+                        data-hero-label="{{ $movie->localised_title() }}"
+                        data-hero-title="{{ $movie->localised_title() }}"
+                        data-hero-synopsis="{{ $movie->localised_synopsis() }}"
+                        data-hero-language="{{ $movie->language }}"
+                        data-hero-duration="{{ $movie->duration_label() }}"
+                        data-hero-details="true"
+                        data-hero-book-url="{{ route('movies.show', $movie) }}"
+                        data-hero-book-title="{{ $movie->localised_title() }}"
+                    >
+                        <span @class([
+                            'h-1 rounded-full transition-all duration-300',
+                            'w-8 bg-cg-red' => $index === 0,
+                            'w-3 bg-white/45 group-hover:bg-white/75' => $index !== 0,
+                        ]) data-hero-indicator></span>
+                    </button>
+                @endforeach
             </nav>
         </section>
     @endif
