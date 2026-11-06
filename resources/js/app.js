@@ -141,16 +141,22 @@ function initHeroPagination() {
     document.querySelectorAll('[data-hero-pagination]').forEach((hero) => {
         const pages = Array.from(hero.querySelectorAll('[data-hero-page]'));
         const artLayers = Array.from(hero.querySelectorAll('[data-hero-art]'));
+        const label = hero.querySelector('[data-hero-label]');
+        const movieTitle = hero.querySelector('[data-hero-movie-title]');
         const title = hero.querySelector('[data-hero-title]');
         const synopsis = hero.querySelector('[data-hero-synopsis]');
-        const badges = hero.querySelector('[data-hero-badges]');
         const metadata = hero.querySelector('[data-hero-metadata]');
         const actions = hero.querySelector('[data-hero-actions]');
-        const bookLink = hero.querySelector('[data-hero-book-link]');
+        const primaryLink = hero.querySelector('[data-hero-primary-link]');
+        const primaryText = hero.querySelector('[data-hero-primary-text]');
+        const secondaryLink = hero.querySelector('[data-hero-secondary-link]');
+        const secondaryText = hero.querySelector('[data-hero-secondary-text]');
         const duration = hero.querySelector('[data-hero-duration]');
         const language = hero.querySelector('[data-hero-language]');
         const releaseDate = hero.querySelector('[data-hero-release-date]');
+        const certificate = hero.querySelector('[data-hero-certificate]');
         const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        const mobileViewport = window.matchMedia('(max-width: 639px)');
 
         if (pages.length < 2 || artLayers.length < 2) return;
 
@@ -179,23 +185,32 @@ function initHeroPagination() {
         const show = (index) => {
             const page = pages[index];
             const request = ++selection;
-            const image = new Image();
-
-            image.onload = () => {
+            const imageUrl = mobileViewport.matches
+                ? (page.dataset.heroMobileImage || page.dataset.heroImage)
+                : page.dataset.heroImage;
+            const updateSlide = () => {
                 if (request !== selection) return;
 
                 const nextArtIndex = (activeArtIndex + 1) % artLayers.length;
                 const currentArt = artLayers[activeArtIndex];
                 const nextArt = artLayers[nextArtIndex];
-                const hasDetails = page.dataset.heroDetails === 'true';
                 const pageSynopsis = page.dataset.heroSynopsis ?? '';
 
-                nextArt.style.backgroundImage = `url("${page.dataset.heroImage}")`;
+                nextArt.style.setProperty('--hero-image-desktop', page.dataset.heroImage ? `url(${JSON.stringify(page.dataset.heroImage)})` : 'none');
+                nextArt.style.setProperty('--hero-image-mobile', page.dataset.heroMobileImage ? `url(${JSON.stringify(page.dataset.heroMobileImage)})` : 'none');
                 nextArt.classList.add('cg-home-hero-art-active');
                 currentArt.classList.remove('cg-home-hero-art-active');
                 activeArtIndex = nextArtIndex;
 
-                hero.setAttribute('aria-label', `Featured movie: ${page.dataset.heroLabel}`);
+                hero.setAttribute('aria-label', `Featured movie: ${page.dataset.heroMovieTitle || page.dataset.heroTitle}`);
+                if (label) {
+                    label.textContent = page.dataset.heroLabel;
+                    label.parentElement.hidden = !page.dataset.heroLabel;
+                }
+                if (movieTitle) {
+                    movieTitle.textContent = page.dataset.heroMovieTitle;
+                    movieTitle.hidden = !page.dataset.heroMovieTitle;
+                }
                 if (title) title.textContent = page.dataset.heroTitle;
 
                 if (synopsis) {
@@ -203,28 +218,35 @@ function initHeroPagination() {
                     synopsis.hidden = !pageSynopsis;
                 }
 
-                if (badges) badges.hidden = page.dataset.heroBadges !== 'true';
-                if (metadata) metadata.hidden = !hasDetails;
+                [[duration, page.dataset.heroDuration], [language, page.dataset.heroLanguage],
+                    [releaseDate, page.dataset.heroReleaseDate], [certificate, page.dataset.heroCertificate]]
+                    .forEach(([element, value]) => {
+                        if (!element) return;
+                        element.textContent = value || '';
+                        element.hidden = !value;
+                    });
+                if (metadata) metadata.hidden = ![duration, language, releaseDate, certificate]
+                    .some((element) => element && !element.hidden);
 
-                if (actions) {
-                    actions.hidden = !hasDetails;
+                if (primaryLink) {
+                    primaryLink.href = page.dataset.heroPrimaryUrl || '#';
+                    primaryLink.hidden = !page.dataset.heroPrimaryUrl || !page.dataset.heroPrimaryText;
+                    if (primaryText) primaryText.textContent = page.dataset.heroPrimaryText || '';
+                    primaryLink.setAttribute('aria-label', page.dataset.heroPrimaryText || '');
                 }
-
-                if (hasDetails) {
-                    if (duration) duration.textContent = page.dataset.heroDuration;
-                    if (language) language.textContent = page.dataset.heroLanguage;
-                    if (releaseDate) releaseDate.textContent = page.dataset.heroReleaseDate;
-                    if (bookLink) {
-                        bookLink.href = page.dataset.heroBookUrl;
-                        bookLink.setAttribute('aria-label', `Book ${page.dataset.heroBookTitle} tickets`);
-                    }
+                if (secondaryLink) {
+                    secondaryLink.href = page.dataset.heroSecondaryUrl || '#';
+                    secondaryLink.hidden = !page.dataset.heroSecondaryUrl || !page.dataset.heroSecondaryText;
+                    if (secondaryText) secondaryText.textContent = page.dataset.heroSecondaryText || '';
                 }
+                if (actions) actions.hidden = (!primaryLink || primaryLink.hidden) && (!secondaryLink || secondaryLink.hidden);
 
                 pages.forEach((paginationPage) => {
                     const isCurrent = paginationPage === page;
                     const indicator = paginationPage.querySelector('[data-hero-indicator]');
 
                     paginationPage.setAttribute('aria-current', String(isCurrent));
+                    paginationPage.setAttribute('aria-label', `Show featured movie: ${paginationPage.dataset.heroMovieTitle || paginationPage.dataset.heroTitle}`);
                     indicator.classList.toggle('w-8', isCurrent);
                     indicator.classList.toggle('w-3', !isCurrent);
                     indicator.classList.toggle('bg-cg-red', isCurrent);
@@ -232,15 +254,37 @@ function initHeroPagination() {
                 });
             };
 
+            if (!imageUrl) {
+                updateSlide();
+                return;
+            }
+
+            const image = new Image();
+            image.onload = updateSlide;
             image.onerror = () => {
-                console.error(`Unable to load hero image: ${page.dataset.heroImage}`);
+                console.error(`Unable to load hero image: ${imageUrl}`);
+                updateSlide();
             };
-            image.src = page.dataset.heroImage;
+            image.src = imageUrl;
         };
 
         pages.forEach((page, index) => {
             page.addEventListener('click', () => {
                 show(index);
+                start();
+            });
+        });
+        hero.querySelectorAll('[data-hero-next]').forEach((button) => {
+            button.addEventListener('click', () => {
+                const activeIndex = pages.findIndex((page) => page.getAttribute('aria-current') === 'true');
+                show((activeIndex + 1) % pages.length);
+                start();
+            });
+        });
+        hero.querySelectorAll('[data-hero-prev]').forEach((button) => {
+            button.addEventListener('click', () => {
+                const activeIndex = pages.findIndex((page) => page.getAttribute('aria-current') === 'true');
+                show((activeIndex - 1 + pages.length) % pages.length);
                 start();
             });
         });
@@ -259,6 +303,10 @@ function initHeroPagination() {
             } else {
                 start();
             }
+        });
+        mobileViewport.addEventListener('change', () => {
+            const activeIndex = pages.findIndex((page) => page.getAttribute('aria-current') === 'true');
+            show(Math.max(activeIndex, 0));
         });
 
         start();

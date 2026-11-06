@@ -3,9 +3,8 @@
 @section('title', ui('home', 'Home'))
 
 @section('content')
-    @if ($featured->isNotEmpty())
-        @php($heroMovie = $featured->first())
-        @php($heroImage = $heroMovie->banner_url ?: $heroMovie->poster_url)
+    @if ($heroItems->isNotEmpty())
+        @php($heroItem = $heroItems->first())
         <section
             class="cg-home-hero relative min-h-[min(760px,100svh)] w-full overflow-hidden"
             aria-label="Featured movies"
@@ -15,7 +14,7 @@
             <div
                 class="cg-home-hero-art cg-home-hero-art-active"
                 aria-hidden="true"
-                style="background-image: url('{{ $heroImage }}')"
+                style="--hero-image-desktop: url('{{ $heroItem['desktop_image'] }}'); --hero-image-mobile: url('{{ $heroItem['mobile_image'] ?: $heroItem['desktop_image'] }}')"
                 data-hero-art
             ></div>
             <div class="cg-home-hero-art" aria-hidden="true" data-hero-art></div>
@@ -23,60 +22,72 @@
             <div class="pointer-events-none absolute inset-0 z-[1] bg-gradient-to-r from-black/85 via-black/55 to-black/10"></div>
             <div class="pointer-events-none absolute inset-0 z-[1] bg-gradient-to-t from-black/55 via-transparent to-black/10"></div>
 
+            @if ($heroItems->count() > 1)
+                <button type="button" class="absolute left-4 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/30 bg-black/35 text-white backdrop-blur transition hover:bg-black/65 sm:left-7 sm:h-12 sm:w-12" aria-label="Previous featured movie" data-hero-prev>
+                    <x-icon name="arrow-left" :size="18" />
+                </button>
+                <button type="button" class="absolute right-4 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/30 bg-black/35 text-white backdrop-blur transition hover:bg-black/65 sm:right-7 sm:h-12 sm:w-12" aria-label="Next featured movie" data-hero-next>
+                    <x-icon name="arrow-right" :size="18" />
+                </button>
+            @endif
+
             <div class="container-page relative z-[2] flex min-h-[min(760px,100svh)] items-center pb-20 pt-24 sm:pb-24">
                 <div class="max-w-3xl">
                     <p class="mb-4 inline-flex items-center gap-2 rounded-full border border-white/25 bg-black/25 px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-white backdrop-blur-sm">
                         <span class="h-2 w-2 rounded-full bg-cg-red"></span>
-                        {{ ui('now_showing', 'Now Showing') }}
+                        <span data-hero-label>{{ $heroItem['label'] ?: ui('now_showing', 'Now Showing') }}</span>
                     </p>
+                    <p class="mb-2 text-sm font-medium text-white/70" data-hero-movie-title>{{ $heroItem['movie_title'] }}</p>
                     <h1 class="font-display text-5xl leading-[0.98] text-white sm:text-6xl lg:text-7xl" data-hero-title>
-                        {{ $heroMovie->localised_title() }}
+                        {{ $heroItem['title'] }}
                     </h1>
                     <p class="mt-5 max-w-2xl text-sm leading-7 text-white/80 sm:text-base" data-hero-synopsis>
-                        {{ $heroMovie->localised_synopsis() }}
+                        {{ $heroItem['description'] }}
                     </p>
-                    <div class="mt-5 flex flex-wrap items-center gap-2 text-xs font-medium text-white/80" data-hero-metadata>
-                        <span class="rounded-full border border-white/25 bg-black/25 px-3 py-1.5" data-hero-language>{{ $heroMovie->language }}</span>
-                        <span class="rounded-full border border-white/25 bg-black/25 px-3 py-1.5" data-hero-duration>{{ $heroMovie->duration_label() }}</span>
-                        @if ($heroMovie->certificate)
-                            <span class="rounded-full border border-white/25 bg-black/25 px-3 py-1.5">{{ $heroMovie->certificate }}</span>
-                        @endif
+                    <div class="mt-5 flex flex-wrap items-center gap-2 text-xs font-medium text-white/80" data-hero-metadata @if (! $heroItem['language'] && ! $heroItem['duration'] && ! $heroItem['release_date'] && ! $heroItem['certificate']) hidden @endif>
+                        <span class="rounded-full border border-white/25 bg-black/25 px-3 py-1.5" data-hero-language @if (! $heroItem['language']) hidden @endif>{{ $heroItem['language'] }}</span>
+                        <span class="rounded-full border border-white/25 bg-black/25 px-3 py-1.5" data-hero-duration @if (! $heroItem['duration']) hidden @endif>{{ $heroItem['duration'] }}</span>
+                        <span class="rounded-full border border-white/25 bg-black/25 px-3 py-1.5" data-hero-release-date @if (! $heroItem['release_date']) hidden @endif>{{ $heroItem['release_date'] }}</span>
+                        <span class="rounded-full border border-white/25 bg-black/25 px-3 py-1.5" data-hero-certificate @if (! $heroItem['certificate']) hidden @endif>{{ $heroItem['certificate'] }}</span>
                     </div>
                     <div class="mt-8 flex flex-wrap gap-3" data-hero-actions>
                         <a
-                            href="{{ route('movies.show', $heroMovie) }}"
+                            href="{{ $heroItem['primary_url'] }}"
                             class="btn-primary btn-lg"
-                            data-hero-book-link
-                            data-hero-book-title="{{ $heroMovie->localised_title() }}"
+                            data-hero-primary-link
                         >
                             <x-icon name="ticket" :size="18" />
-                            {{ ui('book_tickets', 'Book Tickets') }}
+                            <span data-hero-primary-text>{{ $heroItem['primary_text'] }}</span>
                         </a>
-                        <a href="{{ route('movies.index') }}" class="btn-lg rounded-lg border border-white/35 bg-white/10 px-5 py-2.5 text-sm font-semibold text-white backdrop-blur-sm transition hover:bg-white/20">
-                            {{ ui('explore_movies', 'Explore Movies') }}
+                        <a href="{{ $heroItem['secondary_url'] }}" class="btn-lg rounded-lg border border-white/35 bg-white/10 px-5 py-2.5 text-sm font-semibold text-white backdrop-blur-sm transition hover:bg-white/20" data-hero-secondary-link>
+                            <span data-hero-secondary-text>{{ $heroItem['secondary_text'] }}</span>
                         </a>
                     </div>
                 </div>
             </div>
 
             <nav class="absolute inset-x-0 bottom-5 z-10 flex items-center justify-center gap-2" aria-label="Featured movies">
-                @foreach ($featured as $index => $movie)
-                    @php($image = $movie->banner_url ?: $movie->poster_url)
+                @foreach ($heroItems as $index => $item)
                     <button
                         type="button"
                         class="group flex h-11 items-center px-1"
-                        aria-label="{{ ui('show_featured_movie', 'Show featured movie') }}: {{ $movie->localised_title() }}"
+                        aria-label="{{ ui('show_featured_movie', 'Show featured movie') }}: {{ $item['movie_title'] }}"
                         aria-current="{{ $index === 0 ? 'true' : 'false' }}"
                         data-hero-page
-                        data-hero-image="{{ $image }}"
-                        data-hero-label="{{ $movie->localised_title() }}"
-                        data-hero-title="{{ $movie->localised_title() }}"
-                        data-hero-synopsis="{{ $movie->localised_synopsis() }}"
-                        data-hero-language="{{ $movie->language }}"
-                        data-hero-duration="{{ $movie->duration_label() }}"
-                        data-hero-details="true"
-                        data-hero-book-url="{{ route('movies.show', $movie) }}"
-                        data-hero-book-title="{{ $movie->localised_title() }}"
+                        data-hero-image="{{ $item['desktop_image'] }}"
+                        data-hero-mobile-image="{{ $item['mobile_image'] ?: $item['desktop_image'] }}"
+                        data-hero-label="{{ $item['label'] }}"
+                        data-hero-movie-title="{{ $item['movie_title'] }}"
+                        data-hero-title="{{ $item['title'] }}"
+                        data-hero-synopsis="{{ $item['description'] }}"
+                        data-hero-language="{{ $item['language'] }}"
+                        data-hero-duration="{{ $item['duration'] }}"
+                        data-hero-release-date="{{ $item['release_date'] }}"
+                        data-hero-certificate="{{ $item['certificate'] }}"
+                        data-hero-primary-text="{{ $item['primary_text'] }}"
+                        data-hero-primary-url="{{ $item['primary_url'] }}"
+                        data-hero-secondary-text="{{ $item['secondary_text'] }}"
+                        data-hero-secondary-url="{{ $item['secondary_url'] }}"
                     >
                         <span @class([
                             'h-1 rounded-full transition-all duration-300',

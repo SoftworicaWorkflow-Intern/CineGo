@@ -7,6 +7,7 @@ use App\Models\City;
 use App\Models\Hall;
 use App\Models\Movie;
 use App\Models\Showtime;
+use Database\Seeders\KawasotiDemoSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -72,6 +73,16 @@ class PublicPagesTest extends TestCase
             ->assertDontSee('id="home-genre"', false)
             ->assertDontSee('id="home-date"', false)
             ->assertDontSee('id="home-time"', false);
+    }
+
+    public function test_movies_page_does_not_show_the_popular_tab(): void
+    {
+        $this->get(route('movies.index'))
+            ->assertOk()
+            ->assertDontSee('Popular')
+            ->assertSee(ui('all_movies', 'All Movies'))
+            ->assertSee(ui('now_showing', 'Now Showing'))
+            ->assertSee(ui('coming_soon', 'Coming Soon'));
     }
 
     public function test_homepage_shows_one_now_playing_movie_without_rating_or_trailer(): void
@@ -291,6 +302,9 @@ class PublicPagesTest extends TestCase
             ->assertSee($movie->title)
             ->assertSee('4:00 PM')
             ->assertSee('<summary data-showtime-option', false)
+            ->assertSee('data-showtime-card', false)
+            ->assertSee('min-w-[150px]', false)
+            ->assertSee('grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4', false)
             ->assertDontSee($cinema->localised_name())
             ->assertDontSee($hall->name)
             ->assertSee(route('booking.seats', $showtime))
@@ -299,6 +313,53 @@ class PublicPagesTest extends TestCase
             ->assertDontSee('>Dates</p>', false)
             ->assertDontSee('42 Hidden Street')
             ->assertDontSee('Hidden City');
+    }
+
+    public function test_chhaya_bazaar_demo_showtimes_are_available_for_booking(): void
+    {
+        $this->travelTo('2026-11-04 00:00:00');
+
+        $movie = Movie::factory()->comingSoon()->create([
+            'title' => 'Chhaya Bazaar',
+            'slug' => 'chhaya-bazaar',
+            'release_date' => '2026-12-02',
+            'language' => 'Nepali',
+        ]);
+
+        $seeder = app(KawasotiDemoSeeder::class);
+        $seeder->run();
+        $seeder->run();
+
+        $cinema = Cinema::query()->where('slug', 'cinego-kawasoti-demo')->firstOrFail();
+        $hall = Hall::query()->where('cinema_id', $cinema->id)->where('name', 'Hall 1')->firstOrFail();
+        $showtime = Showtime::query()->where('movie_id', $movie->id)->where('start_time', '10:30:00')->firstOrFail();
+
+        $this->assertDatabaseCount('showtimes', 5);
+        $this->assertDatabaseCount('seats', 112);
+        $this->assertDatabaseHas('showtimes', [
+            'id' => $showtime->id,
+            'cinema_id' => $cinema->id,
+            'hall_id' => $hall->id,
+            'price_normal' => 450,
+            'price_premium' => 650,
+            'price_recliner' => 850,
+        ]);
+        $this->assertSame('2026-12-08', $showtime->show_date->toDateString());
+
+        $this->get(route('movies.show', $movie))
+            ->assertOk()
+            ->assertSee('10:30 AM')
+            ->assertSee('1:15 PM')
+            ->assertSee('4:00 PM')
+            ->assertSee('7:00 PM')
+            ->assertSee('9:30 PM')
+            ->assertSee('Rs. 450')
+            ->assertSee(route('booking.seats', $showtime));
+
+        $this->get(route('booking.seats', $showtime))
+            ->assertOk()
+            ->assertSee($movie->title)
+            ->assertSee('aria-label="A1 — Available"', false);
     }
 
     public function test_movie_detail_renders_a_seat_link_for_each_showtime_date(): void

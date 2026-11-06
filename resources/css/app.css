@@ -272,11 +272,18 @@
 .cg-home-hero-art {
     position: absolute;
     inset: 0;
+    background-image: var(--hero-image-desktop, none);
     background-position: center;
     background-repeat: no-repeat;
     background-size: cover;
     opacity: 0;
     transition: opacity 700ms ease-in-out;
+}
+
+@media (max-width: 639px) {
+    .cg-home-hero-art {
+        background-image: var(--hero-image-mobile, var(--hero-image-desktop, none));
+    }
 }
 
 .cg-home-hero-art-active {

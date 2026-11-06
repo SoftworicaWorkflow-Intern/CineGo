@@ -39,6 +39,7 @@
                         ['route' => 'admin.dashboard', 'label' => ui('dashboard', 'Dashboard'), 'icon' => 'dashboard', 'match' => 'admin.dashboard'],
                         ['route' => 'admin.movies.index', 'label' => ui('movies', 'Movies'), 'icon' => 'film', 'match' => 'admin.movies.*'],
                         ['route' => 'admin.showtimes.index', 'label' => ui('showtimes_for', 'Showtime'), 'icon' => 'clock', 'match' => 'admin.showtimes.*'],
+                        ['route' => 'admin.hero-sliders.index', 'label' => 'Hero Banner', 'icon' => 'image', 'match' => 'admin.hero-sliders.*'],
                         ['route' => 'admin.bookings.index', 'label' => ui('bookings', 'Bookings'), 'icon' => 'ticket', 'match' => 'admin.bookings.*'],
                         ['route' => 'admin.messages.index', 'label' => ui('contact', 'Messages'), 'icon' => 'mail', 'match' => 'admin.messages.*'],
                         ['route' => 'admin.users.index', 'label' => ui('customers', 'Customers'), 'icon' => 'users', 'match' => 'admin.users.*'],

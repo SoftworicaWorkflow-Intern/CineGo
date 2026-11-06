@@ -108,7 +108,7 @@
                     />
                 @else
                     {{-- Date selector --}}
-                    <div class="-mx-4 mb-6 flex gap-2 overflow-x-auto px-4 pb-2 sm:mx-0 sm:px-0" role="tablist" aria-label="Show dates">
+                    <div class="-mx-4 mb-6 flex gap-3 overflow-x-auto px-4 pb-2 sm:mx-0 sm:px-0" role="tablist" aria-label="Show dates">
                         @foreach ($dateKeys as $index => $dateKey)
                             @php($date = \Illuminate\Support\Carbon::parse($dateKey))
                             <button
@@ -116,12 +116,12 @@
                                 role="tab"
                                 data-date-chip="{{ $dateKey }}"
                                 aria-selected="{{ $index === 0 ? 'true' : 'false' }}"
-                                class="cg-step-idle shrink-0 rounded-xl border px-5 py-3 text-center transition {{ $index === 0 ? 'cg-step-active' : '' }}"
+                                class="min-w-[150px] shrink-0 rounded-[20px] border border-cg-border bg-cg-charcoal px-6 py-5 text-center text-cg-dim transition hover:border-cg-red/40 {{ $index === 0 ? 'border-cg-red/40 bg-cg-red/5 text-cg-white shadow-sm' : '' }}"
                             >
-                                <span class="block text-[11px] uppercase tracking-wide">
+                                <span class="block text-sm uppercase tracking-wide">
                                     {{ $date->isToday() ? ui('today', 'Today') : $date->format('D') }}
                                 </span>
-                                <span class="block text-sm font-bold">{{ $date->format('M j') }}</span>
+                                <span class="mt-1 block text-lg font-bold">{{ $date->format('M j') }}</span>
                             </button>
                         @endforeach
                     </div>
@@ -132,17 +132,20 @@
                             data-date-panel="{{ $dateKey }}"
                             class="{{ $index === 0 ? '' : 'hidden' }}"
                         >
-                            <div class="card p-4 sm:p-5">
-                                <div class="grid grid-cols-2 gap-2.5 sm:grid-cols-3 md:grid-cols-4">
+                            <div class="card rounded-[22px] p-4 shadow-md sm:p-6">
+                                <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4">
                                     @foreach ($dayShowtimes as $showtime)
-                                        <details class="rounded-lg border border-cg-border bg-cg-charcoal transition hover:border-cg-red">
-                                            <summary data-showtime-option class="cursor-pointer px-3 py-2.5 text-center">
-                                                <span class="block text-sm font-bold text-cg-white">{{ $showtime->start_time_label() }}</span>
-                                                <span class="mt-0.5 block text-[11px] text-cg-dim">
+                                        <details data-showtime-card class="group overflow-hidden rounded-2xl border border-cg-border bg-cg-charcoal transition hover:border-cg-red/40 hover:shadow-sm">
+                                            <summary data-showtime-option class="list-none cursor-pointer px-3 py-5 text-center [&::-webkit-details-marker]:hidden sm:px-4 sm:py-6">
+                                                <span class="flex justify-center text-cg-white">
+                                                    <x-icon name="play" :size="18" />
+                                                </span>
+                                                <span class="mt-3 block text-base font-bold text-cg-white sm:text-lg">{{ $showtime->start_time_label() }}</span>
+                                                <span class="mt-1 block text-xs text-cg-dim sm:text-sm">
                                                     {{ $showtime->format }} · {{ $showtime->language }} · Rs. {{ number_format($showtime->price_normal) }}
                                                 </span>
                                             </summary>
-                                            <div class="space-y-3 border-t border-cg-border px-3 py-3 text-center">
+                                            <div class="space-y-3 border-t border-cg-border px-3 py-4 text-center">
                                                 <div class="text-xs text-cg-muted">
                                                     <p>{{ \Illuminate\Support\Carbon::parse($dateKey)->format('D, M j, Y') }} · {{ $showtime->start_time_label() }}</p>
                                                 </div>
@@ -203,8 +206,12 @@
                     chips.forEach(function (other) {
                         var active = other.getAttribute('data-date-chip') === date;
                         other.setAttribute('aria-selected', active ? 'true' : 'false');
-                        other.classList.toggle('cg-step-active', active);
-                        other.classList.toggle('cg-step-idle', !active);
+                        other.classList.toggle('border-cg-red/40', active);
+                        other.classList.toggle('bg-cg-red/5', active);
+                        other.classList.toggle('text-cg-white', active);
+                        other.classList.toggle('shadow-sm', active);
+                        other.classList.toggle('bg-cg-charcoal', !active);
+                        other.classList.toggle('text-cg-dim', !active);
                     });
 
                     var target = document.getElementById('showtimes');
