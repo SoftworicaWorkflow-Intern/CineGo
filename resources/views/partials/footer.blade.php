@@ -70,7 +70,6 @@
                 <li><a class="footer-link" href="{{ route('movies.index') }}">{{ ui('movies', 'Movies') }}</a></li>
                 <li><a class="footer-link" href="{{ route('movies.index', ['tab' => 'now_showing']) }}">{{ ui('now_showing_link', 'Now Showing') }}</a></li>
                 <li><a class="footer-link" href="{{ route('movies.index', ['tab' => 'coming_soon']) }}">{{ ui('coming_soon_link', 'Coming Soon') }}</a></li>
-                <li><a class="footer-link" href="{{ route('offers.index') }}">{{ ui('offers', 'Offers') }}</a></li>
                 <li><a class="footer-link" href="{{ route('pages.about') }}">{{ ui('about', 'About Us') }}</a></li>
                 <li><a class="footer-link" href="{{ route('pages.contact') }}">{{ ui('contact', 'Contact') }}</a></li>
             </ul>
@@ -80,8 +79,6 @@
             <h2 class="mb-5 text-sm font-bold uppercase tracking-wider text-cg-white">{{ ui('help_support', 'Help & support') }}</h2>
             <ul class="space-y-3 text-sm">
                 <li><a class="footer-link" href="{{ route('pages.contact') }}">{{ ui('faq', 'FAQs') }}</a></li>
-                <li><a class="footer-link" href="{{ route('movies.index') }}">{{ ui('how_to_book', 'How to Book Tickets') }}</a></li>
-                <li><a class="footer-link" href="mailto:support@cinego.com.np">{{ ui('payment_methods', 'Payment Methods') }}</a></li>
                 <li><a class="footer-link" href="{{ route('pages.terms') }}">{{ ui('terms', 'Terms & Conditions') }}</a></li>
                 <li><a class="footer-link" href="{{ route('pages.privacy') }}">{{ ui('privacy', 'Privacy Policy') }}</a></li>
                 <li><a class="footer-link" href="{{ route('pages.refund') }}">{{ ui('refund', 'Refund Policy') }}</a></li>
@@ -128,13 +125,24 @@
         <div class="container-page flex flex-col gap-4 py-6 text-sm text-cg-muted md:flex-row md:items-center md:justify-between">
             <div class="space-y-1">
                 <p>© {{ date('Y') }} CineGo. {{ ui('rights', 'All rights reserved.') }}</p>
-                <p class="text-xs text-cg-dim">{{ ui('crafted', 'Crafted for Nepali cinema lovers.') }}</p>
             </div>
-            <nav aria-label="{{ ui('legal_links', 'Legal links') }}" class="flex flex-wrap gap-x-5 gap-y-2">
-                <a class="footer-link" href="{{ route('pages.privacy') }}">{{ ui('privacy', 'Privacy Policy') }}</a>
-                <a class="footer-link" href="{{ route('pages.terms') }}">{{ ui('terms', 'Terms & Conditions') }}</a>
-                <a class="footer-link" href="{{ route('pages.refund') }}">{{ ui('refund', 'Refund Policy') }}</a>
-            </nav>
+            <div class="flex flex-col gap-3">
+                <nav aria-label="{{ ui('legal_links', 'Legal links') }}" class="flex flex-wrap gap-x-5 gap-y-2">
+                    <a class="footer-link" href="{{ route('pages.privacy') }}">{{ ui('privacy', 'Privacy Policy') }}</a>
+                    <a class="footer-link" href="{{ route('pages.terms') }}">{{ ui('terms', 'Terms & Conditions') }}</a>
+                    <a class="footer-link" href="{{ route('pages.refund') }}">{{ ui('refund', 'Refund Policy') }}</a>
+                </nav>
+                <div class="flex items-center gap-3 text-xs text-cg-muted md:translate-x-4">
+                    <span>Designed &amp; developed by</span>
+                    <img
+                        src="{{ asset('img/softworica.png') }}"
+                        alt="Softworica"
+                        width="140"
+                        height="28"
+                        loading="lazy"
+                    >
+                </div>
+            </div>
         </div>
     </div>
 </footer>

@@ -4,7 +4,6 @@
 @section('meta', \Illuminate\Support\Str::limit(strip_tags($movie->localised_synopsis()), 155))
 
 @php($dateKeys = $groupedShowtimes->keys()->values())
-@php($firstShowtime = $groupedShowtimes->isEmpty() ? null : $groupedShowtimes->first()->sortBy('start_time')->first())
 
 @section('content')
     {{-- Backdrop --}}
@@ -46,18 +45,9 @@
                     </h1>
 
                     <div class="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-cg-muted">
-                        @if ($movie->rating)
-                            <span class="inline-flex items-center gap-1.5 font-semibold text-cg-white">
-                                <x-icon name="star" :size="16" class="cg-star" />
-                                {{ number_format($movie->rating, 1) }} <span class="font-normal text-cg-dim">/ 10</span>
-                            </span>
-                        @endif
                         <span class="inline-flex items-center gap-1.5"><x-icon name="clock" :size="15" class="text-cg-red" />{{ $movie->duration_label() }}</span>
                         <span class="inline-flex items-center gap-1.5"><x-icon name="globe" :size="15" class="text-cg-red" />{{ $movie->language }}</span>
                         <span class="inline-flex items-center gap-1.5"><x-icon name="calendar" :size="15" class="text-cg-red" />{{ $movie->release_date?->format('M j, Y') }}</span>
-                        @if ($movie->rating)
-                            <span class="inline-flex items-center gap-1.5"><x-icon name="star" :size="15" class="text-cg-red" />{{ $reviewCount }} {{ ui('rating', 'Rating') }}</span>
-                        @endif
                     </div>
 
                     <p class="mt-5 max-w-3xl leading-relaxed text-cg-muted">{{ $movie->localised_synopsis() }}</p>
@@ -140,21 +130,27 @@
                         @php($dayShowtimes = $groupedShowtimes[$dateKey]->sortBy('start_time'))
                         <div
                             data-date-panel="{{ $dateKey }}"
-                            data-booking-url="{{ route('booking.seats', $dayShowtimes->first()) }}"
                             class="{{ $index === 0 ? '' : 'hidden' }}"
                         >
                             <div class="card p-4 sm:p-5">
                                 <div class="grid grid-cols-2 gap-2.5 sm:grid-cols-3 md:grid-cols-4">
                                     @foreach ($dayShowtimes as $showtime)
-                                        <a
-                                            href="{{ route('booking.seats', $showtime) }}"
-                                            class="group flex flex-col items-center rounded-lg border border-cg-border bg-cg-charcoal px-3 py-2.5 transition hover:border-cg-red hover:bg-cg-red/10"
-                                        >
-                                            <span class="text-sm font-bold text-cg-white">{{ $showtime->start_time_label() }}</span>
-                                            <span class="mt-0.5 text-[11px] text-cg-dim">
-                                                {{ $showtime->format }} · {{ $showtime->language }} · Rs. {{ number_format($showtime->price_normal) }}
-                                            </span>
-                                        </a>
+                                        <details class="rounded-lg border border-cg-border bg-cg-charcoal transition hover:border-cg-red">
+                                            <summary data-showtime-option class="cursor-pointer px-3 py-2.5 text-center">
+                                                <span class="block text-sm font-bold text-cg-white">{{ $showtime->start_time_label() }}</span>
+                                                <span class="mt-0.5 block text-[11px] text-cg-dim">
+                                                    {{ $showtime->format }} · {{ $showtime->language }} · Rs. {{ number_format($showtime->price_normal) }}
+                                                </span>
+                                            </summary>
+                                            <div class="space-y-3 border-t border-cg-border px-3 py-3 text-center">
+                                                <div class="text-xs text-cg-muted">
+                                                    <p>{{ \Illuminate\Support\Carbon::parse($dateKey)->format('D, M j, Y') }} · {{ $showtime->start_time_label() }}</p>
+                                                </div>
+                                                <a href="{{ route('booking.seats', $showtime) }}" class="btn-primary btn-block">
+                                                    {{ ui('proceed_to_seats', 'Continue to seats') }}
+                                                </a>
+                                            </div>
+                                        </details>
                                     @endforeach
                                 </div>
                             </div>
@@ -163,144 +159,12 @@
                 @endif
             </section>
 
-            {{-- ===================== Reviews ===================== --}}
-            <section id="reviews">
-                <x-section-head
-                    :kicker="ui('rating', 'Rating')"
-                    :title="ui('reviews', 'Reviews')"
-                />
 
-                <div class="mb-6 flex flex-wrap items-center gap-6">
-                    <div class="flex items-center gap-3">
-                        <span class="font-display text-5xl text-cg-white">
-                            {{ $averageRating > 0 ? number_format($averageRating, 1) : '—' }}
-                        </span>
-                        <span>
-                            <span class="flex gap-0.5">
-                                @for ($star = 1; $star <= 5; $star++)
-                                    <x-icon name="star" :size="16" class="{{ $star <= round($averageRating) ? 'cg-star' : 'text-cg-border' }}" />
-                                @endfor
-                            </span>
-                            <span class="text-xs text-cg-dim">{{ $reviewCount }} {{ ui('reviews_count', 'reviews') }}</span>
-                        </span>
-                    </div>
-
-                    @auth
-                        <a href="#write-review" class="btn-outline ml-auto px-4 py-2 text-sm">
-                            <x-icon name="edit" :size="15" /> {{ ui('write_review', 'Write a review') }}
-                        </a>
-                    @endauth
-                </div>
-
-                @auth
-                    <form id="write-review" action="{{ route('movies.review', $movie) }}" method="POST" class="card mb-8 space-y-4 p-5">
-                        @csrf
-                        <div class="grid gap-4 sm:grid-cols-2">
-                            <div>
-                                <label class="label" for="review-rating">{{ ui('your_rating', 'Your rating') }} *</label>
-                                <select id="review-rating" name="rating" class="input cursor-pointer" required>
-                                    @for ($star = 5; $star >= 1; $star--)
-                                        <option value="{{ $star }}" @selected(old('rating', $userReview?->rating) == $star)>
-                                            {{ $star }} ★
-                                        </option>
-                                    @endfor
-                                </select>
-                            </div>
-                            <div>
-                                <label class="label" for="review-title">{{ ui('review_title', 'Title (optional)') }}</label>
-                                <input id="review-title" type="text" name="title" value="{{ old('title', $userReview?->title) }}" class="input" maxlength="80">
-                            </div>
-                        </div>
-                        <div>
-                            <label class="label" for="review-body">{{ ui('message', 'Message') }}</label>
-                            <textarea id="review-body" name="body" rows="3" class="input resize-y" maxlength="2000">{{ old('body', $userReview?->body) }}</textarea>
-                        </div>
-                        <button type="submit" class="btn-primary">{{ ui('send_message', 'Submit') }}</button>
-                    </form>
-                @else
-                    <p class="card mb-8 p-5 text-sm text-cg-muted">
-                        {{ ui('login_to_review', 'Log in to write a review.') }}
-                        <a href="{{ route('login') }}" class="font-semibold text-cg-red hover:underline">{{ ui('login', 'Login') }}</a>
-                    </p>
-                @endauth
-
-                <div class="space-y-4">
-                    @forelse ($reviews as $review)
-                        <article class="card p-5">
-                            <div class="flex flex-wrap items-center justify-between gap-2">
-                                <div class="flex items-center gap-3">
-                                    <span class="flex h-9 w-9 items-center justify-center rounded-full bg-cg-red/20 text-sm font-bold text-cg-red">
-                                        {{ strtoupper(substr($review->user?->name ?? '?', 0, 1)) }}
-                                    </span>
-                                    <span>
-                                        <span class="block text-sm font-semibold text-cg-white">{{ $review->user?->name ?? 'Guest' }}</span>
-                                        <span class="flex gap-0.5">
-                                            @for ($star = 1; $star <= 5; $star++)
-                                                <x-icon name="star" :size="12" class="{{ $star <= $review->rating ? 'cg-star' : 'text-cg-border' }}" />
-                                            @endfor
-                                        </span>
-                                    </span>
-                                </div>
-                                <span class="text-xs text-cg-dim">{{ $review->created_at->diffForHumans() }}</span>
-                            </div>
-                            @if ($review->title)
-                                <h4 class="mt-3 font-semibold text-cg-white">{{ $review->title }}</h4>
-                            @endif
-                            @if ($review->body)
-                                <p class="mt-1.5 text-sm leading-relaxed text-cg-muted">{{ $review->body }}</p>
-                            @endif
-                        </article>
-                    @empty
-                        <x-empty :title="ui('no_reviews', 'No reviews yet.')" :text="ui('be_first', 'Be the first to review this movie.')" icon="star" />
-                    @endforelse
-                </div>
-            </section>
         </div>
 
         {{-- ===================== Sidebar ===================== --}}
         <aside class="space-y-6">
-            <div class="card sticky top-24 space-y-4 p-5">
-                <div class="flex items-center gap-3">
-                    <span class="flex h-12 w-12 items-center justify-center rounded-xl bg-cg-red/15 text-cg-red">
-                        <x-icon name="ticket" :size="24" />
-                    </span>
-                    <span>
-                        <span class="block font-semibold text-cg-white">{{ ui('book_tickets', 'Book Tickets') }}</span>
-                        <span class="text-xs text-cg-muted">{{ ui('choose_date', 'Choose a date') }} → {{ ui('choose_showtime', 'Choose a showtime') }}</span>
-                    </span>
-                </div>
 
-                @if ($dateKeys->isNotEmpty())
-                    <div class="rounded-lg border border-cg-border bg-cg-charcoal p-3 text-sm text-cg-muted">
-                        <p class="mb-1.5 text-xs uppercase tracking-wide text-cg-dim">{{ ui('dates', 'Dates') }}</p>
-                        <div class="flex flex-wrap gap-1.5">
-                            @foreach ($dateKeys as $dateKey)
-                                <button
-                                    type="button"
-                                    data-date-chip="{{ $dateKey }}"
-                                    aria-selected="{{ $index === 0 ? 'true' : 'false' }}"
-                                    class="rounded-md border border-cg-border px-2.5 py-1.5 text-xs text-cg-white transition hover:border-cg-red"
-                                >{{ \Illuminate\Support\Carbon::parse($dateKey)->format('M j') }}</button>
-                            @endforeach
-                        </div>
-                    </div>
-                @endif
-
-                @if ($firstShowtime)
-                    <a data-booking-link href="{{ route('booking.seats', $firstShowtime) }}" class="btn-primary btn-block">
-                        {{ ui('proceed_to_seats', 'Choose your seats') }}
-                    </a>
-                @else
-                    <button type="button" class="btn-primary btn-block cursor-not-allowed opacity-60" disabled>
-                        {{ ui('proceed_to_seats', 'Choose your seats') }}
-                    </button>
-                @endif
-
-                <p class="flex items-start gap-2 text-xs text-cg-dim">
-                    <x-icon name="info" :size="14" class="mt-0.5 shrink-0 text-cg-red" />
-                    {{ ui('demo_payment_note', 'Pay with eSewa, Khalti or card — your seat is confirmed instantly.') }}
-                </p>
-            </div>
 
             {{-- Similar movies --}}
             @if ($similar->isNotEmpty())
@@ -326,7 +190,6 @@
         (function () {
             var chips = document.querySelectorAll('[data-date-chip]');
             var panels = document.querySelectorAll('[data-date-panel]');
-            var bookingLink = document.querySelector('[data-booking-link]');
             if (!chips.length) return;
 
             chips.forEach(function (chip) {
@@ -336,13 +199,6 @@
                     panels.forEach(function (panel) {
                         panel.classList.toggle('hidden', panel.getAttribute('data-date-panel') !== date);
                     });
-
-                    var activePanel = Array.from(panels).find(function (panel) {
-                        return panel.getAttribute('data-date-panel') === date;
-                    });
-                    if (bookingLink && activePanel) {
-                        bookingLink.href = activePanel.getAttribute('data-booking-url');
-                    }
 
                     chips.forEach(function (other) {
                         var active = other.getAttribute('data-date-chip') === date;

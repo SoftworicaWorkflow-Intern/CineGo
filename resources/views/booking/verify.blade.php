@@ -38,7 +38,6 @@
                     <div class="flex flex-wrap items-start justify-between gap-3">
                         <div>
                             <p class="font-display text-2xl tracking-wide text-cg-white">{{ $booking->movie_title }}</p>
-                            <p class="mt-0.5 text-sm text-cg-muted">{{ $booking->cinema_name }} · {{ $booking->hall_name }}</p>
                         </div>
                         <span class="badge-dark font-mono">{{ $booking->booking_code }}</span>
                     </div>

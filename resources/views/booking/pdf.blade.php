@@ -78,7 +78,7 @@
     </table>
 
     <p class="movie">{{ $booking->movie_title }}</p>
-    <p class="sub">{{ $booking->cinema_name }} · {{ $booking->hall_name }} · {{ $booking->format }}</p>
+    <p class="sub">{{ $booking->format }}</p>
 
     <table>
         <tr>

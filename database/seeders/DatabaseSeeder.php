@@ -57,30 +57,40 @@ class DatabaseSeeder extends Seeder
 
     private function seedUsers(): void
     {
-        $this->users[] = User::factory()->create([
-            'name' => 'CineGo Admin',
-            'email' => 'admin@cinego.com.np',
-            'phone' => '9800000001',
-            'password' => Hash::make('password'),
-            'preferred_language' => 'en',
-            'is_admin' => true,
-        ]);
+        $admin = User::query()->firstOrCreate(
+            ['email' => 'admin@cinego.com.np'],
+            [
+                'name' => 'CineGo Admin',
+                'phone' => '9800000001',
+                'password' => Hash::make('password'),
+                'preferred_language' => 'en',
+                'is_admin' => true,
+            ],
+        );
+        if ($admin->wasRecentlyCreated) {
+            $admin->forceFill(['is_admin' => true])->save();
+        }
+        $this->users[] = $admin;
 
-        $this->users[] = User::factory()->create([
-            'name' => 'Shreeja Gurung',
-            'email' => 'shreeja@example.com',
-            'phone' => '9800000002',
-            'password' => Hash::make('password'),
-            'preferred_language' => 'en',
-        ]);
+        $this->users[] = User::query()->firstOrCreate(
+            ['email' => 'shreeja@example.com'],
+            [
+                'name' => 'Shreeja Gurung',
+                'phone' => '9800000002',
+                'password' => Hash::make('password'),
+                'preferred_language' => 'en',
+            ],
+        );
 
-        $this->users[] = User::factory()->create([
-            'name' => 'Aayush Thapa',
-            'email' => 'aayush@example.com',
-            'phone' => '9800000003',
-            'password' => Hash::make('password'),
-            'preferred_language' => 'np',
-        ]);
+        $this->users[] = User::query()->firstOrCreate(
+            ['email' => 'aayush@example.com'],
+            [
+                'name' => 'Aayush Thapa',
+                'phone' => '9800000003',
+                'password' => Hash::make('password'),
+                'preferred_language' => 'np',
+            ],
+        );
     }
 
     private function seedCities(): void

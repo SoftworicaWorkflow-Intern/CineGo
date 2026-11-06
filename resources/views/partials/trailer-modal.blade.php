@@ -25,7 +25,8 @@
                 class="absolute inset-0 h-full w-full"
                 src=""
                 title="Movie trailer"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                referrerpolicy="strict-origin-when-cross-origin"
                 allowfullscreen
             ></iframe>
         </div>

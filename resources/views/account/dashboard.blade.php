@@ -73,7 +73,7 @@
                                         <span class="min-w-0 flex-1">
                                             <span class="block truncate font-semibold text-cg-white">{{ $booking->movie_title }}</span>
                                             <span class="mt-0.5 block truncate text-xs text-cg-muted">
-                                                {{ $booking->cinema_name }} · {{ $booking->show_date->format('M j, Y') }} · {{ \Illuminate\Support\Str::of($booking->start_time)->substr(0, 5) }}
+                                                {{ $booking->show_date->format('M j, Y') }} · {{ \Illuminate\Support\Str::of($booking->start_time)->substr(0, 5) }}
                                             </span>
                                             <span class="mt-1 block text-xs font-semibold text-cg-red">{{ $booking->seat_labels() }}</span>
                                         </span>

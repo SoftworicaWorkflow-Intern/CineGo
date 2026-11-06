@@ -53,9 +53,6 @@
                                     @endif
                                 </div>
 
-                                <p class="mt-1.5 text-sm text-cg-muted">
-                                    {{ $booking->cinema_name }} · {{ $booking->hall_name }}
-                                </p>
                                 <p class="mt-1 flex flex-wrap gap-x-4 text-xs text-cg-dim">
                                     <span class="inline-flex items-center gap-1.5">
                                         <x-icon name="calendar" :size="13" class="text-cg-red" />
