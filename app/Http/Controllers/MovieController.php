@@ -2,9 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Booking;
 use App\Models\Movie;
-use App\Models\Review;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
@@ -18,7 +16,7 @@ class MovieController extends Controller
     public function index(Request $request): View
     {
         $validated = $request->validate([
-            'tab' => 'nullable|in:all,now_showing,coming_soon,popular,top_rated',
+            'tab' => 'nullable|in:all,now_showing,coming_soon,top_rated',
             'genre' => 'nullable|string|max:40',
             'language' => 'nullable|string|max:40',
             'show_date' => 'nullable|date_format:Y-m-d',
@@ -37,14 +35,11 @@ class MovieController extends Controller
         match ($tab) {
             'now_showing' => $query->nowShowing(),
             'coming_soon' => $query->comingSoon(),
-            'popular' => $query->nowShowing()->withCount([
-                'showtimes.bookings as bookings_count' => fn ($builder) => $builder->where('status', Booking::STATUS_CONFIRMED),
-            ])->orderByDesc('bookings_count'),
             'top_rated' => $query->nowShowing()->whereNotNull('rating')->orderByDesc('rating'),
             default => null,
         };
 
-        if (! in_array($tab, ['popular', 'top_rated'], true)) {
+        if ($tab !== 'top_rated') {
             $this->applySort($query, $sort);
         }
 

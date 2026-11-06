@@ -4,6 +4,7 @@ use App\Http\Controllers\AccountController;
 use App\Http\Controllers\Admin\AnnouncementController as AdminAnnouncementController;
 use App\Http\Controllers\Admin\BookingController as AdminBookingController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Http\Controllers\Admin\HeroSlideController as AdminHeroSlideController;
 use App\Http\Controllers\Admin\MessageController as AdminMessageController;
 use App\Http\Controllers\Admin\MovieController as AdminMovieController;
 use App\Http\Controllers\Admin\OfferController as AdminOfferController;
@@ -135,6 +136,11 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::get('/settings', [AdminSettingsController::class, 'index'])->name('settings.index');
 
     Route::resource('movies', AdminMovieController::class)->except(['show']);
+    Route::post('/hero-sliders/reorder', [AdminHeroSlideController::class, 'reorder'])->name('hero-sliders.reorder');
+    Route::patch('/hero-sliders/{heroSlide}/status', [AdminHeroSlideController::class, 'toggleStatus'])->name('hero-sliders.status');
+    Route::get('/hero-sliders/{heroSlide}/preview', [AdminHeroSlideController::class, 'preview'])->name('hero-sliders.preview');
+    Route::resource('hero-sliders', AdminHeroSlideController::class)->except(['show'])->parameters(['hero-sliders' => 'heroSlide']);
+
     Route::resource('showtimes', AdminShowtimeController::class)->except(['show']);
     Route::resource('offers', AdminOfferController::class)->except(['show']);
     Route::resource('announcements', AdminAnnouncementController::class)->except(['create', 'edit', 'show']);

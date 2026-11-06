@@ -48,6 +48,7 @@ class DatabaseSeeder extends Seeder
         $this->seedCinemas();
         $this->seedMovies();
         $this->seedShowtimes();
+        $this->call(KawasotiDemoSeeder::class);
         $this->seedOffers();
         $this->seedAnnouncements();
         $this->seedReviews();

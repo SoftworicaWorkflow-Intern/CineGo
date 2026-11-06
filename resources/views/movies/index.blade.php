@@ -7,7 +7,6 @@
         'all' => ui('all_movies', 'All Movies'),
         'now_showing' => ui('now_showing', 'Now Showing'),
         'coming_soon' => ui('coming_soon', 'Coming Soon'),
-        'popular' => ui('popular', 'Popular'),
     ];
 
     $currentQuery = request()->query();

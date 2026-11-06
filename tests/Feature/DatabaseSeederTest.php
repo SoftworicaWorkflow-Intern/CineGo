@@ -2,6 +2,9 @@
 
 namespace Tests\Feature;
 
+use App\Models\Cinema;
+use App\Models\Movie;
+use App\Models\Showtime;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
@@ -33,5 +36,18 @@ class DatabaseSeederTest extends TestCase
             'email' => 'admin@cinego.com.np',
             'is_admin' => true,
         ]);
+    }
+
+    public function test_seeding_includes_kawasoti_demo_showtimes(): void
+    {
+        $this->seed();
+
+        $movie = Movie::query()->where('slug', 'chhaya-bazaar')->firstOrFail();
+        $cinema = Cinema::query()->where('slug', 'cinego-kawasoti-demo')->firstOrFail();
+
+        $this->assertSame(5, Showtime::query()
+            ->where('movie_id', $movie->id)
+            ->where('cinema_id', $cinema->id)
+            ->count());
     }
 }

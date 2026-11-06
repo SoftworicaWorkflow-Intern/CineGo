@@ -58,6 +58,14 @@ class Movie extends Model
     }
 
     /**
+     * @return HasMany<HeroSlide, $this>
+     */
+    public function heroSlides(): HasMany
+    {
+        return $this->hasMany(HeroSlide::class);
+    }
+
+    /**
      * @return HasMany<Review, $this>
      */
     public function reviews(): HasMany
