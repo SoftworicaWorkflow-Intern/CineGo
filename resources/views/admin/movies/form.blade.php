@@ -53,11 +53,9 @@
                     </div>
                 </div>
 
-                <div class="grid gap-4 sm:grid-cols-2">
-                    <div>
-                        <label class="label" for="certificate">{{ ui('certificate', 'Certificate') }}</label>
-                        <input id="certificate" type="text" name="certificate" value="{{ old('certificate', $movie->certificate) }}" class="input" maxlength="10" placeholder="UA / A / G">
-                    </div>
+                <div>
+                    <label class="label" for="certificate">{{ ui('certificate', 'Certificate') }}</label>
+                    <input id="certificate" type="text" name="certificate" value="{{ old('certificate', $movie->certificate) }}" class="input" maxlength="10" placeholder="UA / A / G">
                 </div>
             </section>
 

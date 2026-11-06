@@ -5,7 +5,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Storage;
 
 class HeroSlide extends Model
@@ -16,25 +15,9 @@ class HeroSlide extends Model
 
     protected $fillable = [
         'movie_id',
+        'internal_title',
         'desktop_image',
         'mobile_image',
-        'movie_title_en',
-        'movie_title_np',
-        'title_en',
-        'title_np',
-        'description_en',
-        'description_np',
-        'label_en',
-        'label_np',
-        'duration',
-        'language',
-        'release_date',
-        'primary_button_text_en',
-        'primary_button_text_np',
-        'primary_button_url',
-        'secondary_button_text_en',
-        'secondary_button_text_np',
-        'secondary_button_url',
         'display_order',
         'status',
         'starts_at',
@@ -42,11 +25,9 @@ class HeroSlide extends Model
     ];
 
     protected $casts = [
-        'release_date' => 'date',
         'starts_at' => 'datetime',
         'ends_at' => 'datetime',
         'display_order' => 'integer',
-        'duration' => 'integer',
     ];
 
     /**
@@ -70,52 +51,6 @@ class HeroSlide extends Model
             ->where(fn (Builder $query) => $query->whereNull('ends_at')->orWhere('ends_at', '>=', $now))
             ->orderBy('display_order')
             ->orderBy('id');
-    }
-
-    public function localized_movie_title(): string
-    {
-        return App::isLocale('np') && $this->movie_title_np ? $this->movie_title_np : $this->movie_title_en;
-    }
-
-    public function localized_title(): string
-    {
-        return App::isLocale('np') && $this->title_np ? $this->title_np : $this->title_en;
-    }
-
-    public function localized_description(): string
-    {
-        return App::isLocale('np') && $this->description_np ? $this->description_np : $this->description_en;
-    }
-
-    public function localized_label(): ?string
-    {
-        return App::isLocale('np') && $this->label_np ? $this->label_np : $this->label_en;
-    }
-
-    public function localized_primary_button_text(): string
-    {
-        return App::isLocale('np') && $this->primary_button_text_np
-            ? $this->primary_button_text_np
-            : $this->primary_button_text_en;
-    }
-
-    public function localized_secondary_button_text(): ?string
-    {
-        return App::isLocale('np') && $this->secondary_button_text_np
-            ? $this->secondary_button_text_np
-            : $this->secondary_button_text_en;
-    }
-
-    public function duration_label(): string
-    {
-        if ($this->duration === null) {
-            return '';
-        }
-
-        $hours = intdiv($this->duration, 60);
-        $minutes = $this->duration % 60;
-
-        return $hours > 0 ? "{$hours}h {$minutes}m" : "{$minutes}m";
     }
 
     public function desktop_image_url(): ?string

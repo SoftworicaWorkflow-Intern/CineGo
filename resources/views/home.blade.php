@@ -5,6 +5,7 @@
 @section('content')
     @if ($heroItems->isNotEmpty())
         @php($heroItem = $heroItems->first())
+        @php($heroMovie = $heroItem['movie'])
         <section
             class="cg-home-hero relative min-h-[min(760px,100svh)] w-full overflow-hidden"
             aria-label="Featured movies"
@@ -18,76 +19,91 @@
                 data-hero-art
             ></div>
             <div class="cg-home-hero-art" aria-hidden="true" data-hero-art></div>
+            <div class="pointer-events-none absolute inset-0 bg-gradient-to-r from-black/90 via-black/60 to-black/20" aria-hidden="true"></div>
+            <div class="pointer-events-none absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-black/80 to-transparent" aria-hidden="true"></div>
 
-            <div class="pointer-events-none absolute inset-0 z-[1] bg-gradient-to-r from-black/85 via-black/55 to-black/10"></div>
-            <div class="pointer-events-none absolute inset-0 z-[1] bg-gradient-to-t from-black/55 via-transparent to-black/10"></div>
-
-            @if ($heroItems->count() > 1)
-                <button type="button" class="absolute left-4 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/30 bg-black/35 text-white backdrop-blur transition hover:bg-black/65 sm:left-7 sm:h-12 sm:w-12" aria-label="Previous featured movie" data-hero-prev>
-                    <x-icon name="arrow-left" :size="18" />
-                </button>
-                <button type="button" class="absolute right-4 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/30 bg-black/35 text-white backdrop-blur transition hover:bg-black/65 sm:right-7 sm:h-12 sm:w-12" aria-label="Next featured movie" data-hero-next>
-                    <x-icon name="arrow-right" :size="18" />
-                </button>
-            @endif
-
-            <div class="container-page relative z-[2] flex min-h-[min(760px,100svh)] items-center pb-20 pt-24 sm:pb-24">
-                <div class="max-w-3xl">
-                    <p class="mb-4 inline-flex items-center gap-2 rounded-full border border-white/25 bg-black/25 px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-white backdrop-blur-sm">
-                        <span class="h-2 w-2 rounded-full bg-cg-red"></span>
-                        <span data-hero-label>{{ $heroItem['label'] ?: ui('now_showing', 'Now Showing') }}</span>
-                    </p>
-                    <p class="mb-2 text-sm font-medium text-white/70" data-hero-movie-title>{{ $heroItem['movie_title'] }}</p>
-                    <h1 class="font-display text-5xl leading-[0.98] text-white sm:text-6xl lg:text-7xl" data-hero-title>
-                        {{ $heroItem['title'] }}
-                    </h1>
-                    <p class="mt-5 max-w-2xl text-sm leading-7 text-white/80 sm:text-base" data-hero-synopsis>
-                        {{ $heroItem['description'] }}
-                    </p>
-                    <div class="mt-5 flex flex-wrap items-center gap-2 text-xs font-medium text-white/80" data-hero-metadata @if (! $heroItem['language'] && ! $heroItem['duration'] && ! $heroItem['release_date'] && ! $heroItem['certificate']) hidden @endif>
-                        <span class="rounded-full border border-white/25 bg-black/25 px-3 py-1.5" data-hero-language @if (! $heroItem['language']) hidden @endif>{{ $heroItem['language'] }}</span>
-                        <span class="rounded-full border border-white/25 bg-black/25 px-3 py-1.5" data-hero-duration @if (! $heroItem['duration']) hidden @endif>{{ $heroItem['duration'] }}</span>
-                        <span class="rounded-full border border-white/25 bg-black/25 px-3 py-1.5" data-hero-release-date @if (! $heroItem['release_date']) hidden @endif>{{ $heroItem['release_date'] }}</span>
-                        <span class="rounded-full border border-white/25 bg-black/25 px-3 py-1.5" data-hero-certificate @if (! $heroItem['certificate']) hidden @endif>{{ $heroItem['certificate'] }}</span>
-                    </div>
-                    <div class="mt-8 flex flex-wrap gap-3" data-hero-actions>
-                        <a
-                            href="{{ $heroItem['primary_url'] }}"
-                            class="btn-primary btn-lg"
-                            data-hero-primary-link
-                        >
-                            <x-icon name="ticket" :size="18" />
-                            <span data-hero-primary-text>{{ $heroItem['primary_text'] }}</span>
-                        </a>
-                        <a href="{{ $heroItem['secondary_url'] }}" class="btn-lg rounded-lg border border-white/35 bg-white/10 px-5 py-2.5 text-sm font-semibold text-white backdrop-blur-sm transition hover:bg-white/20" data-hero-secondary-link>
-                            <span data-hero-secondary-text>{{ $heroItem['secondary_text'] }}</span>
-                        </a>
+            <div class="container-page relative z-[1] flex min-h-[min(760px,100svh)] items-center py-16 sm:py-20">
+                <div class="flex max-w-4xl items-center gap-5 sm:gap-8 lg:-translate-x-8" data-hero-content>
+                    <img
+                        src="{{ $heroMovie->poster_url }}"
+                        alt="{{ $heroMovie->localised_title() }}"
+                        class="hidden h-64 w-44 shrink-0 rounded-xl object-cover shadow-2xl ring-1 ring-white/15 lg:block"
+                        data-hero-poster
+                    >
+                    <div class="min-w-0 text-white">
+                        <p class="text-xs font-bold uppercase tracking-[0.24em] text-cg-red sm:text-sm" data-hero-label>
+                            {{ ui('now_showing', 'Now Showing') }}
+                        </p>
+                        <h1 class="mt-3 text-4xl font-black leading-tight tracking-tight sm:text-5xl lg:text-6xl" data-hero-title>
+                            {{ $heroMovie->localised_title() }}
+                        </h1>
+                        <p class="mt-4 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs font-medium text-white/80 sm:text-sm">
+                            <span data-hero-genres>{{ $heroMovie->genre_label() }}</span>
+                            <span aria-hidden="true">·</span>
+                            <span data-hero-duration>{{ $heroMovie->duration_label() }}</span>
+                            <span aria-hidden="true">·</span>
+                            <span data-hero-language>{{ $heroMovie->language }}</span>
+                            <span
+                                aria-hidden="true"
+                                class="{{ $heroMovie->certificate ? '' : 'hidden' }}"
+                                data-hero-certificate-separator
+                            >·</span>
+                            <span data-hero-certificate>{{ $heroMovie->certificate }}</span>
+                        </p>
+                        <p class="mt-2 text-xs text-white/70 sm:text-sm">
+                            {{ ui('release_date', 'Release date') }}:
+                            <span data-hero-release-date>{{ $heroMovie->release_date?->format('M j, Y') }}</span>
+                        </p>
+                        <p class="mt-4 max-w-2xl text-sm leading-relaxed text-white/80 sm:text-base" data-hero-synopsis>
+                            {{ $heroMovie->localised_synopsis() }}
+                        </p>
+                        <div class="mt-6 flex flex-wrap gap-3" data-hero-actions>
+                            <a href="{{ route('movies.show', $heroMovie) }}" class="btn-primary btn-lg" data-hero-book>
+                                <x-icon name="ticket" :size="17" /> {{ ui('book_tickets', 'Book Tickets') }}
+                            </a>
+                            <button
+                                type="button"
+                                class="{{ $heroMovie->valid_trailer_url() ? 'inline-flex' : 'hidden' }} btn-outline btn-lg"
+                                data-trailer="{{ $heroMovie->valid_trailer_url() ?? '' }}"
+                                data-hero-trailer
+                                @disabled(! $heroMovie->valid_trailer_url())
+                            >
+                                <x-icon name="play" :size="17" /> {{ ui('watch_trailer', 'Watch Trailer') }}
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
+
+            @if ($heroItems->count() > 1)
+                <button type="button" class="absolute left-4 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/30 bg-black/35 text-white backdrop-blur transition hover:bg-black/65 sm:left-7 sm:h-12 sm:w-12" aria-label="Previous hero banner" data-hero-prev>
+                    <x-icon name="arrow-left" :size="18" />
+                </button>
+                <button type="button" class="absolute right-4 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/30 bg-black/35 text-white backdrop-blur transition hover:bg-black/65 sm:right-7 sm:h-12 sm:w-12" aria-label="Next hero banner" data-hero-next>
+                    <x-icon name="arrow-right" :size="18" />
+                </button>
+            @endif
 
             <nav class="absolute inset-x-0 bottom-5 z-10 flex items-center justify-center gap-2" aria-label="Featured movies">
                 @foreach ($heroItems as $index => $item)
                     <button
                         type="button"
                         class="group flex h-11 items-center px-1"
-                        aria-label="{{ ui('show_featured_movie', 'Show featured movie') }}: {{ $item['movie_title'] }}"
+                        aria-label="Show hero banner {{ $index + 1 }}"
                         aria-current="{{ $index === 0 ? 'true' : 'false' }}"
                         data-hero-page
                         data-hero-image="{{ $item['desktop_image'] }}"
                         data-hero-mobile-image="{{ $item['mobile_image'] ?: $item['desktop_image'] }}"
-                        data-hero-label="{{ $item['label'] }}"
-                        data-hero-movie-title="{{ $item['movie_title'] }}"
-                        data-hero-title="{{ $item['title'] }}"
-                        data-hero-synopsis="{{ $item['description'] }}"
-                        data-hero-language="{{ $item['language'] }}"
-                        data-hero-duration="{{ $item['duration'] }}"
-                        data-hero-release-date="{{ $item['release_date'] }}"
-                        data-hero-certificate="{{ $item['certificate'] }}"
-                        data-hero-primary-text="{{ $item['primary_text'] }}"
-                        data-hero-primary-url="{{ $item['primary_url'] }}"
-                        data-hero-secondary-text="{{ $item['secondary_text'] }}"
-                        data-hero-secondary-url="{{ $item['secondary_url'] }}"
+                        data-hero-title="{{ $item['movie']->localised_title() }}"
+                        data-hero-synopsis="{{ $item['movie']->localised_synopsis() }}"
+                        data-hero-genres="{{ $item['movie']->genre_label() }}"
+                        data-hero-duration="{{ $item['movie']->duration_label() }}"
+                        data-hero-language="{{ $item['movie']->language }}"
+                        data-hero-certificate="{{ $item['movie']->certificate }}"
+                        data-hero-release-date="{{ $item['movie']->release_date?->format('M j, Y') }}"
+                        data-hero-book-url="{{ route('movies.show', $item['movie']) }}"
+                        data-hero-trailer-url="{{ $item['movie']->valid_trailer_url() ?? '' }}"
+                        data-hero-poster="{{ $item['movie']->poster_url }}"
                     >
                         <span @class([
                             'h-1 rounded-full transition-all duration-300',

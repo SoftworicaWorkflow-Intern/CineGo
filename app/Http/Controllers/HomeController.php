@@ -13,22 +13,16 @@ class HomeController extends Controller
      */
     public function index(): View
     {
-        $heroItems = HeroSlide::query()->published()->get()->map(fn (HeroSlide $slide): array => [
-            'desktop_image' => $slide->desktop_image_url() ?? '',
-            'mobile_image' => $slide->mobile_image_url() ?? '',
-            'label' => $slide->localized_label() ?? '',
-            'movie_title' => $slide->localized_movie_title(),
-            'title' => $slide->localized_title(),
-            'description' => $slide->localized_description(),
-            'language' => $slide->language ?? '',
-            'duration' => $slide->duration_label(),
-            'release_date' => $slide->release_date?->format('M j, Y') ?? '',
-            'certificate' => '',
-            'primary_text' => $slide->localized_primary_button_text(),
-            'primary_url' => $slide->primary_button_url,
-            'secondary_text' => $slide->localized_secondary_button_text() ?? '',
-            'secondary_url' => $slide->secondary_button_url ?? '',
-        ]);
+        $heroItems = HeroSlide::query()
+            ->with('movie')
+            ->whereHas('movie')
+            ->published()
+            ->get()
+            ->map(fn (HeroSlide $slide): array => [
+                'movie' => $slide->movie,
+                'desktop_image' => $slide->desktop_image_url() ?? '',
+                'mobile_image' => $slide->mobile_image_url() ?? $slide->desktop_image_url() ?? '',
+            ]);
 
         if ($heroItems->isEmpty() && ! HeroSlide::query()->exists()) {
             $heroItems = Movie::query()
@@ -39,20 +33,9 @@ class HomeController extends Controller
                 ->limit(5)
                 ->get()
                 ->map(fn (Movie $movie): array => [
+                    'movie' => $movie,
                     'desktop_image' => $movie->banner_url ?: $movie->poster_url,
                     'mobile_image' => $movie->banner_url ?: $movie->poster_url,
-                    'label' => ui('now_showing', 'Now Showing'),
-                    'movie_title' => $movie->localised_title(),
-                    'title' => $movie->localised_title(),
-                    'description' => $movie->localised_synopsis(),
-                    'language' => $movie->language,
-                    'duration' => $movie->duration_label(),
-                    'release_date' => $movie->release_date?->format('M j, Y') ?? '',
-                    'certificate' => $movie->certificate ?? '',
-                    'primary_text' => ui('book_tickets', 'Book Tickets'),
-                    'primary_url' => route('movies.show', $movie),
-                    'secondary_text' => ui('explore_movies', 'Explore Movies'),
-                    'secondary_url' => route('movies.index'),
                 ]);
         }
 

@@ -140,6 +140,27 @@ class Movie extends Model
         return implode(', ', $this->genres ?? []);
     }
 
+    public function valid_trailer_url(): ?string
+    {
+        if (! is_string($this->trailer_url) || filter_var($this->trailer_url, FILTER_VALIDATE_URL) === false) {
+            return null;
+        }
+
+        $trailer = parse_url($this->trailer_url);
+        $scheme = strtolower($trailer['scheme'] ?? '');
+        $host = strtolower($trailer['host'] ?? '');
+        $host = str_starts_with($host, 'www.') ? substr($host, 4) : $host;
+        $isSupportedHost = $host === 'youtu.be'
+            || $host === 'youtube.com'
+            || str_ends_with($host, '.youtube.com')
+            || $host === 'youtube-nocookie.com'
+            || str_ends_with($host, '.youtube-nocookie.com')
+            || $host === 'vimeo.com'
+            || $host === 'player.vimeo.com';
+
+        return in_array($scheme, ['http', 'https'], true) && $isSupportedHost ? $this->trailer_url : null;
+    }
+
     public function is_released(): bool
     {
         return $this->release_date !== null && $this->release_date->isPast();

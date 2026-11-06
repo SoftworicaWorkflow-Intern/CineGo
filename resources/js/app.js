@@ -141,20 +141,6 @@ function initHeroPagination() {
     document.querySelectorAll('[data-hero-pagination]').forEach((hero) => {
         const pages = Array.from(hero.querySelectorAll('[data-hero-page]'));
         const artLayers = Array.from(hero.querySelectorAll('[data-hero-art]'));
-        const label = hero.querySelector('[data-hero-label]');
-        const movieTitle = hero.querySelector('[data-hero-movie-title]');
-        const title = hero.querySelector('[data-hero-title]');
-        const synopsis = hero.querySelector('[data-hero-synopsis]');
-        const metadata = hero.querySelector('[data-hero-metadata]');
-        const actions = hero.querySelector('[data-hero-actions]');
-        const primaryLink = hero.querySelector('[data-hero-primary-link]');
-        const primaryText = hero.querySelector('[data-hero-primary-text]');
-        const secondaryLink = hero.querySelector('[data-hero-secondary-link]');
-        const secondaryText = hero.querySelector('[data-hero-secondary-text]');
-        const duration = hero.querySelector('[data-hero-duration]');
-        const language = hero.querySelector('[data-hero-language]');
-        const releaseDate = hero.querySelector('[data-hero-release-date]');
-        const certificate = hero.querySelector('[data-hero-certificate]');
         const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
         const mobileViewport = window.matchMedia('(max-width: 639px)');
 
@@ -164,6 +150,7 @@ function initHeroPagination() {
         let activeArtIndex = artLayers.findIndex((layer) => layer.classList.contains('cg-home-hero-art-active'));
         let timer = null;
         let selection = 0;
+        let pausedByInteraction = false;
 
         const stop = () => {
             if (timer) {
@@ -174,7 +161,7 @@ function initHeroPagination() {
 
         const start = () => {
             stop();
-            if (reducedMotion) return;
+            if (reducedMotion || pausedByInteraction || document.hidden) return;
 
             timer = window.setInterval(() => {
                 const activeIndex = pages.findIndex((page) => page.getAttribute('aria-current') === 'true');
@@ -194,7 +181,6 @@ function initHeroPagination() {
                 const nextArtIndex = (activeArtIndex + 1) % artLayers.length;
                 const currentArt = artLayers[activeArtIndex];
                 const nextArt = artLayers[nextArtIndex];
-                const pageSynopsis = page.dataset.heroSynopsis ?? '';
 
                 nextArt.style.setProperty('--hero-image-desktop', page.dataset.heroImage ? `url(${JSON.stringify(page.dataset.heroImage)})` : 'none');
                 nextArt.style.setProperty('--hero-image-mobile', page.dataset.heroMobileImage ? `url(${JSON.stringify(page.dataset.heroMobileImage)})` : 'none');
@@ -202,56 +188,55 @@ function initHeroPagination() {
                 currentArt.classList.remove('cg-home-hero-art-active');
                 activeArtIndex = nextArtIndex;
 
-                hero.setAttribute('aria-label', `Featured movie: ${page.dataset.heroMovieTitle || page.dataset.heroTitle}`);
-                if (label) {
-                    label.textContent = page.dataset.heroLabel;
-                    label.parentElement.hidden = !page.dataset.heroLabel;
-                }
-                if (movieTitle) {
-                    movieTitle.textContent = page.dataset.heroMovieTitle;
-                    movieTitle.hidden = !page.dataset.heroMovieTitle;
-                }
-                if (title) title.textContent = page.dataset.heroTitle;
-
-                if (synopsis) {
-                    synopsis.textContent = pageSynopsis;
-                    synopsis.hidden = !pageSynopsis;
-                }
-
-                [[duration, page.dataset.heroDuration], [language, page.dataset.heroLanguage],
-                    [releaseDate, page.dataset.heroReleaseDate], [certificate, page.dataset.heroCertificate]]
-                    .forEach(([element, value]) => {
-                        if (!element) return;
-                        element.textContent = value || '';
-                        element.hidden = !value;
-                    });
-                if (metadata) metadata.hidden = ![duration, language, releaseDate, certificate]
-                    .some((element) => element && !element.hidden);
-
-                if (primaryLink) {
-                    primaryLink.href = page.dataset.heroPrimaryUrl || '#';
-                    primaryLink.hidden = !page.dataset.heroPrimaryUrl || !page.dataset.heroPrimaryText;
-                    if (primaryText) primaryText.textContent = page.dataset.heroPrimaryText || '';
-                    primaryLink.setAttribute('aria-label', page.dataset.heroPrimaryText || '');
-                }
-                if (secondaryLink) {
-                    secondaryLink.href = page.dataset.heroSecondaryUrl || '#';
-                    secondaryLink.hidden = !page.dataset.heroSecondaryUrl || !page.dataset.heroSecondaryText;
-                    if (secondaryText) secondaryText.textContent = page.dataset.heroSecondaryText || '';
-                }
-                if (actions) actions.hidden = (!primaryLink || primaryLink.hidden) && (!secondaryLink || secondaryLink.hidden);
+                hero.setAttribute('aria-label', `Featured banner ${index + 1} of ${pages.length}`);
 
                 pages.forEach((paginationPage) => {
                     const isCurrent = paginationPage === page;
                     const indicator = paginationPage.querySelector('[data-hero-indicator]');
 
                     paginationPage.setAttribute('aria-current', String(isCurrent));
-                    paginationPage.setAttribute('aria-label', `Show featured movie: ${paginationPage.dataset.heroMovieTitle || paginationPage.dataset.heroTitle}`);
+                    paginationPage.setAttribute('aria-label', `Show hero banner ${pages.indexOf(paginationPage) + 1}`);
                     indicator.classList.toggle('w-8', isCurrent);
                     indicator.classList.toggle('w-3', !isCurrent);
                     indicator.classList.toggle('bg-cg-red', isCurrent);
                     indicator.classList.toggle('bg-white/45', !isCurrent);
                 });
+
+                const setText = (selector, value) => {
+                    const element = hero.querySelector(selector);
+                    if (element) element.textContent = value || '';
+                };
+                const updateImage = (selector, value) => {
+                    const element = hero.querySelector(selector);
+                    if (element && value) element.src = value;
+                    if (element?.matches('[data-hero-poster]')) {
+                        element.alt = page.dataset.heroTitle || '';
+                    }
+                };
+
+                setText('[data-hero-title]', page.dataset.heroTitle);
+                setText('[data-hero-synopsis]', page.dataset.heroSynopsis);
+                setText('[data-hero-genres]', page.dataset.heroGenres);
+                setText('[data-hero-duration]', page.dataset.heroDuration);
+                setText('[data-hero-language]', page.dataset.heroLanguage);
+                setText('[data-hero-certificate]', page.dataset.heroCertificate);
+                setText('[data-hero-release-date]', page.dataset.heroReleaseDate);
+                updateImage('[data-hero-poster]', page.dataset.heroPoster);
+
+                const certificateSeparator = hero.querySelector('[data-hero-certificate-separator]');
+                if (certificateSeparator) certificateSeparator.classList.toggle('hidden', !page.dataset.heroCertificate);
+
+                const bookButton = hero.querySelector('[data-hero-book]');
+                if (bookButton) bookButton.href = page.dataset.heroBookUrl || '#';
+
+                const trailerButton = hero.querySelector('[data-hero-trailer]');
+                if (trailerButton) {
+                    const trailerUrl = page.dataset.heroTrailerUrl || '';
+                    trailerButton.dataset.trailer = trailerUrl;
+                    trailerButton.disabled = !trailerUrl;
+                    trailerButton.classList.toggle('hidden', !trailerUrl);
+                    trailerButton.classList.toggle('inline-flex', Boolean(trailerUrl));
+                }
             };
 
             if (!imageUrl) {
@@ -270,22 +255,25 @@ function initHeroPagination() {
 
         pages.forEach((page, index) => {
             page.addEventListener('click', () => {
+                pausedByInteraction = true;
+                stop();
                 show(index);
-                start();
             });
         });
         hero.querySelectorAll('[data-hero-next]').forEach((button) => {
             button.addEventListener('click', () => {
                 const activeIndex = pages.findIndex((page) => page.getAttribute('aria-current') === 'true');
+                pausedByInteraction = true;
+                stop();
                 show((activeIndex + 1) % pages.length);
-                start();
             });
         });
         hero.querySelectorAll('[data-hero-prev]').forEach((button) => {
             button.addEventListener('click', () => {
                 const activeIndex = pages.findIndex((page) => page.getAttribute('aria-current') === 'true');
+                pausedByInteraction = true;
+                stop();
                 show((activeIndex - 1 + pages.length) % pages.length);
-                start();
             });
         });
 
@@ -293,7 +281,10 @@ function initHeroPagination() {
         hero.addEventListener('mouseleave', () => {
             if (!hero.contains(document.activeElement)) start();
         });
-        hero.addEventListener('focusin', stop);
+        hero.addEventListener('focusin', () => {
+            pausedByInteraction = true;
+            stop();
+        });
         hero.addEventListener('focusout', (event) => {
             if (!hero.contains(event.relatedTarget) && !hero.matches(':hover')) start();
         });
