@@ -11,7 +11,7 @@
                 </span>
                 <div>
                     <h2 class="font-semibold text-cg-white">{{ ui('admin_settings', 'Admin settings') }}</h2>
-                    <p class="mt-1 text-sm text-cg-muted">{{ ui('admin_settings_subtitle', 'Manage your account preferences and CineGo administration tools.') }}</p>
+                    <p class="mt-1 text-sm text-cg-muted">{{ ui('admin_settings_subtitle', 'Manage your admin account settings.') }}</p>
                 </div>
             </div>
         </section>
@@ -25,11 +25,11 @@
                 </span>
                 <x-icon name="chevron-right" :size="17" class="text-cg-dim" />
             </a>
-            <a href="{{ route('account.settings') }}" class="flex items-center gap-4 p-5 transition hover:bg-white/[0.03]">
+            <a href="{{ route('account.settings') }}#security" class="flex items-center gap-4 p-5 transition hover:bg-white/[0.03]">
                 <span class="flex h-10 w-10 items-center justify-center rounded-lg bg-cg-charcoal text-cg-red"><x-icon name="lock" :size="18" /></span>
                 <span class="min-w-0 flex-1">
-                    <span class="block font-medium text-cg-white">{{ ui('security_settings', 'Security and preferences') }}</span>
-                    <span class="block text-sm text-cg-muted">{{ ui('security_settings_subtitle', 'Change your password, language and city preferences.') }}</span>
+                    <span class="block font-medium text-cg-white">{{ ui('security_settings', 'Security') }}</span>
+                    <span class="block text-sm text-cg-muted">{{ ui('security_settings_subtitle', 'Change your admin account password.') }}</span>
                 </span>
                 <x-icon name="chevron-right" :size="17" class="text-cg-dim" />
             </a>

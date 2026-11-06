@@ -13,12 +13,12 @@
         <table class="w-full min-w-[820px] text-sm">
             <thead>
                 <tr class="border-b border-cg-border-soft text-left text-xs uppercase tracking-wide text-cg-dim">
-                    <th class="px-5 py-4 font-semibold">{{ ui('offer', 'Offer') }}</th>
-                    <th class="px-5 py-4 font-semibold">{{ ui('promo_code', 'Code') }}</th>
-                    <th class="px-5 py-4 font-semibold">{{ ui('discount', 'Discount') }}</th>
-                    <th class="px-5 py-4 font-semibold">{{ ui('validity', 'Validity') }}</th>
-                    <th class="px-5 py-4 font-semibold">{{ ui('status', 'Status') }}</th>
-                    <th class="px-5 py-4 text-right font-semibold">{{ ui('actions', 'Actions') }}</th>
+                    <th class="px-5 py-4 font-bold text-black">{{ ui('offer', 'Offer') }}</th>
+                    <th class="px-5 py-4 font-bold text-black">{{ ui('promo_code', 'Code') }}</th>
+                    <th class="px-5 py-4 font-bold text-black">{{ ui('discount', 'Discount') }}</th>
+                    <th class="px-5 py-4 font-bold text-black">{{ ui('validity', 'Validity') }}</th>
+                    <th class="px-5 py-4 font-bold text-black">{{ ui('status', 'Status') }}</th>
+                    <th class="px-5 py-4 text-right font-bold text-black">{{ ui('actions', 'Actions') }}</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-cg-border-soft">

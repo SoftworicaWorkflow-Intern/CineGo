@@ -351,12 +351,42 @@ function initCopyButtons() {
  * Usage: <form data-confirm="Delete this item?">…</form>
  */
 function initConfirmForms() {
+    const modal = document.getElementById('admin-delete-modal');
+    const message = modal?.querySelector('[data-admin-delete-message]');
+    const cancel = modal?.querySelector('[data-admin-delete-cancel]');
+    const confirm = modal?.querySelector('[data-admin-delete-confirm]');
+    let pendingForm = null;
+
+    const closeModal = () => {
+        if (!modal) return;
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+        pendingForm = null;
+    };
+
+    cancel?.addEventListener('click', closeModal);
+    modal?.addEventListener('click', (event) => {
+        if (event.target === modal) closeModal();
+    });
+    confirm?.addEventListener('click', () => {
+        const form = pendingForm;
+        closeModal();
+        form?.submit();
+    });
+
     document.querySelectorAll('form[data-confirm]').forEach((form) => {
         form.addEventListener('submit', (event) => {
             if (event.defaultPrevented) return;
-            if (!window.confirm(form.dataset.confirm)) {
-                event.preventDefault();
+            if (!modal || !message) {
+                if (!window.confirm(form.dataset.confirm)) event.preventDefault();
+                return;
             }
+
+            event.preventDefault();
+            pendingForm = form;
+            message.textContent = form.dataset.confirm;
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
         });
     });
 }

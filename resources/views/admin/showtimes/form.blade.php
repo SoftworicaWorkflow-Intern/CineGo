@@ -70,7 +70,8 @@
 
                 <div>
                     <label class="label" for="start_time">{{ ui('times', 'Start time') }} *</label>
-                    <input id="start_time" type="time" name="start_time" value="{{ old('start_time', \Illuminate\Support\Str::of((string) $showtime->start_time)->substr(0, 5)) }}" class="input" required>
+                    <input id="start_time" type="time" name="start_time" value="{{ old('start_time', \Illuminate\Support\Str::of((string) $showtime->start_time)->substr(0, 5)) }}" class="input" required min="00:00" max="23:59" step="60" autocomplete="off">
+                    <p class="mt-1.5 text-xs text-cg-dim">{{ ui('time_hint', 'Choose the show start time.') }}</p>
                 </div>
 
                 <div class="sm:col-span-2">

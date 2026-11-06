@@ -33,17 +33,19 @@
                         <input id="profile-phone" type="tel" name="phone" value="{{ old('phone', $user->phone) }}" class="input" maxlength="20" autocomplete="tel" placeholder="98XXXXXXXX">
                     </div>
 
-                    <div class="sm:col-span-2">
-                        <label class="label" for="profile-city">{{ ui('select_city', 'Preferred city') }}</label>
-                        <select id="profile-city" name="city_id" class="input cursor-pointer">
-                            <option value="">{{ ui('all_cities', 'All Cities') }}</option>
-                            @foreach ($cities as $city)
-                                <option value="{{ $city->id }}" @selected((string) old('city_id', $user->city_id) === (string) $city->id)>
-                                    {{ $city->display_name() }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
+                    @unless ($user->is_admin)
+                        <div class="sm:col-span-2">
+                            <label class="label" for="profile-city">{{ ui('select_city', 'Preferred city') }}</label>
+                            <select id="profile-city" name="city_id" class="input cursor-pointer">
+                                <option value="">{{ ui('all_cities', 'All Cities') }}</option>
+                                @foreach ($cities as $city)
+                                    <option value="{{ $city->id }}" @selected((string) old('city_id', $user->city_id) === (string) $city->id)>
+                                        {{ $city->display_name() }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                    @endunless
                 </div>
 
                 <div class="flex items-center gap-3 rounded-lg border border-cg-border bg-cg-charcoal px-4 py-3 text-xs text-cg-muted">

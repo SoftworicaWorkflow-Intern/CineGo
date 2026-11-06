@@ -3,22 +3,23 @@
 @section('title', ui('showtimes_for', 'Showtimes'))
 
 @section('content')
-    <div class="mb-5 flex flex-wrap items-center justify-between gap-3">
+    <div class="mb-5 flex flex-wrap items-center justify-end gap-3">
         <a href="{{ route('admin.showtimes.create') }}" class="btn-primary">
             <x-icon name="plus" :size="17" /> {{ ui('add_showtime', 'Add showtime') }}
         </a>
     </div>
 
-    <div class="card overflow-x-auto">
+    <div class="card overflow-x-auto overflow-y-hidden">
         <table class="w-full min-w-[760px] text-sm">
             <thead>
                 <tr class="border-b border-cg-border-soft text-left text-xs uppercase tracking-wide text-cg-dim">
-                    <th class="px-5 py-4 font-semibold">{{ ui('date', 'Date') }}</th>
-                    <th class="px-5 py-4 font-semibold">{{ ui('times', 'Time') }}</th>
-                    <th class="px-5 py-4 font-semibold">{{ ui('movies', 'Movie') }}</th>
-                    <th class="px-5 py-4 font-semibold">{{ ui('format', 'Format') }}</th>
-                    <th class="px-5 py-4 font-semibold">{{ ui('prices', 'Prices') }}</th>
-                    <th class="px-5 py-4 text-right font-semibold">{{ ui('actions', 'Actions') }}</th>
+                    <th class="px-5 py-4 font-bold text-black">{{ ui('date', 'Date') }}</th>
+                    <th class="px-5 py-4 font-bold text-black">{{ ui('times', 'Time') }}</th>
+                    <th class="px-5 py-4 font-bold text-black">{{ ui('movies', 'Movie') }}</th>
+                    <th class="px-5 py-4 font-bold text-black">{{ ui('screens', 'Screen') }}</th>
+                    <th class="px-5 py-4 font-bold text-black">{{ ui('format', 'Format') }}</th>
+                    <th class="px-5 py-4 font-bold text-black">{{ ui('prices', 'Prices') }}</th>
+                    <th class="px-5 py-4 text-right font-bold text-black">{{ ui('actions', 'Actions') }}</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-cg-border-soft">
@@ -57,7 +58,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="6" class="px-5 py-10 text-center text-cg-muted">
+                        <td colspan="7" class="px-5 py-10 text-center text-cg-muted">
                             {{ ui('no_showtimes', 'No showtimes scheduled.') }}
                             <a href="{{ route('admin.showtimes.create') }}" class="font-semibold text-cg-red hover:underline">
                                 {{ ui('add_showtime', 'Add showtime') }}

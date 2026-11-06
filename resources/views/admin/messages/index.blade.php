@@ -30,11 +30,11 @@
         <table class="w-full min-w-[720px] text-sm">
             <thead>
                 <tr class="border-b border-cg-border-soft text-left text-xs uppercase tracking-wide text-cg-dim">
-                    <th class="px-5 py-4 font-semibold">{{ ui('from', 'From') }}</th>
-                    <th class="px-5 py-4 font-semibold">{{ ui('subject', 'Subject') }}</th>
-                    <th class="px-5 py-4 font-semibold">{{ ui('message', 'Message') }}</th>
-                    <th class="px-5 py-4 font-semibold">{{ ui('date', 'Date') }}</th>
-                    <th class="px-5 py-4 text-right font-semibold">{{ ui('actions', 'Actions') }}</th>
+                    <th class="px-5 py-4 font-bold text-black">{{ ui('from', 'From') }}</th>
+                    <th class="px-5 py-4 font-bold text-black">{{ ui('subject', 'Subject') }}</th>
+                    <th class="px-5 py-4 font-bold text-black">{{ ui('message', 'Message') }}</th>
+                    <th class="px-5 py-4 font-bold text-black">{{ ui('date', 'Date') }}</th>
+                    <th class="px-5 py-4 text-right font-bold text-black">{{ ui('actions', 'Actions') }}</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-cg-border-soft">

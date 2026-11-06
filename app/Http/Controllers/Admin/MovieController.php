@@ -7,6 +7,7 @@ use App\Models\Movie;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class MovieController extends Controller
@@ -34,7 +35,9 @@ class MovieController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
-        $movie = Movie::create($this->validated($request));
+        $validated = $this->validated($request);
+        $validated['poster_url'] = $this->storePoster($request);
+        $movie = Movie::create($validated);
 
         return redirect()->route('admin.movies.edit', $movie)
             ->with('success', ui('admin_movie_created', 'Movie created.'));
@@ -47,7 +50,16 @@ class MovieController extends Controller
 
     public function update(Request $request, Movie $movie): RedirectResponse
     {
-        $movie->update($this->validated($request));
+        $validated = $this->validated($request);
+
+        if ($request->hasFile('poster')) {
+            $validated['poster_url'] = $this->storePoster($request);
+            $this->deleteStoredPoster($movie->poster_url);
+        } else {
+            $validated['poster_url'] = $movie->poster_url;
+        }
+
+        $movie->update($validated);
 
         return redirect()->route('admin.movies.edit', $movie)
             ->with('success', ui('admin_movie_updated', 'Movie updated.'));
@@ -73,27 +85,48 @@ class MovieController extends Controller
             'genres.*' => 'string|max:40',
             'duration_minutes' => 'required|integer|min:1|max:600',
             'language' => 'required|string|max:40',
-            'release_date' => 'required|date',
             'certificate' => 'nullable|string|max:10',
-            'poster_url' => 'required|string|max:300',
+            'poster' => [
+                $request->route('movie') instanceof Movie ? 'nullable' : 'required',
+                'image',
+                'mimes:jpg,jpeg,png,webp',
+                'max:2048',
+            ],
             'trailer_url' => 'nullable|string|max:300',
             'director' => 'nullable|string|max:120',
             'cast' => 'nullable|string|max:500',
         ], [
             'title.required' => ui('validation_title', 'Please enter the movie title.'),
-            'synopsis.required' => ui('validation_synopsis', 'Please enter a storyline.'),
+            'synopsis.required' => ui('validation_synopsis', 'Please enter a description.'),
             'genres.required' => ui('validation_genres', 'Please choose at least one genre.'),
-            'poster_url.required' => ui('validation_poster', 'Please provide a poster image path.'),
+            'poster.required' => ui('validation_poster', 'Please upload a poster image.'),
         ]);
 
         $validated['slug'] = $this->uniqueSlug($request->input('title'), $request->route('movie')?->id);
         $movie = $request->route('movie');
+        $validated['release_date'] = $movie instanceof Movie
+            ? $movie->release_date?->toDateString() ?? now()->toDateString()
+            : now()->toDateString();
         $validated['is_now_showing'] = $movie instanceof Movie ? $movie->is_now_showing : true;
         $validated['is_coming_soon'] = $movie instanceof Movie ? $movie->is_coming_soon : false;
         $validated['is_featured'] = $movie instanceof Movie ? $movie->is_featured : false;
         $validated['is_active'] = $movie instanceof Movie ? $movie->is_active : true;
 
         return $validated;
+    }
+
+    private function storePoster(Request $request): string
+    {
+        return Storage::disk('public')->url($request->file('poster')->store('posters', 'public'));
+    }
+
+    private function deleteStoredPoster(?string $posterUrl): void
+    {
+        if (! $posterUrl || ! Str::startsWith($posterUrl, '/storage/')) {
+            return;
+        }
+
+        Storage::disk('public')->delete(Str::after($posterUrl, '/storage/'));
     }
 
     private function uniqueSlug(string $title, ?int $ignoreId = null): string

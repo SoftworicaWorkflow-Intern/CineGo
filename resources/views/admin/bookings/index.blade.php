@@ -26,9 +26,9 @@
 
         <form action="{{ route('admin.bookings.index') }}" method="GET" class="flex w-full items-center justify-center gap-2 sm:w-auto">
             @if ($status)<input type="hidden" name="status" value="{{ $status }}">@endif
-            <div class="relative flex h-9 min-w-0 flex-1 items-center sm:flex-none">
-                <x-icon name="search" :size="14" class="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-cg-red" />
-                <input type="search" name="q" value="{{ $term }}" placeholder="{{ ui('search_booking_hint', 'Code, name, phone, movie…') }}" class="input h-9 min-h-9 min-w-0 py-2 pl-8 text-xs sm:w-56">
+            <div class="relative h-9 min-w-0 flex-1 sm:w-56 sm:flex-none">
+                <x-icon name="search" :size="14" class="pointer-events-none absolute left-2.5 top-1/2 z-10 -translate-y-1/2 text-cg-red" />
+                <input type="search" name="q" value="{{ $term }}" placeholder="{{ ui('search_booking_hint', 'Code, name, phone, movie…') }}" class="input h-9 !min-h-9 min-w-0 py-2 pl-8 text-xs">
             </div>
             <button type="submit" class="btn-outline h-9 min-h-9 px-3 text-xs">{{ ui('search', 'Search') }}</button>
         </form>
@@ -38,14 +38,14 @@
         <table class="w-full min-w-[880px] text-sm">
             <thead>
                 <tr class="border-b border-cg-border-soft text-left text-xs uppercase tracking-wide text-cg-dim">
-                    <th class="px-5 py-4 font-semibold">{{ ui('booking_id', 'Booking') }}</th>
-                    <th class="px-5 py-4 font-semibold">{{ ui('movies', 'Movie') }}</th>
-                    <th class="px-5 py-4 font-semibold">{{ ui('customer_info', 'Customer') }}</th>
-                    <th class="px-5 py-4 font-semibold">{{ ui('show', 'Show') }}</th>
-                    <th class="px-5 py-4 font-semibold">{{ ui('seats', 'Seats') }}</th>
-                    <th class="px-5 py-4 font-semibold">{{ ui('total', 'Amount') }}</th>
-                    <th class="px-5 py-4 font-semibold">{{ ui('status', 'Status') }}</th>
-                    <th class="px-5 py-4 text-right font-semibold">{{ ui('actions', 'Actions') }}</th>
+                    <th class="px-5 py-4 font-bold text-black">{{ ui('booking_id', 'Booking') }}</th>
+                    <th class="px-5 py-4 font-bold text-black">{{ ui('movies', 'Movie') }}</th>
+                    <th class="px-5 py-4 font-bold text-black">{{ ui('customer_info', 'Customer') }}</th>
+                    <th class="px-5 py-4 font-bold text-black">{{ ui('show', 'Show') }}</th>
+                    <th class="px-5 py-4 font-bold text-black">{{ ui('seats', 'Seats') }}</th>
+                    <th class="px-5 py-4 font-bold text-black">{{ ui('total', 'Amount') }}</th>
+                    <th class="px-5 py-4 font-bold text-black">{{ ui('status', 'Status') }}</th>
+                    <th class="px-5 py-4 text-right font-bold text-black">{{ ui('actions', 'Actions') }}</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-cg-border-soft">

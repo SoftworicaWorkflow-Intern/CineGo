@@ -5,9 +5,9 @@
 @section('content')
     <div class="mb-5 flex flex-wrap items-center justify-between gap-3">
         <form action="{{ route('admin.movies.index') }}" method="GET" class="flex w-full items-center justify-center gap-2 sm:w-auto">
-            <div class="relative flex h-9 min-w-0 flex-1 items-center sm:flex-none">
-                <x-icon name="search" :size="14" class="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-cg-red" />
-                <input type="search" name="q" value="{{ $term }}" placeholder="{{ ui('search', 'Search') }}…" class="input h-9 min-h-9 min-w-0 py-2 pl-8 text-xs sm:w-56">
+            <div class="relative h-9 min-w-0 flex-1 sm:w-56 sm:flex-none">
+                <x-icon name="search" :size="14" class="pointer-events-none absolute left-2.5 top-1/2 z-10 -translate-y-1/2 text-cg-red" />
+                <input type="search" name="q" value="{{ $term }}" placeholder="{{ ui('search', 'Search') }}…" class="input h-9 !min-h-9 min-w-0 py-2 pl-8 text-xs">
             </div>
             <button type="submit" class="btn-outline h-9 min-h-9 px-3 text-xs">{{ ui('search', 'Search') }}</button>
         </form>
@@ -17,15 +17,14 @@
         </a>
     </div>
 
-    <div class="card overflow-x-auto">
+    <div class="card overflow-x-auto overflow-y-hidden">
         <table class="w-full min-w-[760px] text-sm">
             <thead>
                 <tr class="border-b border-cg-border-soft text-left text-xs uppercase tracking-wide text-cg-dim">
-                    <th class="px-5 py-4 font-semibold">{{ ui('movies', 'Movie') }}</th>
-                    <th class="px-5 py-4 font-semibold">{{ ui('release_date', 'Release') }}</th>
-                    <th class="px-5 py-4 font-semibold">{{ ui('language_label', 'Language') }}</th>
-                    <th class="px-5 py-4 font-semibold">{{ ui('status', 'Status') }}</th>
-                    <th class="px-5 py-4 text-right font-semibold">{{ ui('actions', 'Actions') }}</th>
+                    <th class="px-5 py-4 font-bold text-black">{{ ui('movies', 'Movie') }}</th>
+                    <th class="px-5 py-4 font-bold text-black">{{ ui('language_label', 'Language') }}</th>
+                    <th class="px-5 py-4 font-bold text-black">{{ ui('status', 'Status') }}</th>
+                    <th class="px-5 py-4 text-right font-bold text-black">{{ ui('actions', 'Actions') }}</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-cg-border-soft">
@@ -42,7 +41,6 @@
                                 </div>
                             </div>
                         </td>
-                        <td class="px-5 py-4 text-cg-muted">{{ $movie->release_date?->format('M j, Y') }}</td>
                         <td class="px-5 py-4 text-cg-muted">{{ $movie->language }}</td>
                         <td class="px-5 py-4">
                             <div class="flex flex-wrap gap-1.5">
@@ -70,7 +68,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="5" class="px-5 py-10 text-center text-cg-muted">{{ ui('no_results', 'Nothing matched your search.') }}</td>
+                        <td colspan="4" class="px-5 py-10 text-center text-cg-muted">{{ ui('no_results', 'Nothing matched your search.') }}</td>
                     </tr>
                 @endforelse
             </tbody>

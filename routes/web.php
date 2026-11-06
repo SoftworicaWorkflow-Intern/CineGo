@@ -1,7 +1,6 @@
 <?php
 
 use App\Http\Controllers\AccountController;
-use App\Http\Controllers\Admin\AnnouncementController as AdminAnnouncementController;
 use App\Http\Controllers\Admin\BookingController as AdminBookingController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\MessageController as AdminMessageController;
@@ -137,8 +136,6 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'admin'])->group(fun
     Route::resource('movies', AdminMovieController::class)->except(['show']);
     Route::resource('showtimes', AdminShowtimeController::class)->except(['show']);
     Route::resource('offers', AdminOfferController::class)->except(['show']);
-    Route::resource('announcements', AdminAnnouncementController::class)->except(['create', 'edit', 'show']);
-
     Route::get('/bookings', [AdminBookingController::class, 'index'])->name('bookings.index');
     Route::get('/bookings/{booking}', [AdminBookingController::class, 'show'])->name('bookings.show');
     Route::patch('/bookings/{booking}', [AdminBookingController::class, 'update'])->name('bookings.update');

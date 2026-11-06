@@ -5,7 +5,7 @@
 @php
     $allGenres = ['Action', 'Comedy', 'Drama', 'Romance', 'Horror', 'Thriller', 'Animation', 'Adventure', 'Family', 'Sci-Fi', 'Fantasy', 'Mystery', 'Biography', 'Documentary', 'Musical', 'War', 'History', 'Sport'];
     $selectedGenres = old('genres', $movie->genres ?? []);
-    $languages = ['Hindi', 'English', 'Korean', 'Chinese'];
+    $languages = ['Hindi', 'English', 'Nepali', 'Korean', 'Chinese'];
 @endphp
 
 @section('content')
@@ -23,6 +23,7 @@
     <form
         action="{{ $movie->exists ? route('admin.movies.update', $movie) : route('admin.movies.store') }}"
         method="POST"
+        enctype="multipart/form-data"
         class="grid gap-6 xl:grid-cols-[1fr_320px]"
     >
         @csrf
@@ -37,7 +38,7 @@
                     <input id="title" type="text" name="title" value="{{ old('title', $movie->title) }}" class="input" required maxlength="160">
                 </div>
 
-                <div class="grid gap-4 sm:grid-cols-3">
+                <div class="grid gap-4 sm:grid-cols-2">
                     <div>
                         <label class="label" for="duration_minutes">{{ ui('duration', 'Duration') }} (min) *</label>
                         <input id="duration_minutes" type="number" name="duration_minutes" value="{{ old('duration_minutes', $movie->duration_minutes ?? 120) }}" class="input" required min="1" max="600">
@@ -49,10 +50,6 @@
                                 <option value="{{ $lang }}" @selected(old('language', $movie->language) === $lang)>{{ $lang }}</option>
                             @endforeach
                         </select>
-                    </div>
-                    <div>
-                        <label class="label" for="release_date">{{ ui('release_date', 'Release date') }} *</label>
-                        <input id="release_date" type="date" name="release_date" value="{{ old('release_date', $movie->release_date?->format('Y-m-d')) }}" class="input" required>
                     </div>
                 </div>
 
@@ -80,7 +77,7 @@
             </section>
 
             <section class="card space-y-4 p-5 sm:p-6">
-                <h2 class="font-semibold text-cg-white">{{ ui('synopsis', 'Storyline') }} *</h2>
+                <h2 class="font-semibold text-cg-white">{{ ui('description', 'Description') }} *</h2>
                 <div>
                     <label class="label" for="synopsis">English</label>
                     <textarea id="synopsis" name="synopsis" rows="5" class="input resize-y" required maxlength="4000">{{ old('synopsis', $movie->synopsis) }}</textarea>
@@ -107,11 +104,20 @@
                 <h2 class="font-semibold text-cg-white">{{ ui('media', 'Media') }}</h2>
 
                 <div>
-                    <label class="label" for="poster_url">{{ ui('poster', 'Poster path') }} *</label>
-                    <input id="poster_url" type="text" name="poster_url" value="{{ old('poster_url', $movie->poster_url ?? '/img/posters/poster-1.svg') }}" class="input" required maxlength="300" placeholder="/img/posters/poster-1.svg">
-                    @if ($movie->poster_url ?? null)
-                        <img src="{{ $movie->poster_url }}" alt="" class="mt-2 h-40 w-28 rounded-lg object-cover">
-                    @endif
+                    <label class="label" for="poster">{{ ui('poster', 'Poster image') }} {{ $movie->exists ? '' : '*' }}</label>
+                    <label for="poster" data-poster-dropzone class="flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-cg-border bg-cg-charcoal px-4 py-8 text-center transition hover:border-cg-red">
+                        <span class="text-sm font-semibold text-cg-white">{{ ui('drop_poster', 'Drop poster image here') }}</span>
+                        <span class="mt-1 text-xs text-cg-muted">{{ ui('browse_poster', 'or click to browse') }}</span>
+                        <span data-poster-filename class="mt-2 hidden text-xs font-medium text-cg-red"></span>
+                    </label>
+                    <input id="poster" type="file" name="poster" accept="image/jpeg,image/png,image/webp" class="sr-only" data-poster-input @required(!$movie->exists)>
+                    <p class="mt-1.5 text-xs text-cg-dim">{{ ui('poster_hint', 'JPG, PNG or WebP, up to 2 MB.') }}</p>
+                    <img
+                        src="{{ $movie->poster_url ?? '' }}"
+                        alt=""
+                        class="{{ $movie->poster_url ? '' : 'hidden' }} mt-2 h-40 w-28 rounded-lg object-cover"
+                        data-poster-preview
+                    >
                 </div>
 
                 <div>

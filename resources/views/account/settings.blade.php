@@ -15,7 +15,7 @@
 
         <div class="grid max-w-4xl gap-6 lg:grid-cols-2">
             {{-- Change password --}}
-            <form action="{{ route('account.password.update') }}" method="POST" class="card space-y-4 p-6">
+            <form id="security" action="{{ route('account.password.update') }}" method="POST" class="card space-y-4 p-6">
                 @csrf
 
                 <h2 class="flex items-center gap-2 font-semibold text-cg-white">
@@ -51,28 +51,27 @@
                 <button type="submit" class="btn-primary">{{ ui('change_password', 'Change password') }}</button>
             </form>
 
-            {{-- Language & preferences --}}
-            <form action="{{ route('account.preferences.update') }}" method="POST" class="card space-y-4 p-6">
-                @csrf
+            @unless ($user->is_admin)
+                <form id="preferences" action="{{ route('account.preferences.update') }}" method="POST" class="card space-y-4 p-6">
+                    @csrf
 
-                <h2 class="flex items-center gap-2 font-semibold text-cg-white">
-                    <x-icon name="globe" :size="17" class="text-cg-red" />
-                    {{ ui('language_preference', 'Language preference') }}
-                </h2>
+                    <h2 class="flex items-center gap-2 font-semibold text-cg-white">
+                        <x-icon name="globe" :size="17" class="text-cg-red" />
+                        {{ ui('language_preference', 'Language preference') }}
+                    </h2>
 
-                <div class="grid grid-cols-2 gap-3">
-                    @foreach (['en' => 'English', 'np' => 'नेपाली'] as $code => $label)
-                        <label class="cursor-pointer">
-                            <input type="radio" name="preferred_language" value="{{ $code }}" class="peer sr-only"
-                                @checked(old('preferred_language', $user->preferred_language ?? 'en') === $code)>
-                            <span class="flex items-center justify-center rounded-xl border border-cg-border bg-cg-charcoal px-4 py-3.5 font-semibold text-cg-white transition hover:border-cg-red peer-checked:border-cg-red peer-checked:bg-cg-red/10 peer-checked:text-cg-red">
-                                {{ $label }}
-                            </span>
-                        </label>
-                    @endforeach
-                </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        @foreach (['en' => 'English', 'np' => 'नेपाली'] as $code => $label)
+                            <label class="cursor-pointer">
+                                <input type="radio" name="preferred_language" value="{{ $code }}" class="peer sr-only"
+                                    @checked(old('preferred_language', $user->preferred_language ?? 'en') === $code)>
+                                <span class="flex items-center justify-center rounded-xl border border-cg-border bg-cg-charcoal px-4 py-3.5 font-semibold text-cg-white transition hover:border-cg-red peer-checked:border-cg-red peer-checked:bg-cg-red/10 peer-checked:text-cg-red">
+                                    {{ $label }}
+                                </span>
+                            </label>
+                        @endforeach
+                    </div>
 
-                @unless ($user->is_admin)
                     <div>
                         <label class="label" for="settings-city">{{ ui('select_city', 'Preferred city') }}</label>
                         <select id="settings-city" name="city_id" class="input cursor-pointer">
@@ -84,15 +83,14 @@
                             @endforeach
                         </select>
                     </div>
-                @endunless
+                    <p class="flex items-start gap-2 text-xs text-cg-dim">
+                        <x-icon name="info" :size="14" class="mt-0.5 shrink-0 text-cg-red" />
+                        {{ ui('language_note', 'Your choice is saved to your account and applied on your next visit.') }}
+                    </p>
 
-                <p class="flex items-start gap-2 text-xs text-cg-dim">
-                    <x-icon name="info" :size="14" class="mt-0.5 shrink-0 text-cg-red" />
-                    {{ ui('language_note', 'Your choice is saved to your account and applied on your next visit.') }}
-                </p>
-
-                <button type="submit" class="btn-primary">{{ ui('save', 'Save changes') }}</button>
-            </form>
+                    <button type="submit" class="btn-primary">{{ ui('save', 'Save changes') }}</button>
+                </form>
+            @endunless
         </div>
     </div>
 @endsection

@@ -97,8 +97,51 @@ function mountCharts() {
     });
 }
 
+function mountPosterDropzone() {
+    const dropzone = document.querySelector('[data-poster-dropzone]');
+    const input = document.querySelector('[data-poster-input]');
+    const preview = document.querySelector('[data-poster-preview]');
+    const filename = document.querySelector('[data-poster-filename]');
+
+    if (!dropzone || !input || !preview || !filename) return;
+
+    const updateFile = (file) => {
+        if (!file) return;
+
+        const transfer = new DataTransfer();
+        transfer.items.add(file);
+        input.files = transfer.files;
+        filename.textContent = file.name;
+        filename.classList.remove('hidden');
+        preview.src = URL.createObjectURL(file);
+        preview.classList.remove('hidden');
+    };
+
+    input.addEventListener('change', () => updateFile(input.files[0]));
+
+    ['dragenter', 'dragover'].forEach((eventName) => {
+        dropzone.addEventListener(eventName, (event) => {
+            event.preventDefault();
+            dropzone.classList.add('border-cg-red', 'bg-cg-red/5');
+        });
+    });
+
+    ['dragleave', 'drop'].forEach((eventName) => {
+        dropzone.addEventListener(eventName, (event) => {
+            event.preventDefault();
+            dropzone.classList.remove('border-cg-red', 'bg-cg-red/5');
+        });
+    });
+
+    dropzone.addEventListener('drop', (event) => updateFile(event.dataTransfer.files[0]));
+}
+
 if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', mountCharts);
+    document.addEventListener('DOMContentLoaded', () => {
+        mountCharts();
+        mountPosterDropzone();
+    });
 } else {
     mountCharts();
+    mountPosterDropzone();
 }

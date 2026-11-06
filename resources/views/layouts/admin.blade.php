@@ -40,7 +40,6 @@
                         ['route' => 'admin.movies.index', 'label' => ui('movies', 'Movies'), 'icon' => 'film', 'match' => 'admin.movies.*'],
                         ['route' => 'admin.showtimes.index', 'label' => ui('showtimes_for', 'Showtime'), 'icon' => 'clock', 'match' => 'admin.showtimes.*'],
                         ['route' => 'admin.bookings.index', 'label' => ui('bookings', 'Bookings'), 'icon' => 'ticket', 'match' => 'admin.bookings.*'],
-                        ['route' => 'admin.announcements.index', 'label' => ui('announcements', 'Announcements'), 'icon' => 'bell', 'match' => 'admin.announcements.*'],
                         ['route' => 'admin.messages.index', 'label' => ui('contact', 'Messages'), 'icon' => 'mail', 'match' => 'admin.messages.*'],
                         ['route' => 'admin.users.index', 'label' => ui('customers', 'Customers'), 'icon' => 'users', 'match' => 'admin.users.*'],
                         ['route' => 'admin.settings.index', 'label' => ui('settings', 'Settings'), 'icon' => 'settings', 'match' => 'admin.settings.*'],
@@ -111,15 +110,29 @@
     </div>
 
     <div id="admin-logout-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 p-4" role="dialog" aria-modal="true" aria-labelledby="admin-logout-title">
-        <div class="w-full max-w-sm rounded-2xl border border-cg-border bg-cg-white p-6 text-cg-black shadow-2xl">
-            <div class="flex h-11 w-11 items-center justify-center rounded-full bg-cg-red/10 text-cg-red">
+        <div class="w-full max-w-sm rounded-2xl border border-cg-border-soft bg-cg-card p-6 text-cg-white shadow-2xl">
+            <div class="flex h-11 w-11 items-center justify-center rounded-full bg-cg-red/15 text-cg-red">
                 <x-icon name="log-out" :size="20" />
             </div>
             <h2 id="admin-logout-title" class="mt-4 text-lg font-semibold">{{ ui('logout_confirm_title', 'Log out of admin panel?') }}</h2>
             <p class="mt-2 text-sm text-cg-muted">{{ ui('logout_confirm_message', 'You will need to log in again to access the admin panel.') }}</p>
             <div class="mt-6 flex justify-end gap-3">
-                <button type="button" data-admin-logout-cancel class="btn-outline !text-black">{{ ui('cancel', 'Cancel') }}</button>
-                <button type="button" data-admin-logout-confirm class="btn-primary">{{ ui('logout', 'Log out') }}</button>
+                <button type="button" data-admin-logout-cancel class="btn-outline !border-cg-border !text-cg-white hover:!border-cg-border hover:!bg-cg-charcoal hover:!text-cg-white active:!bg-cg-border active:!text-cg-white">{{ ui('cancel', 'Cancel') }}</button>
+                <button type="button" data-admin-logout-confirm class="btn-primary hover:!text-white active:!text-cg-red">{{ ui('logout', 'Log out') }}</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="admin-delete-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 p-4" role="dialog" aria-modal="true" aria-labelledby="admin-delete-title">
+        <div class="w-full max-w-sm rounded-2xl border border-cg-border-soft bg-cg-card p-6 text-cg-white shadow-2xl">
+            <div class="flex h-11 w-11 items-center justify-center rounded-full bg-cg-red/15 text-cg-red">
+                <x-icon name="trash" :size="20" />
+            </div>
+            <h2 id="admin-delete-title" class="mt-4 text-lg font-semibold">{{ ui('delete_confirm_title', 'Confirm deletion') }}</h2>
+            <p data-admin-delete-message class="mt-2 text-sm text-cg-muted"></p>
+            <div class="mt-6 flex justify-end gap-3">
+                <button type="button" data-admin-delete-cancel class="btn-outline !border-cg-border !text-cg-white hover:!border-cg-border hover:!bg-cg-charcoal hover:!text-cg-white active:!bg-cg-border active:!text-cg-white">{{ ui('cancel', 'Cancel') }}</button>
+                <button type="button" data-admin-delete-confirm class="btn-primary hover:!text-white active:!text-cg-red">{{ ui('delete', 'Delete') }}</button>
             </div>
         </div>
     </div>
