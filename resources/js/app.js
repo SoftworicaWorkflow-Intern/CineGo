@@ -483,6 +483,73 @@ function initScrollReveal() {
     });
 }
 
+function initSeatAvailability() {
+    const seatMap = document.querySelector('[data-seat-map]');
+    if (!seatMap) return;
+
+    import('./echo.js').then(() => {
+        if (!window.Echo) return;
+
+        const timers = new Map();
+        const seats = new Map(
+            Array.from(seatMap.querySelectorAll('[data-seat]')).map((seat) => [seat.dataset.seatId, seat]),
+        );
+
+        const clearTimer = (seatId) => {
+            const timer = timers.get(seatId);
+            if (timer) window.clearTimeout(timer);
+            timers.delete(seatId);
+        };
+
+        const updateSeat = (seatId, status, expiresAt = null) => {
+            const seat = seats.get(String(seatId));
+            if (!seat || !['available', 'locked', 'booked'].includes(status)) return;
+            if (status === 'locked' && seat.getAttribute('aria-pressed') === 'true') return;
+
+            clearTimer(String(seatId));
+            seat.dataset.seatStatus = status;
+            seat.dataset.lockExpires = expiresAt || '';
+            seat.classList.toggle('cg-seat-locked', status === 'locked');
+            seat.classList.toggle('cg-seat-booked', status === 'booked');
+            seat.disabled = status !== 'available';
+
+            if (status === 'booked') {
+                seat.classList.remove('cg-seat-selected');
+                seat.setAttribute('aria-pressed', 'false');
+            }
+
+            const label = status === 'available' && seat.getAttribute('aria-pressed') === 'true'
+                ? seat.dataset.labelSelected
+                : seat.dataset[`label${status.charAt(0).toUpperCase()}${status.slice(1)}`];
+            seat.setAttribute('aria-label', `${seat.dataset.label} — ${label}`);
+
+            const expirationTime = Date.parse(expiresAt);
+            if (status === 'locked' && Number.isFinite(expirationTime)) {
+                const delay = Math.max(0, expirationTime - Date.now());
+                timers.set(String(seatId), window.setTimeout(() => {
+                    if (seat.dataset.lockExpires === expiresAt && seat.dataset.seatStatus === 'locked') {
+                        updateSeat(seatId, 'available');
+                    }
+                }, delay));
+            }
+        };
+
+        seats.forEach((seat, seatId) => {
+            if (seat.dataset.seatStatus === 'locked' && seat.dataset.lockExpires) {
+                updateSeat(seatId, 'locked', seat.dataset.lockExpires);
+            }
+        });
+
+        window.Echo.channel(`showtime.${seatMap.dataset.showtimeId}`)
+            .listen('.seat.availability.changed', (event) => {
+                if (!Array.isArray(event.seat_ids)) return;
+                event.seat_ids.forEach((seatId) => updateSeat(seatId, event.status, event.expires_at));
+            });
+    }).catch((error) => {
+        console.error('Seat availability updates could not be initialized.', error);
+    });
+}
+
 /**
  * Register the service worker (production builds only — the dev server
  * relies on network requests so HMR keeps working).
@@ -506,6 +573,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initHeroPagination();
     initTrailers();
     initCopyButtons();
+    initSeatAvailability();
     initScrollReveal();
     initServiceWorker();
 });

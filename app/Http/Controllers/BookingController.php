@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\SeatAvailabilityChanged;
 use App\Models\Booking;
 use App\Models\Offer;
 use App\Models\Seat;
@@ -47,6 +48,7 @@ class BookingController extends Controller
             'rows' => $rows,
             'bookedIds' => $statuses['booked'],
             'lockedIds' => $statuses['locked'],
+            'lockExpirations' => $statuses['lockExpirations'],
             'selectedIds' => $selectedIds,
         ]);
     }
@@ -69,6 +71,17 @@ class BookingController extends Controller
         $seatIds = array_map('intval', $validated['seats']);
 
         $conflicts = $this->bookingService->lockSeats($showtime, $seatIds, $this->holder());
+
+        $lockedSeatIds = array_values(array_diff($seatIds, $conflicts));
+
+        if ($lockedSeatIds !== []) {
+            SeatAvailabilityChanged::dispatch(
+                $showtime->id,
+                $lockedSeatIds,
+                'locked',
+                now()->addMinutes(SeatLock::TTL_MINUTES)->toIso8601String(),
+            );
+        }
 
         if ($conflicts !== []) {
             return back()
@@ -163,6 +176,8 @@ class BookingController extends Controller
             holder: $this->holder(),
             status: Booking::STATUS_PENDING,
         );
+
+        SeatAvailabilityChanged::dispatch($showtime->id, $draft['seat_ids'], 'booked');
 
         session()->forget('booking_draft');
 

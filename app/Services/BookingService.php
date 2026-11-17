@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Events\SeatAvailabilityChanged;
 use App\Models\Booking;
 use App\Models\BookingSeat;
 use App\Models\Offer;
@@ -23,7 +24,7 @@ class BookingService
     /**
      * Seat ids for a showtime, split by state.
      *
-     * @return array{booked: list<int>, locked: list<int>}
+     * @return array{booked: list<int>, locked: list<int>, lockExpirations: array<int, string>}
      */
     public function seatStatuses(Showtime $showtime, ?string $holder = null): array
     {
@@ -53,9 +54,14 @@ class BookingService
             $lockedQuery->where('holder', '!=', $holder);
         }
 
+        $locks = $lockedQuery->get(['seat_id', 'expires_at']);
+
         return [
             'booked' => array_map('intval', $booked),
-            'locked' => array_map('intval', $lockedQuery->pluck('seat_id')->all()),
+            'locked' => $locks->pluck('seat_id')->map(fn ($seatId): int => (int) $seatId)->all(),
+            'lockExpirations' => $locks->mapWithKeys(fn (SeatLock $lock): array => [
+                (int) $lock->seat_id => $lock->expires_at->toIso8601String(),
+            ])->all(),
         ];
     }
 
@@ -215,11 +221,36 @@ class BookingService
      */
     public function releaseStaleBookings(Showtime $showtime): void
     {
-        Booking::query()
-            ->where('showtime_id', $showtime->id)
-            ->where('status', Booking::STATUS_PENDING)
-            ->where('created_at', '<=', now()->subMinutes(self::PENDING_TTL_MINUTES))
-            ->update(['status' => Booking::STATUS_CANCELLED]);
+        $releasedSeatIds = DB::transaction(function () use ($showtime): array {
+            $staleBookings = Booking::query()
+                ->where('showtime_id', $showtime->id)
+                ->where('status', Booking::STATUS_PENDING)
+                ->where('created_at', '<=', now()->subMinutes(self::PENDING_TTL_MINUTES))
+                ->lockForUpdate()
+                ->get(['id']);
+
+            if ($staleBookings->isEmpty()) {
+                return [];
+            }
+
+            $bookingIds = $staleBookings->modelKeys();
+            $seatIds = BookingSeat::query()
+                ->whereIn('booking_id', $bookingIds)
+                ->pluck('seat_id')
+                ->map(fn ($seatId): int => (int) $seatId)
+                ->all();
+
+            $updated = Booking::query()
+                ->whereIn('id', $bookingIds)
+                ->where('status', Booking::STATUS_PENDING)
+                ->update(['status' => Booking::STATUS_CANCELLED]);
+
+            return $updated > 0 ? $seatIds : [];
+        });
+
+        if ($releasedSeatIds !== []) {
+            SeatAvailabilityChanged::dispatch($showtime->id, $releasedSeatIds, 'available');
+        }
     }
 
     /**
@@ -252,10 +283,26 @@ class BookingService
                 continue;
             }
 
-            SeatLock::updateOrInsert(
+            $expiresAt = now()->addMinutes(SeatLock::TTL_MINUTES);
+            $lock = SeatLock::query()->firstOrCreate(
                 ['showtime_id' => $showtime->id, 'seat_id' => $seatId],
-                ['holder' => $holder, 'expires_at' => now()->addMinutes(SeatLock::TTL_MINUTES), 'created_at' => now(), 'updated_at' => now()],
+                ['holder' => $holder, 'expires_at' => $expiresAt],
             );
+            $updated = SeatLock::query()
+                ->whereKey($lock->getKey())
+                ->where(function ($query) use ($holder): void {
+                    $query->where('holder', $holder)
+                        ->orWhere('expires_at', '<=', now());
+                })
+                ->update([
+                    'holder' => $holder,
+                    'expires_at' => $expiresAt,
+                    'updated_at' => now(),
+                ]);
+
+            if ($updated === 0) {
+                $held[] = $seatId;
+            }
         }
 
         return $held;

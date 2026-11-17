@@ -144,7 +144,7 @@
 
             <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6 lg:gap-5">
                 @foreach ($comingSoon as $movie)
-                    <x-movie-card :movie="$movie" :show-book="false" />
+                    <x-movie-card :movie="$movie" :show-book="false" :show-release-date-on-poster="true" />
                 @endforeach
             </div>
         </section>

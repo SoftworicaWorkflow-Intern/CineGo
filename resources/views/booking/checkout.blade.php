@@ -40,7 +40,7 @@
                         <div class="grid gap-4 sm:grid-cols-2">
                             <div class="sm:col-span-2">
                                 <label class="label font-bold" for="customer_name">{{ ui('full_name', 'Full name') }} *</label>
-                                <input id="customer_name" type="text" name="customer_name" value="{{ old('customer_name', auth()->user()?->name) }}" class="input" required maxlength="100" autocomplete="name">
+                                <input id="customer_name" type="text" name="customer_name" value="{{ old('customer_name', auth()->user()?->name) }}" class="input bg-[#27272a] text-white" required maxlength="100" autocomplete="name">
                             </div>
 
                             <div>
@@ -102,7 +102,7 @@
                                     <span class="flex items-center gap-3 rounded-xl border border-cg-border bg-cg-charcoal px-4 py-3.5 transition hover:border-cg-red peer-checked:border-cg-red peer-checked:bg-cg-red/10">
                                         <span class="flex h-10 min-w-16 shrink-0 items-center justify-center rounded-lg bg-white px-2">
                                             @if ($method === 'esewa')
-                                                <img src="{{ asset('img/payments/esewa.png') }}" alt="eSewa" class="h-7 w-20 object-contain" width="120" height="52">
+                                                <img src="{{ asset('img/payments/esewa.png') }}" alt="eSewa" class="h-6 w-16 object-contain" width="120" height="52">
                                             @elseif ($method === 'khalti')
                                                 <img src="{{ asset('img/payments/khalti.png') }}" alt="Khalti" class="h-8 w-8 object-contain" width="694" height="694">
                                             @else

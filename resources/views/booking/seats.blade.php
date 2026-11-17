@@ -35,7 +35,7 @@
                 </div>
 
                 {{-- Seat map --}}
-                <div class="card p-4 sm:p-7" data-no-scroll-reveal>
+                <div class="card p-4 sm:p-7" data-no-scroll-reveal data-seat-map data-showtime-id="{{ $showtime->id }}">
                     <div class="mb-5 flex flex-wrap items-center justify-between gap-3">
                         <h1 class="font-display text-2xl tracking-wide text-cg-white">{{ ui('step_select_seats', 'Select Seats') }}</h1>
                     </div>
@@ -77,6 +77,12 @@
                                                     data-type="{{ $seat->seat_type }}"
                                                     data-price="{{ $priceFor($seat->seat_type) }}"
                                                     data-label="{{ $seat->label() }}"
+                                                    data-seat-status="{{ $isBooked ? 'booked' : ($isLocked ? 'locked' : 'available') }}"
+                                                    data-lock-expires="{{ $lockExpirations[$seat->id] ?? '' }}"
+                                                    data-label-available="{{ ui('seat_available', 'Available') }}"
+                                                    data-label-locked="{{ ui('seat_locked', 'Locked') }}"
+                                                    data-label-booked="{{ ui('seat_booked', 'Booked') }}"
+                                                    data-label-selected="{{ ui('seat_selected', 'Selected') }}"
                                                     aria-pressed="{{ $isSelected ? 'true' : 'false' }}"
                                                     aria-label="{{ $seat->label() }} — {{ $isBooked ? ui('seat_booked', 'Booked') : ($isLocked ? ui('seat_locked', 'Locked') : ($isSelected ? ui('seat_selected', 'Selected') : ui('seat_available', 'Available'))) }}"
                                                     {{ ($isBooked || $isLocked) ? 'disabled' : '' }}
@@ -84,11 +90,12 @@
                                                         {{ $isBooked ? 'cg-seat-booked' : '' }}
                                                         {{ $isLocked ? 'cg-seat-locked' : '' }}
                                                         {{ $isSelected ? 'cg-seat-selected' : '' }}"
-                                                >{{ $seat->seat_number }}</button>
+                                                >
+                                                    <x-icon name="armchair" :size="30" class="cg-seat-icon" />
+                                                    <span aria-hidden="true" class="cg-seat-label">{{ $seat->label() }}</span>
+                                                </button>
                                             @endforeach
                                         </div>
-
-                                        <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-cg-red/40 bg-cg-red/10 text-sm font-bold text-cg-white shadow-sm">{{ $rowLabel }}</span>
                                     </div>
                                 @endforeach
                             </div>
@@ -103,7 +110,6 @@
                             <span class="inline-flex items-center gap-2"><span class="h-4 w-4 rounded border border-cg-red bg-cg-red"></span>{{ ui('seat_selected', 'Selected') }}</span>
                             <span class="inline-flex items-center gap-2"><span class="h-4 w-4 rounded border border-blue-300 bg-blue-100"></span>{{ ui('seat_premium', 'Premium') }}</span>
                             <span class="inline-flex items-center gap-2"><span class="h-4 w-4 rounded border border-purple-300 bg-purple-100"></span>{{ ui('seat_recliner', 'Recliner') }}</span>
-                            <span class="inline-flex items-center gap-2"><span class="h-4 w-4 rounded border border-amber-300 bg-amber-100"></span>{{ ui('seat_locked', 'Locked') }}</span>
                             <span class="inline-flex items-center gap-2"><span class="h-4 w-4 rounded border border-gray-300 bg-gray-200"></span>{{ ui('seat_booked', 'Booked') }}</span>
                         </div>
                     </div>

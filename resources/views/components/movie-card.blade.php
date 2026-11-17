@@ -1,4 +1,4 @@
-@props(['movie', 'showBook' => true, 'showTrailer' => true])
+@props(['movie', 'showBook' => true, 'showTrailer' => true, 'showReleaseDateOnPoster' => false])
 
 @php
     $detailRoute = route('movies.show', $movie);
@@ -25,6 +25,12 @@
                 @endif
             </div>
         </a>
+
+        @if ($showReleaseDateOnPoster && $movie->release_date)
+            <span class="absolute inset-x-2 bottom-2 z-10 rounded-md bg-black/75 px-2 py-1.5 text-center text-xs font-bold text-white backdrop-blur-sm">
+                {{ ui('release_date', 'Release Date') }}: {{ $movie->release_date->format('M j, Y') }}
+            </span>
+        @endif
 
         <div class="cg-poster-overlay pointer-events-none">
             <a href="{{ $detailRoute }}" class="btn-primary pointer-events-auto w-full justify-center text-xs">
@@ -53,13 +59,15 @@
             <span class="meta-dot"></span>{{ $movie->language }}
         </p>
 
-        <p class="text-xs text-cg-dim">
-            @if ($isComingSoon)
-                {{ ui('release_date', 'Release Date') }}: {{ $movie->release_date?->format('M j, Y') }}
-            @else
-                {{ $movie->release_date?->format('M j, Y') }}
-            @endif
-        </p>
+        @unless ($showReleaseDateOnPoster)
+            <p class="text-xs text-cg-dim">
+                @if ($isComingSoon)
+                    {{ ui('release_date', 'Release Date') }}: {{ $movie->release_date?->format('M j, Y') }}
+                @else
+                    {{ $movie->release_date?->format('M j, Y') }}
+                @endif
+            </p>
+        @endunless
 
         <div class="flex gap-2 pt-1">
             @if ($showBook)

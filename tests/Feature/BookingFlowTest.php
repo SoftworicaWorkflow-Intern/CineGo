@@ -2,16 +2,19 @@
 
 namespace Tests\Feature;
 
+use App\Events\SeatAvailabilityChanged;
 use App\Models\Booking;
 use App\Models\Cinema;
 use App\Models\Hall;
 use App\Models\Movie;
 use App\Models\Payment;
 use App\Models\Seat;
+use App\Models\SeatLock;
 use App\Models\Showtime;
 use App\Models\User;
 use App\Services\BookingService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Validation\ValidationException;
 use Tests\TestCase;
 
@@ -107,15 +110,95 @@ class BookingFlowTest extends TestCase
             ->assertSessionHasErrors('seats');
     }
 
+    public function test_selecting_seats_broadcasts_their_live_lock(): void
+    {
+        $showtime = $this->makeShowtime();
+        $seat = $this->seat($showtime, 1);
+        Event::fake([SeatAvailabilityChanged::class]);
+
+        $this->post(route('booking.select', $showtime), ['seats' => [$seat->id]])
+            ->assertRedirect(route('booking.checkout', $showtime));
+
+        Event::assertDispatched(SeatAvailabilityChanged::class, fn (SeatAvailabilityChanged $event): bool => (
+            $event->showtimeId === $showtime->id
+            && $event->seatIds === [$seat->id]
+            && $event->status === 'locked'
+            && $event->expiresAt !== null
+        ));
+    }
+
+    public function test_a_live_seat_lock_cannot_be_taken_from_another_holder(): void
+    {
+        $showtime = $this->makeShowtime();
+        $seat = $this->seat($showtime, 1);
+        SeatLock::query()->create([
+            'showtime_id' => $showtime->id,
+            'seat_id' => $seat->id,
+            'holder' => 'first-customer',
+            'expires_at' => now()->addMinutes(SeatLock::TTL_MINUTES),
+        ]);
+
+        $conflicts = app(BookingService::class)->lockSeats($showtime, [$seat->id], 'second-customer');
+
+        $this->assertSame([$seat->id], $conflicts);
+        $this->assertDatabaseHas('seat_locks', [
+            'showtime_id' => $showtime->id,
+            'seat_id' => $seat->id,
+            'holder' => 'first-customer',
+        ]);
+    }
+
+    public function test_expired_seat_locks_broadcast_availability(): void
+    {
+        $showtime = $this->makeShowtime();
+        $seat = $this->seat($showtime, 1);
+        SeatLock::query()->create([
+            'showtime_id' => $showtime->id,
+            'seat_id' => $seat->id,
+            'holder' => 'expired-customer',
+            'expires_at' => now()->subSecond(),
+        ]);
+        Event::fake([SeatAvailabilityChanged::class]);
+
+        SeatLock::purgeExpired();
+
+        $this->assertDatabaseMissing('seat_locks', ['seat_id' => $seat->id]);
+        Event::assertDispatched(SeatAvailabilityChanged::class, fn (SeatAvailabilityChanged $event): bool => (
+            $event->showtimeId === $showtime->id
+            && $event->seatIds === [$seat->id]
+            && $event->status === 'available'
+        ));
+    }
+
+    public function test_seat_availability_event_uses_the_public_showtime_channel(): void
+    {
+        $event = new SeatAvailabilityChanged(42, [5, 6], 'locked', '2026-11-07T10:10:00+00:00');
+
+        $this->assertSame('showtime.42', $event->broadcastOn()[0]->name);
+        $this->assertSame([
+            'showtime_id' => 42,
+            'seat_ids' => [5, 6],
+            'status' => 'locked',
+            'expires_at' => '2026-11-07T10:10:00+00:00',
+        ], $event->broadcastWith());
+    }
+
     public function test_selecting_seats_holds_them_and_opens_checkout(): void
     {
         $showtime = $this->makeShowtime();
         $seat = $this->seat($showtime, 1);
 
-        $this->get(route('booking.seats', $showtime))
+        $seatResponse = $this->get(route('booking.seats', $showtime));
+
+        $seatResponse
             ->assertOk()
             ->assertSee('Screen this way')
-            ->assertSee('border-cg-red/40 bg-cg-red/10 text-sm font-bold text-cg-white', false);
+            ->assertSee('border-cg-red/40 bg-cg-red/10 text-sm font-bold text-cg-white', false)
+            ->assertSee('<span aria-hidden="true" class="cg-seat-label">A1</span>', false)
+            ->assertSee('<svg', false)
+            ->assertDontSee('Seat number')
+            ->assertDontSee('>Locked<', false);
+        $this->assertSame(1, substr_count($seatResponse->getContent(), 'shadow-sm">A</span>'));
 
         $this->post(route('booking.select', $showtime), ['seats' => [$seat->id]])
             ->assertRedirect(route('booking.checkout', $showtime));
@@ -134,6 +217,7 @@ class BookingFlowTest extends TestCase
             ->assertSee('payments/khalti.png')
             ->assertSee('payments/visa.svg')
             ->assertSee('payments/mastercard.svg')
+            ->assertSee('class="input bg-[#27272a] text-white"', false)
             ->assertSee('class="label font-bold" for="customer_name"', false)
             ->assertSee('class="label font-bold" for="customer_email"', false)
             ->assertSee('class="label font-bold" for="customer_phone"', false)
@@ -174,8 +258,10 @@ class BookingFlowTest extends TestCase
     public function test_online_payment_confirms_the_booking_after_verification(): void
     {
         $showtime = $this->makeShowtime();
+        $seat = $this->seat($showtime, 3);
+        Event::fake([SeatAvailabilityChanged::class]);
 
-        $this->post(route('booking.select', $showtime), ['seats' => [$this->seat($showtime, 3)->id]])
+        $this->post(route('booking.select', $showtime), ['seats' => [$seat->id]])
             ->assertRedirect(route('booking.checkout', $showtime));
 
         $this->post(route('booking.place', $showtime), [
@@ -183,6 +269,12 @@ class BookingFlowTest extends TestCase
             'customer_phone' => '9811111111',
             'payment_method' => 'esewa',
         ])->assertRedirect();
+
+        Event::assertDispatched(SeatAvailabilityChanged::class, fn (SeatAvailabilityChanged $event): bool => (
+            $event->showtimeId === $showtime->id
+            && $event->seatIds === [$seat->id]
+            && $event->status === 'booked'
+        ));
 
         $payment = Payment::sole();
         $this->assertSame(Payment::STATUS_PENDING, $payment->status);
@@ -284,6 +376,7 @@ class BookingFlowTest extends TestCase
             'customer_name' => 'Slow Payer',
             'customer_phone' => '9800000003',
         ]);
+        Event::fake([SeatAvailabilityChanged::class]);
 
         Booking::query()->whereKey($booking->id)->update([
             'created_at' => now()->subMinutes(BookingService::PENDING_TTL_MINUTES + 1),
@@ -292,6 +385,11 @@ class BookingFlowTest extends TestCase
         $service->releaseStaleBookings($showtime);
 
         $this->assertSame(Booking::STATUS_CANCELLED, $booking->fresh()->status);
+        Event::assertDispatched(SeatAvailabilityChanged::class, fn (SeatAvailabilityChanged $event): bool => (
+            $event->showtimeId === $showtime->id
+            && $event->seatIds === [$seat->id]
+            && $event->status === 'available'
+        ));
 
         // The seat is bookable again after the payment window expires.
         $again = $service->createBooking($showtime, [$seat->id], [

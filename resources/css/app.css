@@ -325,8 +325,16 @@
 
 /* Seat map */
 .cg-seat {
-    @apply flex h-10 w-10 cursor-pointer items-center justify-center rounded-md border text-xs font-bold
+    @apply relative flex h-10 w-10 cursor-pointer items-center justify-center rounded-md border text-xs font-bold
         transition duration-150 sm:h-11 sm:w-11;
+}
+
+.cg-seat-icon {
+    @apply absolute bottom-0.5 h-7 w-7;
+}
+
+.cg-seat-label {
+    @apply pointer-events-none absolute top-[19px] z-10 text-[6px] font-extrabold leading-none;
 }
 
 /* Available: green */

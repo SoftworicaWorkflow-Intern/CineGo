@@ -174,6 +174,21 @@ class PublicPagesTest extends TestCase
             ->assertSee('Watch Trailer');
     }
 
+    public function test_homepage_shows_release_date_on_upcoming_movie_poster(): void
+    {
+        $movie = Movie::factory()->comingSoon()->create([
+            'title' => 'Upcoming Poster Release',
+            'slug' => 'upcoming-poster-release',
+            'release_date' => '2026-12-25',
+        ]);
+
+        $this->get('/')
+            ->assertOk()
+            ->assertSee('Release Date: Dec 25, 2026')
+            ->assertSee('bg-black/75 px-2 py-1.5 text-center text-xs font-bold text-white', false)
+            ->assertSee($movie->poster_url, false);
+    }
+
     public function test_movies_page_has_no_filter_bar(): void
     {
         $this->get(route('movies.index'))
