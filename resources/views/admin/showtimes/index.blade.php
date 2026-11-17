@@ -33,11 +33,7 @@
                         <td class="px-5 py-4 font-mono text-cg-white">{{ $showtime->start_time_label() }}</td>
                         <td class="px-5 py-4 text-cg-muted">{{ $showtime->movie?->localised_title() }}</td>
                         <td class="px-5 py-4"><span class="badge-dark">{{ $showtime->format }}</span></td>
-                        <td class="px-5 py-4 text-xs text-cg-dim">
-                            N {{ number_format($showtime->price_normal) }} ·
-                            P {{ number_format($showtime->price_premium) }} ·
-                            R {{ number_format($showtime->price_recliner) }}
-                        </td>
+                        <td class="px-5 py-4 text-xs text-cg-dim">Rs. {{ number_format($showtime->price_normal) }}</td>
                         <td class="px-5 py-4">
                             <div class="flex justify-end gap-2">
                                 <a href="{{ route('admin.showtimes.edit', $showtime) }}" class="btn-ghost px-3 py-1.5 text-xs">

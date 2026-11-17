@@ -69,7 +69,7 @@ class AdminAccessTest extends TestCase
             ->assertSee('Security')
             ->assertDontSee('href="'.route('account.dashboard').'"')
             ->assertDontSee('href="'.route('account.bookings').'"')
-            ->assertDontSee('href="'.route('account.favorites').'"')
+            ->assertDontSee('Favourite')
             ->assertDontSee('href="'.route('account.payments').'"')
             ->assertDontSee('href="'.route('account.notifications').'"');
     }
@@ -78,6 +78,7 @@ class AdminAccessTest extends TestCase
     {
         Storage::fake('public');
         $admin = User::factory()->create(['is_admin' => true]);
+        $posterContents = base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=');
 
         $response = $this->actingAs($admin)->post(route('admin.movies.store'), [
             'title' => 'Uploaded Poster Movie',
@@ -86,10 +87,7 @@ class AdminAccessTest extends TestCase
             'duration_minutes' => 120,
             'language' => 'English',
             'release_date' => today()->toDateString(),
-            'poster' => UploadedFile::fake()->createWithContent(
-                'poster.png',
-                base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII='),
-            ),
+            'poster' => UploadedFile::fake()->createWithContent('poster.png', $posterContents.str_repeat('0', 3 * 1024 * 1024)),
         ]);
 
         $response->assertRedirect();
@@ -120,8 +118,6 @@ class AdminAccessTest extends TestCase
             'format' => '2D',
             'language' => $movie->language,
             'price_normal' => 450,
-            'price_premium' => 650,
-            'price_recliner' => 850,
             'is_active' => true,
         ]);
 
@@ -131,7 +127,14 @@ class AdminAccessTest extends TestCase
             'hall_id' => $hall->id,
             'cinema_id' => $hall->cinema_id,
             'start_time' => '19:00:00',
+            'price_normal' => 450,
         ]);
+
+        $this->get(route('admin.showtimes.create'))
+            ->assertOk()
+            ->assertSee('id="price_normal"', false)
+            ->assertDontSee('Premium')
+            ->assertDontSee('Recliner');
     }
 
     public function test_admin_saves_a_future_release_as_coming_soon(): void

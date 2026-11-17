@@ -82,8 +82,6 @@ class KawasotiDemoSeeder extends Seeder
                 'format' => '2D',
                 'language' => $movie->language ?? 'Nepali',
                 'price_normal' => 450,
-                'price_premium' => 650,
-                'price_recliner' => 850,
                 'is_active' => true,
             ]);
 
@@ -96,18 +94,12 @@ class KawasotiDemoSeeder extends Seeder
         $seats = [];
 
         for ($row = 0; $row < $hall->total_rows; $row++) {
-            $seatType = match (true) {
-                $row === $hall->total_rows - 1 => 'recliner',
-                $row === $hall->total_rows - 2 => 'premium',
-                default => 'normal',
-            };
-
             for ($number = 1; $number <= $hall->seats_per_row; $number++) {
                 $seats[] = [
                     'hall_id' => $hall->id,
                     'row_label' => chr(65 + $row),
                     'seat_number' => $number,
-                    'seat_type' => $seatType,
+                    'seat_type' => 'normal',
                     'is_active' => true,
                     'created_at' => now(),
                     'updated_at' => now(),

@@ -6,7 +6,6 @@
     $booked = array_flip($bookedIds);
     $locked = array_flip($lockedIds);
     $selected = array_flip($selectedIds);
-    $priceFor = fn (string $type) => (float) $showtime->price_for($type);
 @endphp
 
 @section('content')
@@ -74,8 +73,8 @@
                                                     type="button"
                                                     data-seat
                                                     data-seat-id="{{ $seat->id }}"
-                                                    data-type="{{ $seat->seat_type }}"
-                                                    data-price="{{ $priceFor($seat->seat_type) }}"
+                                                    data-type="normal"
+                                                    data-price="{{ $showtime->price_for() }}"
                                                     data-label="{{ $seat->label() }}"
                                                     data-seat-status="{{ $isBooked ? 'booked' : ($isLocked ? 'locked' : 'available') }}"
                                                     data-lock-expires="{{ $lockExpirations[$seat->id] ?? '' }}"
@@ -86,7 +85,7 @@
                                                     aria-pressed="{{ $isSelected ? 'true' : 'false' }}"
                                                     aria-label="{{ $seat->label() }} — {{ $isBooked ? ui('seat_booked', 'Booked') : ($isLocked ? ui('seat_locked', 'Locked') : ($isSelected ? ui('seat_selected', 'Selected') : ui('seat_available', 'Available'))) }}"
                                                     {{ ($isBooked || $isLocked) ? 'disabled' : '' }}
-                                                    class="cg-seat cg-seat-{{ $seat->seat_type }}
+                                                    class="cg-seat cg-seat-normal
                                                         {{ $isBooked ? 'cg-seat-booked' : '' }}
                                                         {{ $isLocked ? 'cg-seat-locked' : '' }}
                                                         {{ $isSelected ? 'cg-seat-selected' : '' }}"
@@ -108,8 +107,7 @@
                         <div class="flex flex-wrap gap-x-5 gap-y-2.5 text-xs text-cg-muted">
                             <span class="inline-flex items-center gap-2"><span class="h-4 w-4 rounded border border-emerald-300 bg-emerald-100"></span>{{ ui('seat_available', 'Available') }}</span>
                             <span class="inline-flex items-center gap-2"><span class="h-4 w-4 rounded border border-cg-red bg-cg-red"></span>{{ ui('seat_selected', 'Selected') }}</span>
-                            <span class="inline-flex items-center gap-2"><span class="h-4 w-4 rounded border border-blue-300 bg-blue-100"></span>{{ ui('seat_premium', 'Premium') }}</span>
-                            <span class="inline-flex items-center gap-2"><span class="h-4 w-4 rounded border border-purple-300 bg-purple-100"></span>{{ ui('seat_recliner', 'Recliner') }}</span>
+                            <span class="inline-flex items-center gap-2"><span class="h-4 w-4 rounded border border-emerald-300 bg-emerald-100"></span>{{ ui('normal', 'Normal') }} · Rs. {{ number_format($showtime->price_for()) }}</span>
                             <span class="inline-flex items-center gap-2"><span class="h-4 w-4 rounded border border-gray-300 bg-gray-200"></span>{{ ui('seat_booked', 'Booked') }}</span>
                         </div>
                     </div>

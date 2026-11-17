@@ -35,7 +35,7 @@ class HomeController extends Controller
 
             if ($fallbackMovies->isEmpty()) {
                 $fallbackMovies = Movie::query()
-                    ->nowShowing()
+                    ->scheduled()
                     ->orderBy('sort_order')
                     ->orderByDesc('release_date')
                     ->limit(5)
@@ -50,20 +50,13 @@ class HomeController extends Controller
         }
 
         $nowShowing = Movie::query()
-            ->nowShowing()
-            ->whereNotIn('slug', ['shikhar', 'maya-django'])
+            ->scheduled()
             ->orderByDesc('release_date')
-            ->limit(1)
+            ->limit(6)
             ->get();
 
         $comingSoon = Movie::query()
-            ->active()
-            ->where(function ($query): void {
-                $query->where(function ($query): void {
-                    $query->where('is_coming_soon', true)
-                        ->where('is_now_showing', false);
-                })->orWhereDate('release_date', '>', now()->toDateString());
-            })
+            ->upcomingRelease()
             ->orderBy('release_date')
             ->limit(6)
             ->get();

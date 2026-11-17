@@ -186,7 +186,6 @@
                         <li class="flex items-center justify-between gap-2">
                             <span class="text-cg-white">
                                 {{ $seat->seat?->row_label }}{{ $seat->seat?->seat_number }}
-                                <span class="text-xs capitalize text-cg-dim">({{ $seat->seat?->seat_type }})</span>
                             </span>
                             <span class="text-cg-muted">Rs. {{ number_format($seat->price) }}</span>
                         </li>

@@ -22,7 +22,7 @@ class SeatFactory extends Factory
             'hall_id' => Hall::factory(),
             'row_label' => strtoupper(fake()->randomLetter()),
             'seat_number' => fake()->numberBetween(1, 20),
-            'seat_type' => fake()->randomElement(['normal', 'normal', 'premium', 'recliner']),
+            'seat_type' => 'normal',
             'is_active' => true,
         ];
     }

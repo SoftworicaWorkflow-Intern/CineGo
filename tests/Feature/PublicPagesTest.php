@@ -7,6 +7,7 @@ use App\Models\City;
 use App\Models\Hall;
 use App\Models\Movie;
 use App\Models\Showtime;
+use App\Models\User;
 use Database\Seeders\KawasotiDemoSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -53,7 +54,7 @@ class PublicPagesTest extends TestCase
         $this->get('/')
             ->assertOk()
             ->assertSee($movie->banner_url, false)
-            ->assertSee('min-h-[min(680px,100svh)]', false)
+            ->assertSee('min-h-[min(520px,100svh)]', false)
             ->assertSee('lg:-translate-x-28', false)
             ->assertSee('cg-home-hero-art cg-home-hero-art-active', false)
             ->assertSee('data-hero-pagination', false)
@@ -88,13 +89,20 @@ class PublicPagesTest extends TestCase
 
     public function test_homepage_shows_one_now_playing_movie_without_rating_or_trailer(): void
     {
+        $this->travelTo('2026-11-17 12:00:00');
+
         $featuredMovie = Movie::factory()->nowShowing()->create([
             'title' => 'Homepage Featured Film',
             'slug' => 'homepage-featured-film',
             'release_date' => '2026-10-10',
             'rating' => 7.9,
-            'trailer_url' => 'https://www.youtube.com/embed/homepage-film',
+            'trailer_url' => null,
             'is_featured' => false,
+        ]);
+        Showtime::factory()->create([
+            'movie_id' => $featuredMovie->id,
+            'show_date' => '2026-11-18',
+            'start_time' => '19:00:00',
         ]);
         Movie::factory()->nowShowing()->create([
             'title' => 'Extra Homepage Film',
@@ -108,9 +116,84 @@ class PublicPagesTest extends TestCase
         $response->assertOk()
             ->assertSee($featuredMovie->title)
             ->assertDontSee('Extra Homepage Film')
-            ->assertDontSee('data-trailer="https://www.youtube.com/embed/homepage-film"', false)
-            ->assertDontSee('Watch Trailer')
+            ->assertSee('class="hidden btn-outline btn-lg"', false)
             ->assertDontSee('7.9');
+    }
+
+    public function test_homepage_and_movie_tabs_use_showtime_and_release_dates_for_sections(): void
+    {
+        $this->travelTo('2026-11-17 12:00:00');
+
+        $scheduledRelease = Movie::factory()->create([
+            'title' => 'Scheduled Release Film',
+            'slug' => 'scheduled-release-film',
+            'release_date' => '2026-11-24',
+            'is_now_showing' => false,
+            'is_coming_soon' => true,
+        ]);
+        Showtime::factory()->create([
+            'movie_id' => $scheduledRelease->id,
+            'show_date' => '2026-11-18',
+            'start_time' => '19:00:00',
+            'is_active' => true,
+        ]);
+
+        $playingMovie = Movie::factory()->create([
+            'title' => 'Currently Playing Film',
+            'slug' => 'currently-playing-film',
+            'release_date' => '2026-11-10',
+            'is_now_showing' => false,
+            'is_coming_soon' => false,
+        ]);
+        Showtime::factory()->create([
+            'movie_id' => $playingMovie->id,
+            'show_date' => '2026-11-18',
+            'start_time' => '19:00:00',
+            'is_active' => true,
+        ]);
+
+        $upcomingRelease = Movie::factory()->create([
+            'title' => 'Upcoming Release Film',
+            'slug' => 'upcoming-release-film',
+            'release_date' => '2026-11-25',
+            'is_now_showing' => true,
+            'is_coming_soon' => false,
+        ]);
+        $inactiveShowtimeRelease = Movie::factory()->create([
+            'title' => 'Inactive Showtime Film',
+            'slug' => 'inactive-showtime-film',
+            'release_date' => '2026-11-26',
+        ]);
+        Showtime::factory()->create([
+            'movie_id' => $inactiveShowtimeRelease->id,
+            'show_date' => '2026-11-18',
+            'start_time' => '19:00:00',
+            'is_active' => false,
+        ]);
+
+        $this->get('/')
+            ->assertOk()
+            ->assertViewHas('nowShowing', fn ($movies): bool => $movies->modelKeys() === [
+                $scheduledRelease->id,
+                $playingMovie->id,
+            ])
+            ->assertViewHas('comingSoon', fn ($movies): bool => $movies->modelKeys() === [
+                $upcomingRelease->id,
+                $inactiveShowtimeRelease->id,
+            ]);
+
+        $this->get(route('movies.index', ['tab' => 'now_showing']))
+            ->assertOk()
+            ->assertSee($scheduledRelease->title)
+            ->assertSee($playingMovie->title)
+            ->assertDontSee($upcomingRelease->title);
+
+        $this->get(route('movies.index', ['tab' => 'coming_soon']))
+            ->assertOk()
+            ->assertSee($upcomingRelease->title)
+            ->assertSee($inactiveShowtimeRelease->title)
+            ->assertDontSee($scheduledRelease->title)
+            ->assertDontSee($playingMovie->title);
     }
 
     public function test_homepage_shows_all_six_features_in_english_and_nepali(): void
@@ -143,10 +226,12 @@ class PublicPagesTest extends TestCase
         Movie::factory()->nowShowing()->create([
             'title' => 'Shikhar',
             'slug' => 'shikhar',
+            'release_date' => '2026-10-10',
         ]);
         Movie::factory()->nowShowing()->create([
             'title' => 'Maya Django',
             'slug' => 'maya-django',
+            'release_date' => '2026-10-09',
         ]);
 
         $this->get('/')
@@ -172,7 +257,28 @@ class PublicPagesTest extends TestCase
         $this->get(route('movies.show', $movie))
             ->assertOk()
             ->assertSee('data-trailer="https://www.youtube.com/watch?v=coming-soon"', false)
-            ->assertSee('Watch Trailer');
+            ->assertSee('Watch Trailer')
+            ->assertDontSee('Favourite');
+    }
+
+    public function test_favorites_feature_is_not_available_on_movie_or_account_pages(): void
+    {
+        $movie = Movie::factory()->create();
+        $customer = User::factory()->create();
+
+        $this->actingAs($customer)
+            ->get(route('movies.show', $movie))
+            ->assertOk()
+            ->assertDontSee('Favourite')
+            ->assertDontSee('movies/'.$movie->slug.'/favorite');
+
+        $this->get(route('account.dashboard'))
+            ->assertOk()
+            ->assertDontSee('Saved movies')
+            ->assertDontSee('Favourite movies');
+
+        $this->get('/account/favorites')->assertNotFound();
+        $this->post('/movies/'.$movie->slug.'/favorite')->assertNotFound();
     }
 
     public function test_homepage_shows_release_date_on_upcoming_movie_poster(): void
@@ -400,13 +506,13 @@ class PublicPagesTest extends TestCase
 
         $this->assertDatabaseCount('showtimes', 5);
         $this->assertDatabaseCount('seats', 112);
+        $this->assertDatabaseMissing('seats', ['seat_type' => 'premium']);
+        $this->assertDatabaseMissing('seats', ['seat_type' => 'recliner']);
         $this->assertDatabaseHas('showtimes', [
             'id' => $showtime->id,
             'cinema_id' => $cinema->id,
             'hall_id' => $hall->id,
             'price_normal' => 450,
-            'price_premium' => 650,
-            'price_recliner' => 850,
         ]);
         $this->assertSame('2026-12-08', $showtime->show_date->toDateString());
 
@@ -423,7 +529,9 @@ class PublicPagesTest extends TestCase
         $this->get(route('booking.seats', $showtime))
             ->assertOk()
             ->assertSee($movie->title)
-            ->assertSee('aria-label="A1 — Available"', false);
+            ->assertSee('aria-label="A1 — Available"', false)
+            ->assertDontSee('Premium')
+            ->assertDontSee('Recliner');
     }
 
     public function test_movie_detail_renders_a_seat_link_for_each_showtime_date(): void

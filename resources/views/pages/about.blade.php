@@ -29,7 +29,7 @@
                 </div>
                 <div class="space-y-4 text-[15px] leading-7 text-gray-600 sm:text-base">
                     <p class="text-lg leading-8 text-gray-900 sm:text-xl">
-                        {{ ui('about_p1', 'CineGo is a modern movie ticket booking platform built for Nepali cinema lovers. We make it simple to discover what is playing, find the nearest hall and lock in your favourite seats — all from your phone.') }}
+                        {{ ui('about_p1', 'CineGo is a modern movie ticket booking platform built for Nepali cinema lovers. We make it simple to discover what is playing, find the nearest hall and reserve your seats — all from your phone.') }}
                     </p>
                     <p>
                         {{ ui('about_p2', 'Every branch, showtime and seat you see on CineGo comes straight from our cinema partners in real time. There are no printed queues and no guesswork: choose a movie, choose a showtime, choose your seats, pay with eSewa, Khalti or card, and your QR ticket is ready instantly.') }}
@@ -101,7 +101,7 @@
                     loading="lazy"
                 >
                 <figcaption class="absolute bottom-5 left-5 rounded-full bg-white/90 px-4 py-2 text-xs font-semibold text-gray-900 shadow-sm">
-                    {{ ui('about_story_caption', 'Your next favourite film is waiting') }}
+                    {{ ui('about_story_caption', 'Your next great film is waiting') }}
                 </figcaption>
             </figure>
         </div>

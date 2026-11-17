@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Booking;
 use App\Models\City;
-use App\Models\Movie;
 use App\Services\TicketService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
@@ -33,12 +32,9 @@ class AccountController extends Controller
             'spent' => $bookings
                 ->where('status', Booking::STATUS_CONFIRMED)
                 ->sum('total_amount'),
-            'favorites' => $user->favoriteMovies()->count(),
         ];
 
-        $favorites = $user->favoriteMovies()->latest('favorites.created_at')->limit(6)->get();
-
-        return view('account.dashboard', compact('user', 'upcoming', 'recent', 'stats', 'favorites'));
+        return view('account.dashboard', compact('user', 'upcoming', 'recent', 'stats'));
     }
 
     /**
@@ -163,26 +159,6 @@ class AccountController extends Controller
         }
 
         return back()->with('success', ui('preferences_saved', 'Preferences saved.'));
-    }
-
-    /**
-     * /account/favourite-movies — the customer's saved list.
-     */
-    public function favorites(Request $request): View
-    {
-        $movies = $request->user()->favoriteMovies()->latest('favorites.created_at')->paginate(12);
-
-        return view('account.favorites', compact('movies'));
-    }
-
-    /**
-     * Toggle a movie in the customer's favourites (AJAX or form post).
-     */
-    public function toggleFavorite(Request $request, Movie $movie): RedirectResponse
-    {
-        $request->user()->favoriteMovies()->toggle($movie);
-
-        return back()->with('success', ui('favorites_updated', 'Your favourites were updated.'));
     }
 
     /**

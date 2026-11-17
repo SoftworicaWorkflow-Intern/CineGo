@@ -31,8 +31,6 @@ class ShowtimeFactory extends Factory
             'format' => fake()->randomElement(['2D', '2D', '2D', '3D']),
             'language' => fake()->randomElement(['Nepali', 'Hindi', 'English']),
             'price_normal' => $normal,
-            'price_premium' => $normal + 100,
-            'price_recliner' => $normal + 250,
             'is_active' => true,
         ];
     }

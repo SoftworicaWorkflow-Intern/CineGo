@@ -109,7 +109,7 @@
                         <span data-poster-filename class="mt-2 hidden text-xs font-medium text-cg-red"></span>
                     </label>
                     <input id="poster" type="file" name="poster" accept="image/jpeg,image/png,image/webp" class="sr-only" data-poster-input @required(!$movie->exists)>
-                    <p class="mt-1.5 text-xs text-cg-dim">{{ ui('poster_hint', 'JPG, PNG or WebP, up to 2 MB.') }}</p>
+                    <p class="mt-1.5 text-xs text-cg-dim">{{ ui('poster_hint', 'JPG, PNG or WebP, up to 10 MB.') }}</p>
                     <img
                         src="{{ $movie->poster_url ?? '' }}"
                         alt=""

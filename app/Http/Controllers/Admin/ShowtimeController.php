@@ -77,8 +77,6 @@ class ShowtimeController extends Controller
             'format' => 'required|in:2D,3D,IMAX,4DX',
             'language' => 'nullable|string|max:40',
             'price_normal' => 'required|numeric|min:0',
-            'price_premium' => 'required|numeric|min:0',
-            'price_recliner' => 'required|numeric|min:0',
             'is_active' => 'nullable|boolean',
         ], [
             'movie_id.required' => ui('validation_movie', 'Please choose a movie.'),

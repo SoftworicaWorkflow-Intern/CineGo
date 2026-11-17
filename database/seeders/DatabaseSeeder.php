@@ -231,10 +231,6 @@ class DatabaseSeeder extends Seeder
         }
     }
 
-    /**
-     * Mirrors the seat layout rules used by the admin screen editor:
-     * last row = recliner, second last = premium, everything else normal.
-     */
     private function generateSeats(Hall $hall): void
     {
         $now = now();
@@ -242,18 +238,12 @@ class DatabaseSeeder extends Seeder
 
         for ($row = 0; $row < $hall->total_rows; $row++) {
             $label = chr(65 + $row);
-            $type = match (true) {
-                $row === $hall->total_rows - 1 => 'recliner',
-                $row === $hall->total_rows - 2 => 'premium',
-                default => 'normal',
-            };
-
             for ($number = 1; $number <= $hall->seats_per_row; $number++) {
                 $seats[] = [
                     'hall_id' => $hall->id,
                     'row_label' => $label,
                     'seat_number' => $number,
-                    'seat_type' => $type,
+                    'seat_type' => 'normal',
                     'is_active' => true,
                     'created_at' => $now,
                     'updated_at' => $now,
@@ -554,11 +544,7 @@ class DatabaseSeeder extends Seeder
     {
         $slots = ['10:30:00', '13:15:00', '16:00:00', '19:00:00', '21:30:00'];
         $nowShowing = collect($this->movies)->where('is_now_showing', true)->values();
-        $prices = [
-            'normal' => [450, 500, 550],
-            'extra_premium' => 150,
-            'extra_recliner' => 300,
-        ];
+        $prices = [450, 500, 550];
 
         $movieCursor = 0;
 
@@ -574,7 +560,7 @@ class DatabaseSeeder extends Seeder
                         $movie = $nowShowing[$movieCursor % $nowShowing->count()];
                         $movieCursor++;
 
-                        $base = $prices['normal'][($cinemaIndex + $hallIndex) % count($prices['normal'])];
+                        $base = $prices[($cinemaIndex + $hallIndex) % count($prices)];
 
                         $this->showtimes[] = Showtime::create([
                             'movie_id' => $movie->id,
@@ -589,8 +575,6 @@ class DatabaseSeeder extends Seeder
                             },
                             'language' => $movie->language,
                             'price_normal' => $base,
-                            'price_premium' => $base + $prices['extra_premium'],
-                            'price_recliner' => $base + $prices['extra_recliner'],
                             'is_active' => true,
                         ]);
                     }
@@ -786,11 +770,7 @@ class DatabaseSeeder extends Seeder
             $lines = [];
 
             foreach ($seats as $seat) {
-                $price = match ($seat->seat_type) {
-                    'premium' => $showtime->price_premium,
-                    'recliner' => $showtime->price_recliner,
-                    default => $showtime->price_normal,
-                };
+                $price = $showtime->price_for();
                 $subtotal += $price;
                 $lines[] = [$seat, $price];
             }
@@ -830,7 +810,7 @@ class DatabaseSeeder extends Seeder
                     'booking_id' => $booking->id,
                     'seat_id' => $seat->id,
                     'seat_label' => $seat->row_label.$seat->seat_number,
-                    'seat_type' => $seat->seat_type,
+                    'seat_type' => 'normal',
                     'price' => $price,
                 ]);
             }

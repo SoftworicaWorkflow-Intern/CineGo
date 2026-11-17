@@ -43,8 +43,6 @@ Route::get('/movies', [MovieController::class, 'index'])->name('movies.index');
 Route::get('/movies/{movie:slug}', [MovieController::class, 'show'])->name('movies.show');
 Route::post('/movies/{movie:slug}/reviews', [MovieController::class, 'storeReview'])
     ->middleware('auth')->name('movies.review');
-Route::post('/movies/{movie:slug}/favorite', [AccountController::class, 'toggleFavorite'])
-    ->middleware('auth')->name('movies.favorite');
 
 Route::redirect('/cinemas', '/movies');
 Route::get('/cinemas/{path}', fn () => to_route('movies.index'))->where('path', '.*');
@@ -117,7 +115,6 @@ Route::prefix('account')->name('account.')->middleware('auth')->group(function (
     Route::get('/settings', [AccountController::class, 'settings'])->name('settings');
     Route::post('/settings/password', [AccountController::class, 'updatePassword'])->name('password.update');
     Route::post('/settings/preferences', [AccountController::class, 'updatePreferences'])->name('preferences.update');
-    Route::get('/favorites', [AccountController::class, 'favorites'])->name('favorites');
     Route::get('/notifications', [AccountController::class, 'notifications'])->name('notifications');
     Route::post('/notifications/read', [AccountController::class, 'markNotificationsRead'])->name('notifications.read');
     Route::get('/payments', [PaymentController::class, 'history'])->name('payments');

@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\App;
 
@@ -75,14 +74,6 @@ class Movie extends Model
     }
 
     /**
-     * @return BelongsToMany<User, $this>
-     */
-    public function fans(): BelongsToMany
-    {
-        return $this->belongsToMany(User::class, 'favorites')->withTimestamps();
-    }
-
-    /**
      * @param  Builder<self>  $query
      * @return Builder<self>
      */
@@ -107,6 +98,26 @@ class Movie extends Model
     public function scopeComingSoon(Builder $query): Builder
     {
         return $query->active()->where('is_coming_soon', true);
+    }
+
+    /**
+     * @param  Builder<self>  $query
+     * @return Builder<self>
+     */
+    public function scopeScheduled(Builder $query): Builder
+    {
+        return $query->active()->whereHas('showtimes', fn (Builder $showtimes): Builder => $showtimes->upcoming());
+    }
+
+    /**
+     * @param  Builder<self>  $query
+     * @return Builder<self>
+     */
+    public function scopeUpcomingRelease(Builder $query): Builder
+    {
+        return $query->active()
+            ->whereDate('release_date', '>', now()->toDateString())
+            ->whereDoesntHave('showtimes', fn (Builder $showtimes): Builder => $showtimes->upcoming());
     }
 
     /**

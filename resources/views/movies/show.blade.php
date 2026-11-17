@@ -76,15 +76,6 @@
                                 <x-icon name="play" :size="17" /> {{ ui('watch_trailer', 'Watch Trailer') }}
                             </button>
                         @endif
-                        @auth
-                            <form action="{{ route('movies.favorite', $movie) }}" method="POST">
-                                @csrf
-                                <button type="submit" class="btn-outline btn-lg {{ $isFavorite ? 'border-cg-red text-cg-red' : '' }}">
-                                    <x-icon name="heart" :size="17" class="{{ $isFavorite ? 'fill-current' : '' }}" />
-                                    {{ $isFavorite ? 'Saved' : ui('favorite_movies', 'Favourite') }}
-                                </button>
-                            </form>
-                        @endauth
                     </div>
                 </div>
             </div>

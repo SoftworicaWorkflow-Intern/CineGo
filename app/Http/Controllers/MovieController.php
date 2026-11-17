@@ -33,9 +33,9 @@ class MovieController extends Controller
         $query = Movie::query()->active();
 
         match ($tab) {
-            'now_showing' => $query->nowShowing(),
-            'coming_soon' => $query->comingSoon(),
-            'top_rated' => $query->nowShowing()->whereNotNull('rating')->orderByDesc('rating'),
+            'now_showing' => $query->scheduled(),
+            'coming_soon' => $query->upcomingRelease(),
+            'top_rated' => $query->scheduled()->whereNotNull('rating')->orderByDesc('rating'),
             default => null,
         };
 
@@ -90,10 +90,6 @@ class MovieController extends Controller
             ->get();
 
         $userReview = $request->user()?->reviews()->where('movie_id', $movie->id)->first();
-        $isFavorite = $request->user()
-            ? $request->user()->favoriteMovies()->whereKey($movie->id)->exists()
-            : false;
-
         $groupedShowtimes = $showtimes->groupBy(fn ($showtime) => $showtime->show_date->toDateString());
 
         return view('movies.show', compact(
@@ -104,7 +100,6 @@ class MovieController extends Controller
             'reviewCount',
             'similar',
             'userReview',
-            'isFavorite',
         ));
     }
 

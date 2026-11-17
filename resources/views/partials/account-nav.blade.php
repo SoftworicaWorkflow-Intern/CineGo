@@ -7,7 +7,6 @@
         : [
             ['route' => 'account.dashboard', 'label' => ui('dashboard', 'Dashboard'), 'icon' => 'dashboard', 'match' => 'account.dashboard'],
             ['route' => 'account.bookings', 'label' => ui('my_bookings', 'My Bookings'), 'icon' => 'ticket', 'match' => 'account.bookings*'],
-            ['route' => 'account.favorites', 'label' => ui('favorite_movies', 'Favourite movies'), 'icon' => 'heart', 'match' => 'account.favorites'],
             ['route' => 'account.payments', 'label' => ui('payment_history', 'Payment history'), 'icon' => 'wallet', 'match' => 'account.payments'],
             ['route' => 'account.notifications', 'label' => ui('notifications', 'Notifications'), 'icon' => 'bell', 'match' => 'account.notifications'],
             ['route' => 'account.profile', 'label' => ui('profile_settings', 'Profile settings'), 'icon' => 'user', 'match' => 'account.profile'],

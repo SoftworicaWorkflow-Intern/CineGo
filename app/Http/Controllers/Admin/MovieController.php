@@ -91,7 +91,7 @@ class MovieController extends Controller
                 $request->route('movie') instanceof Movie ? 'nullable' : 'required',
                 'image',
                 'mimes:jpg,jpeg,png,webp',
-                'max:2048',
+                'max:10240',
             ],
             'trailer_url' => 'nullable|string|max:300',
             'director' => 'nullable|string|max:120',

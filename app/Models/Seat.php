@@ -13,7 +13,7 @@ class Seat extends Model
     /** @use HasFactory<SeatFactory> */
     use HasFactory;
 
-    public const TYPES = ['normal', 'premium', 'recliner'];
+    public const TYPES = ['normal'];
 
     protected $fillable = [
         'hall_id',
@@ -58,10 +58,6 @@ class Seat extends Model
 
     public function type_label(): string
     {
-        return match ($this->seat_type) {
-            'premium' => 'Premium',
-            'recliner' => 'Recliner',
-            default => 'Normal',
-        };
+        return 'Normal';
     }
 }

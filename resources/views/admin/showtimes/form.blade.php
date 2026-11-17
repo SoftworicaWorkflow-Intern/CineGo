@@ -63,18 +63,10 @@
         <section class="card space-y-4 p-5 sm:p-6">
             <h2 class="font-semibold text-cg-white">{{ ui('ticket_prices', 'Ticket prices (Rs.)') }}</h2>
 
-            <div class="grid gap-4 sm:grid-cols-3">
+            <div class="grid gap-4 sm:grid-cols-2">
                 <div>
                     <label class="label" for="price_normal">{{ ui('normal', 'Normal') }} *</label>
                     <input id="price_normal" type="number" name="price_normal" value="{{ old('price_normal', $showtime->price_normal ?? 450) }}" class="input" required min="0" step="1">
-                </div>
-                <div>
-                    <label class="label" for="price_premium">{{ ui('premium', 'Premium') }} *</label>
-                    <input id="price_premium" type="number" name="price_premium" value="{{ old('price_premium', $showtime->price_premium ?? 650) }}" class="input" required min="0" step="1">
-                </div>
-                <div>
-                    <label class="label" for="price_recliner">{{ ui('recliner', 'Recliner') }} *</label>
-                    <input id="price_recliner" type="number" name="price_recliner" value="{{ old('price_recliner', $showtime->price_recliner ?? 850) }}" class="input" required min="0" step="1">
                 </div>
             </div>
         </section>

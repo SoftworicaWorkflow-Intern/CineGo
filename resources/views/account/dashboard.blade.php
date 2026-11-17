@@ -23,19 +23,15 @@
         @include('partials.account-nav')
 
         {{-- Stats --}}
-        <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             @foreach ([
                 ['icon' => 'ticket', 'value' => $stats['bookings'], 'label' => ui('total_bookings', 'Total bookings'), 'tone' => 'red'],
                 ['icon' => 'calendar', 'value' => $stats['upcoming'], 'label' => ui('upcoming', 'Upcoming'), 'tone' => 'green'],
                 ['icon' => 'wallet', 'value' => 'Rs. '.number_format($stats['spent']), 'label' => ui('total_spent', 'Total spent'), 'tone' => 'amber'],
-                ['icon' => 'heart', 'value' => $stats['favorites'], 'label' => ui('saved_movies', 'Saved movies'), 'tone' => 'purple'],
             ] as $stat)
                 <div class="card flex items-center gap-4 p-5">
                     <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl
-                        {{ $stat['tone'] === 'red' ? 'bg-cg-red/15 text-cg-red' : '' }}
-                        {{ $stat['tone'] === 'green' ? 'bg-cg-green/15 text-cg-green' : '' }}
-                        {{ $stat['tone'] === 'amber' ? 'bg-cg-amber/15 text-cg-amber' : '' }}
-                        {{ $stat['tone'] === 'purple' ? 'bg-purple-500/15 text-purple-400' : '' }}">
+                        {{ $stat['tone'] === 'red' ? 'bg-cg-red/15 text-cg-red' : ($stat['tone'] === 'green' ? 'bg-cg-green/15 text-cg-green' : 'bg-cg-amber/15 text-cg-amber') }}">
                         <x-icon :name="$stat['icon']" :size="21" />
                     </span>
                     <span>
@@ -122,29 +118,6 @@
             </div>
 
             <aside class="space-y-6">
-                <div class="card p-5">
-                    <h2 class="mb-4 font-semibold text-cg-white">{{ ui('favorite_movies', 'Favourite movies') }}</h2>
-
-                    @if ($favorites->isEmpty())
-                        <p class="text-sm text-cg-muted">{{ ui('no_favorites', 'No favourite movies yet.') }}</p>
-                    @else
-                        <div class="space-y-3">
-                            @foreach ($favorites as $movie)
-                                <a href="{{ route('movies.show', $movie) }}" class="flex items-center gap-3 rounded-lg p-1 transition hover:bg-cg-charcoal">
-                                    <img src="{{ $movie->poster_url }}" alt="" class="h-16 w-11 rounded-md object-cover" loading="lazy">
-                                    <span class="min-w-0">
-                                        <span class="line-clamp-1 block text-sm font-medium text-cg-white">{{ $movie->localised_title() }}</span>
-                                        <span class="block text-xs text-cg-dim">{{ $movie->genre_label() }}</span>
-                                    </span>
-                                </a>
-                            @endforeach
-                        </div>
-                        <a href="{{ route('account.favorites') }}" class="btn-ghost mt-3 w-full justify-center text-xs">
-                            {{ ui('view_all', 'View all') }}
-                        </a>
-                    @endif
-                </div>
-
                 <div class="card p-5">
                     <h2 class="mb-3 font-semibold text-cg-white">{{ ui('quick_links', 'Quick links') }}</h2>
                     <ul class="space-y-2.5 text-sm">

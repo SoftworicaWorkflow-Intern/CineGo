@@ -24,7 +24,7 @@ class BookingFlowTest extends TestCase
 
     /**
      * Build a linked cinema → hall → seats → movie → showtime chain.
-     * Seats A1–A2 are normal (Rs. 500), A3–A4 premium (Rs. 700).
+     * Every seat uses the normal ticket price of Rs. 500.
      */
     private function makeShowtime(): Showtime
     {
@@ -40,7 +40,7 @@ class BookingFlowTest extends TestCase
                 'hall_id' => $hall->id,
                 'row_label' => 'A',
                 'seat_number' => $number,
-                'seat_type' => $number <= 2 ? 'normal' : 'premium',
+                'seat_type' => 'normal',
                 'is_active' => true,
             ]);
         }
@@ -54,8 +54,6 @@ class BookingFlowTest extends TestCase
             'show_date' => now()->addDay()->format('Y-m-d'),
             'start_time' => '19:00:00',
             'price_normal' => 500,
-            'price_premium' => 700,
-            'price_recliner' => 900,
             'is_active' => true,
         ]);
     }
@@ -278,9 +276,13 @@ class BookingFlowTest extends TestCase
 
         $payment = Payment::sole();
         $this->assertSame(Payment::STATUS_PENDING, $payment->status);
-        // The amount comes from the server-side seat price (premium = 700).
-        $this->assertSame(700.0, (float) $payment->amount);
+        $this->assertSame(500.0, (float) $payment->amount);
         $this->assertSame(Booking::STATUS_PENDING, $payment->booking->status);
+        $this->assertDatabaseHas('booking_seats', [
+            'booking_id' => $payment->booking_id,
+            'seat_type' => 'normal',
+            'price' => 500,
+        ]);
 
         // The simulated provider page is reachable for this guest session.
         $this->get(route('payment.process', $payment))->assertOk();
@@ -357,13 +359,26 @@ class BookingFlowTest extends TestCase
         $showtime = $this->makeShowtime();
 
         $totals = app(BookingService::class)->totals($showtime, [
-            $this->seat($showtime, 1)->id, // normal 500
-            $this->seat($showtime, 3)->id, // premium 700
+            $this->seat($showtime, 1)->id,
+            $this->seat($showtime, 3)->id,
         ]);
 
-        $this->assertSame(1200.0, $totals['subtotal']);
+        $this->assertSame(1000.0, $totals['subtotal']);
         $this->assertSame(0.0, $totals['discount']);
-        $this->assertSame(1200.0, $totals['total']);
+        $this->assertSame(1000.0, $totals['total']);
+    }
+
+    public function test_legacy_seat_tier_uses_normal_pricing_and_label(): void
+    {
+        $showtime = $this->makeShowtime();
+        $seat = $this->seat($showtime, 3);
+        $seat->update(['seat_type' => 'premium']);
+
+        $totals = app(BookingService::class)->totals($showtime, [$seat->id]);
+
+        $this->assertSame(500.0, $totals['subtotal']);
+        $this->assertSame('normal', $totals['lines'][0]['type']);
+        $this->assertSame('Normal', $seat->type_label());
     }
 
     public function test_expired_pending_bookings_release_their_seats(): void

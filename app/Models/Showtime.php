@@ -14,12 +14,6 @@ class Showtime extends Model
     /** @use HasFactory<ShowtimeFactory> */
     use HasFactory;
 
-    public const SEAT_TYPE_PRICES = [
-        'normal' => 'price_normal',
-        'premium' => 'price_premium',
-        'recliner' => 'price_recliner',
-    ];
-
     protected $fillable = [
         'movie_id',
         'cinema_id',
@@ -29,8 +23,6 @@ class Showtime extends Model
         'format',
         'language',
         'price_normal',
-        'price_premium',
-        'price_recliner',
         'is_active',
     ];
 
@@ -100,11 +92,9 @@ class Showtime extends Model
             ->orderBy('start_time');
     }
 
-    public function price_for(string $seatType): float
+    public function price_for(): float
     {
-        $column = self::SEAT_TYPE_PRICES[$seatType] ?? 'price_normal';
-
-        return (float) $this->{$column};
+        return (float) $this->price_normal;
     }
 
     public function start_time_label(): string

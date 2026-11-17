@@ -342,16 +342,6 @@
     @apply border-emerald-300 bg-emerald-100 text-emerald-800 hover:border-emerald-500 hover:bg-emerald-600 hover:text-white;
 }
 
-/* Premium: blue */
-.cg-seat-premium {
-    @apply border-blue-300 bg-blue-100 text-blue-800 hover:border-blue-500 hover:bg-blue-600 hover:text-white;
-}
-
-/* VIP / recliner: purple */
-.cg-seat-recliner {
-    @apply border-purple-300 bg-purple-100 text-purple-800 hover:border-purple-500 hover:bg-purple-600 hover:text-white;
-}
-
 /* Selected: red */
 .cg-seat-selected {
     @apply border-cg-red! bg-cg-red! text-white! shadow-[0_0_16px_rgba(229,9,20,0.55)]!;

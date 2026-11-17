@@ -82,8 +82,8 @@ class BookingService
         $lines = $seats->map(fn (Seat $seat) => [
             'seat_id' => $seat->id,
             'label' => $seat->label(),
-            'type' => $seat->seat_type,
-            'price' => $showtime->price_for($seat->seat_type),
+            'type' => 'normal',
+            'price' => $showtime->price_for(),
         ])->values()->all();
 
         $subtotal = array_sum(array_column($lines, 'price'));
