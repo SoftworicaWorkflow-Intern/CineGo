@@ -138,6 +138,18 @@ class PublicPagesTest extends TestCase
             'is_active' => true,
         ]);
 
+        $lastDayMovie = Movie::factory()->create([
+            'title' => 'Last Day In Window Film',
+            'slug' => 'last-day-in-window-film',
+            'release_date' => '2026-11-24',
+        ]);
+        Showtime::factory()->create([
+            'movie_id' => $lastDayMovie->id,
+            'show_date' => '2026-11-24',
+            'start_time' => '19:00:00',
+            'is_active' => true,
+        ]);
+
         $playingMovie = Movie::factory()->create([
             'title' => 'Currently Playing Film',
             'slug' => 'currently-playing-film',
@@ -148,6 +160,18 @@ class PublicPagesTest extends TestCase
         Showtime::factory()->create([
             'movie_id' => $playingMovie->id,
             'show_date' => '2026-11-18',
+            'start_time' => '19:00:00',
+            'is_active' => true,
+        ]);
+
+        $distantShowtimeMovie = Movie::factory()->create([
+            'title' => 'December 12 Release Film',
+            'slug' => 'december-12-release-film',
+            'release_date' => '2026-11-17',
+        ]);
+        Showtime::factory()->create([
+            'movie_id' => $distantShowtimeMovie->id,
+            'show_date' => '2026-12-12',
             'start_time' => '19:00:00',
             'is_active' => true,
         ]);
@@ -175,9 +199,11 @@ class PublicPagesTest extends TestCase
             ->assertOk()
             ->assertViewHas('nowShowing', fn ($movies): bool => $movies->modelKeys() === [
                 $scheduledRelease->id,
+                $lastDayMovie->id,
                 $playingMovie->id,
             ])
             ->assertViewHas('comingSoon', fn ($movies): bool => $movies->modelKeys() === [
+                $distantShowtimeMovie->id,
                 $upcomingRelease->id,
                 $inactiveShowtimeRelease->id,
             ]);
@@ -185,14 +211,18 @@ class PublicPagesTest extends TestCase
         $this->get(route('movies.index', ['tab' => 'now_showing']))
             ->assertOk()
             ->assertSee($scheduledRelease->title)
+            ->assertSee($lastDayMovie->title)
             ->assertSee($playingMovie->title)
+            ->assertDontSee($distantShowtimeMovie->title)
             ->assertDontSee($upcomingRelease->title);
 
         $this->get(route('movies.index', ['tab' => 'coming_soon']))
             ->assertOk()
             ->assertSee($upcomingRelease->title)
             ->assertSee($inactiveShowtimeRelease->title)
+            ->assertSee($distantShowtimeMovie->title)
             ->assertDontSee($scheduledRelease->title)
+            ->assertDontSee($lastDayMovie->title)
             ->assertDontSee($playingMovie->title);
     }
 

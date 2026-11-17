@@ -106,7 +106,7 @@ class Movie extends Model
      */
     public function scopeScheduled(Builder $query): Builder
     {
-        return $query->active()->whereHas('showtimes', fn (Builder $showtimes): Builder => $showtimes->upcoming());
+        return $query->active()->whereHas('showtimes', fn (Builder $showtimes): Builder => $showtimes->withinNextSevenDays());
     }
 
     /**
@@ -116,8 +116,13 @@ class Movie extends Model
     public function scopeUpcomingRelease(Builder $query): Builder
     {
         return $query->active()
-            ->whereDate('release_date', '>', now()->toDateString())
-            ->whereDoesntHave('showtimes', fn (Builder $showtimes): Builder => $showtimes->upcoming());
+            ->whereDoesntHave('showtimes', fn (Builder $showtimes): Builder => $showtimes->withinNextSevenDays())
+            ->where(function (Builder $query): void {
+                $query->whereDate('release_date', '>', now()->toDateString())
+                    ->orWhereHas('showtimes', fn (Builder $showtimes): Builder => $showtimes
+                        ->upcoming()
+                        ->whereDate('show_date', '>', now()->addDays(7)->toDateString()));
+            });
     }
 
     /**

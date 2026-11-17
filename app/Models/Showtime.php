@@ -92,6 +92,16 @@ class Showtime extends Model
             ->orderBy('start_time');
     }
 
+    /**
+     * @param  Builder<self>  $query
+     * @return Builder<self>
+     */
+    public function scopeWithinNextSevenDays(Builder $query): Builder
+    {
+        return $query->upcoming()
+            ->whereDate('show_date', '<=', now()->addDays(7)->toDateString());
+    }
+
     public function price_for(): float
     {
         return (float) $this->price_normal;
