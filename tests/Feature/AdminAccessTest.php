@@ -30,6 +30,7 @@ class AdminAccessTest extends TestCase
 
     public function test_admin_can_access_the_dashboard_and_crud_pages_except_cinemas(): void
     {
+        $this->travelTo('2026-11-17 12:00:00');
         $admin = User::factory()->create(['is_admin' => true]);
 
         $dashboard = $this->actingAs($admin)->get('/admin');
@@ -38,7 +39,10 @@ class AdminAccessTest extends TestCase
         $movies = $this->actingAs($admin)->get('/admin/movies/create');
         $movies->assertOk()
             ->assertSee('<option value="Nepali"', false)
-            ->assertDontSee('id="release_date"', false)
+            ->assertSee('id="release_date"', false)
+            ->assertSee('type="date"', false)
+            ->assertSee('name="release_date"', false)
+            ->assertSee('value="2026-11-17"', false)
             ->assertSee('Description');
         $this->actingAs($admin)->get('/admin/cinemas')->assertNotFound();
         $this->actingAs($admin)->get('/admin/announcements')->assertNotFound();
@@ -166,6 +170,15 @@ class AdminAccessTest extends TestCase
             '2027-01-01',
             Movie::query()->where('title', 'Future Release Movie')->firstOrFail()->release_date->toDateString(),
         );
+
+        $this->get('/')
+            ->assertOk()
+            ->assertSee('Next Releases')
+            ->assertSee('Future Release Movie');
+
+        $this->get(route('movies.index', ['tab' => 'coming_soon']))
+            ->assertOk()
+            ->assertSee('Future Release Movie');
     }
 
     public function test_admin_updates_movie_status_when_release_date_changes(): void
