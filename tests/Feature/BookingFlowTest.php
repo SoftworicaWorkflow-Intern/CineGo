@@ -112,6 +112,11 @@ class BookingFlowTest extends TestCase
         $showtime = $this->makeShowtime();
         $seat = $this->seat($showtime, 1);
 
+        $this->get(route('booking.seats', $showtime))
+            ->assertOk()
+            ->assertSee('Screen this way')
+            ->assertSee('border-cg-red/40 bg-cg-red/10 text-sm font-bold text-cg-white', false);
+
         $this->post(route('booking.select', $showtime), ['seats' => [$seat->id]])
             ->assertRedirect(route('booking.checkout', $showtime));
 
@@ -120,7 +125,23 @@ class BookingFlowTest extends TestCase
             'seat_id' => $seat->id,
         ]);
 
-        $this->get(route('booking.checkout', $showtime))->assertOk();
+        $this->get(route('booking.checkout', $showtime))
+            ->assertOk()
+            ->assertSee('eSewa')
+            ->assertSee('Khalti')
+            ->assertSee('Credit / Debit Card')
+            ->assertSee('payments/esewa.png')
+            ->assertSee('payments/khalti.png')
+            ->assertSee('payments/visa.svg')
+            ->assertSee('payments/mastercard.svg')
+            ->assertSee('class="label font-bold" for="customer_name"', false)
+            ->assertSee('class="label font-bold" for="customer_email"', false)
+            ->assertSee('class="label font-bold" for="customer_phone"', false)
+            ->assertSee('class="mb-4 flex items-center gap-2 font-bold text-cg-white"', false)
+            ->assertDontSee('Pay at Counter')
+            ->assertDontSee('Pay at the counter')
+            ->assertSee('border-2 border-cg-red/40', false)
+            ->assertSee('font-bold', false);
     }
 
     public function test_checkout_requires_a_live_seat_hold(): void
@@ -131,7 +152,7 @@ class BookingFlowTest extends TestCase
             ->assertRedirect(route('booking.seats', $showtime));
     }
 
-    public function test_guest_can_complete_a_counter_booking(): void
+    public function test_guest_cannot_choose_counter_payment(): void
     {
         $showtime = $this->makeShowtime();
         $seats = [$this->seat($showtime, 1)->id, $this->seat($showtime, 2)->id];
@@ -144,22 +165,10 @@ class BookingFlowTest extends TestCase
             'customer_email' => 'sita@example.com',
             'customer_phone' => '9800000000',
             'payment_method' => 'counter',
-        ])->assertRedirect();
+        ])->assertSessionHasErrors('payment_method');
 
-        $booking = Booking::sole();
-        $this->assertSame(Booking::STATUS_CONFIRMED, $booking->status);
-        $this->assertFalse((bool) $booking->is_paid);
-        $this->assertSame(2, (int) $booking->seat_count);
-        $this->assertSame(1000.0, (float) $booking->total_amount);
-        $this->assertSame('Sita Sharma', $booking->customer_name);
-
-        // The digital ticket (with QR) renders for the booking code.
-        $this->get(route('booking.ticket', $booking->booking_code))
-            ->assertOk()
-            ->assertSee($booking->booking_code);
-
-        // The PDF download works too.
-        $this->get(route('booking.download', $booking->booking_code))->assertOk();
+        $this->assertDatabaseCount('bookings', 0);
+        $this->assertDatabaseCount('payments', 0);
     }
 
     public function test_online_payment_confirms_the_booking_after_verification(): void
@@ -306,7 +315,7 @@ class BookingFlowTest extends TestCase
             ->post(route('booking.place', $showtime), [
                 'customer_name' => $user->name,
                 'customer_phone' => '9833333333',
-                'payment_method' => 'counter',
+                'payment_method' => 'esewa',
             ])
             ->assertRedirect();
 

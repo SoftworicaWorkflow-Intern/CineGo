@@ -38,10 +38,6 @@
                 <div class="card p-4 sm:p-7" data-no-scroll-reveal>
                     <div class="mb-5 flex flex-wrap items-center justify-between gap-3">
                         <h1 class="font-display text-2xl tracking-wide text-cg-white">{{ ui('step_select_seats', 'Select Seats') }}</h1>
-                        <span class="inline-flex items-center gap-2 text-xs text-cg-muted">
-                            <span class="h-2 w-24 rounded-full cg-screen"></span>
-                            {{ ui('screen_here', 'Screen this way') }}
-                        </span>
                     </div>
 
                     @if ($errors->has('seats'))
@@ -56,9 +52,16 @@
 
                         <div class="-mx-2 overflow-x-auto pb-2">
                             <div class="mx-auto flex min-w-max flex-col gap-2.5 px-2">
+                                <div class="mx-auto mb-5 w-full max-w-[34rem] text-center">
+                                    <span class="mb-2 block text-xs font-bold uppercase tracking-[0.3em] text-cg-red">
+                                        {{ ui('screen_here', 'Screen this way') }}
+                                    </span>
+                                    <span class="cg-screen mx-auto block h-3 w-full rounded-[100%] border border-cg-red/60"></span>
+                                </div>
+
                                 @foreach ($rows as $rowLabel => $seats)
-                                    <div class="flex items-center gap-2.5">
-                                        <span class="w-5 text-center text-[11px] font-bold text-cg-dim">{{ $rowLabel }}</span>
+                                    <div class="flex items-center gap-3">
+                                        <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-cg-red/40 bg-cg-red/10 text-sm font-bold text-cg-white shadow-sm">{{ $rowLabel }}</span>
 
                                         <div class="flex gap-2">
                                             @foreach ($seats as $seat)
@@ -85,7 +88,7 @@
                                             @endforeach
                                         </div>
 
-                                        <span class="w-5 text-center text-[11px] font-bold text-cg-dim">{{ $rowLabel }}</span>
+                                        <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-cg-red/40 bg-cg-red/10 text-sm font-bold text-cg-white shadow-sm">{{ $rowLabel }}</span>
                                     </div>
                                 @endforeach
                             </div>

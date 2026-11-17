@@ -31,25 +31,25 @@
                     @csrf
 
                     {{-- Customer information --}}
-                    <section class="card p-5 sm:p-6">
-                        <h2 class="mb-4 flex items-center gap-2 font-semibold text-cg-white">
+                    <section class="card border-2 border-cg-red/40 p-5 shadow-lg shadow-cg-red/5 sm:p-6">
+                        <h2 class="mb-4 flex items-center gap-2 border-b border-cg-border-soft pb-3 font-bold text-cg-white">
                             <x-icon name="user" :size="17" class="text-cg-red" />
                             {{ ui('customer_info', 'Customer information') }}
                         </h2>
 
                         <div class="grid gap-4 sm:grid-cols-2">
                             <div class="sm:col-span-2">
-                                <label class="label" for="customer_name">{{ ui('full_name', 'Full name') }} *</label>
+                                <label class="label font-bold" for="customer_name">{{ ui('full_name', 'Full name') }} *</label>
                                 <input id="customer_name" type="text" name="customer_name" value="{{ old('customer_name', auth()->user()?->name) }}" class="input" required maxlength="100" autocomplete="name">
                             </div>
 
                             <div>
-                                <label class="label" for="customer_email">{{ ui('email_address', 'Email address') }}</label>
+                                <label class="label font-bold" for="customer_email">{{ ui('email_address', 'Email address') }}</label>
                                 <input id="customer_email" type="email" name="customer_email" value="{{ old('customer_email', auth()->user()?->email) }}" class="input" maxlength="160" autocomplete="email" placeholder="you@example.com">
                             </div>
 
                             <div>
-                                <label class="label" for="customer_phone">{{ ui('mobile_number', 'Mobile number') }} *</label>
+                                <label class="label font-bold" for="customer_phone">{{ ui('mobile_number', 'Mobile number') }} *</label>
                                 <input id="customer_phone" type="tel" name="customer_phone" value="{{ old('customer_phone', auth()->user()?->phone) }}" class="input" required maxlength="20" autocomplete="tel" placeholder="98XXXXXXXX">
                             </div>
                         </div>
@@ -57,7 +57,7 @@
 
                     {{-- Promo code --}}
                     <section class="card p-5 sm:p-6">
-                        <h2 class="mb-4 flex items-center gap-2 font-semibold text-cg-white">
+                        <h2 class="mb-4 flex items-center gap-2 font-bold text-cg-white">
                             <x-icon name="tag" :size="17" class="text-cg-red" />
                             {{ ui('promo_code', 'Promo code') }}
                         </h2>
@@ -100,15 +100,22 @@
                                         required
                                     >
                                     <span class="flex items-center gap-3 rounded-xl border border-cg-border bg-cg-charcoal px-4 py-3.5 transition hover:border-cg-red peer-checked:border-cg-red peer-checked:bg-cg-red/10">
-                                        <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-cg-red/15 text-cg-red">
-                                            <x-icon name="{{ $method === 'counter' ? 'armchair' : ($method === 'card' ? 'credit-card' : 'wallet') }}" :size="17" />
+                                        <span class="flex h-10 min-w-16 shrink-0 items-center justify-center rounded-lg bg-white px-2">
+                                            @if ($method === 'esewa')
+                                                <img src="{{ asset('img/payments/esewa.png') }}" alt="eSewa" class="h-7 w-20 object-contain" width="120" height="52">
+                                            @elseif ($method === 'khalti')
+                                                <img src="{{ asset('img/payments/khalti.png') }}" alt="Khalti" class="h-8 w-8 object-contain" width="694" height="694">
+                                            @else
+                                                <span class="flex items-center gap-2">
+                                                    <img src="{{ asset('img/payments/visa.svg') }}" alt="Visa" class="h-4 w-10 object-contain" width="24" height="24">
+                                                    <img src="{{ asset('img/payments/mastercard.svg') }}" alt="Mastercard" class="h-5 w-5 object-contain" width="24" height="24">
+                                                </span>
+                                            @endif
                                         </span>
                                         <span>
                                             <span class="block text-sm font-semibold text-cg-white">{{ $label }}</span>
                                             <span class="block text-[11px] text-cg-dim">
-                                                @if ($method === 'counter')
-                                                    {{ ui('pay_at_counter', 'Pay at the counter') }}
-                                                @elseif ($method === 'card')
+                                                @if ($method === 'card')
                                                     {{ ui('card_note', 'Visa / Mastercard / debit') }}
                                                 @else
                                                     {{ ui('wallet_note', 'Instant wallet payment') }}

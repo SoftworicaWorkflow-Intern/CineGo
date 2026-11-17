@@ -121,7 +121,7 @@ class BookingController extends Controller
             'showtime' => $showtime,
             'seats' => $seats,
             'totals' => $totals,
-            'paymentMethods' => Booking::PAYMENT_METHODS,
+            'paymentMethods' => Booking::ONLINE_PAYMENT_METHODS,
         ]);
     }
 
@@ -141,7 +141,7 @@ class BookingController extends Controller
             'customer_name' => 'required|string|max:100',
             'customer_email' => 'nullable|email|max:160',
             'customer_phone' => 'required|string|min:7|max:20',
-            'payment_method' => 'required|in:'.implode(',', array_keys(Booking::PAYMENT_METHODS)),
+            'payment_method' => 'required|in:'.implode(',', array_keys(Booking::ONLINE_PAYMENT_METHODS)),
             'promo_code' => 'nullable|string|max:40',
         ], [
             'customer_name.required' => ui('validation_name', 'Please enter your name.'),

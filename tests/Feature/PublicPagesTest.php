@@ -154,7 +154,7 @@ class PublicPagesTest extends TestCase
             ->assertDontSee('Maya Django');
     }
 
-    public function test_movies_page_shows_booking_and_trailer_actions_for_coming_soon_movies(): void
+    public function test_movies_page_shows_booking_and_trailer_actions_on_movie_cards(): void
     {
         $movie = Movie::factory()->comingSoon()->create([
             'title' => 'Coming Soon with Trailer',
@@ -164,8 +164,13 @@ class PublicPagesTest extends TestCase
         $this->get(route('movies.index'))
             ->assertOk()
             ->assertSee('href="'.route('movies.show', $movie).'#showtimes"', false)
-            ->assertSee('data-trailer="https://www.youtube.com/watch?v=coming-soon"', false)
             ->assertSee('Book Tickets')
+            ->assertSee('data-trailer="https://www.youtube.com/watch?v=coming-soon"', false)
+            ->assertSee('Watch Trailer');
+
+        $this->get(route('movies.show', $movie))
+            ->assertOk()
+            ->assertSee('data-trailer="https://www.youtube.com/watch?v=coming-soon"', false)
             ->assertSee('Watch Trailer');
     }
 

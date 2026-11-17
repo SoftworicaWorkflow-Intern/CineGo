@@ -20,10 +20,14 @@ class Booking extends Model
 
     public const STATUS_CANCELLED = 'cancelled';
 
-    public const PAYMENT_METHODS = [
+    public const ONLINE_PAYMENT_METHODS = [
         'esewa' => 'eSewa',
         'khalti' => 'Khalti',
         'card' => 'Credit / Debit Card',
+    ];
+
+    public const PAYMENT_METHODS = [
+        ...self::ONLINE_PAYMENT_METHODS,
         'counter' => 'Pay at Counter',
     ];
 
