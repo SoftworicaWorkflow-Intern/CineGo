@@ -7,7 +7,7 @@
         @php($heroItem = $heroItems->first())
         @php($heroMovie = $heroItem['movie'])
         <section
-            class="cg-home-hero relative min-h-[min(760px,100svh)] w-full overflow-hidden"
+            class="cg-home-hero relative min-h-[min(680px,100svh)] w-full overflow-hidden"
             aria-label="Featured movies"
             data-no-scroll-reveal
             data-hero-pagination
@@ -22,8 +22,8 @@
             <div class="pointer-events-none absolute inset-0 bg-gradient-to-r from-black/90 via-black/60 to-black/20" aria-hidden="true"></div>
             <div class="pointer-events-none absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-black/80 to-transparent" aria-hidden="true"></div>
 
-            <div class="container-page relative z-[1] flex min-h-[min(760px,100svh)] items-center py-16 sm:py-20">
-                <div class="flex max-w-4xl items-center gap-5 sm:gap-8 lg:-translate-x-8" data-hero-content>
+            <div class="container-page relative z-[1] flex min-h-[min(680px,100svh)] items-center py-16 sm:py-20">
+                <div class="flex max-w-4xl items-center gap-5 sm:gap-8 lg:-translate-x-28" data-hero-content>
                     <img
                         src="{{ $heroMovie->poster_url }}"
                         alt="{{ $heroMovie->localised_title() }}"
