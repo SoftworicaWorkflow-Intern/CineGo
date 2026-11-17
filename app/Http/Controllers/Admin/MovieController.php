@@ -54,9 +54,9 @@ class MovieController extends Controller
 
         if ($request->hasFile('poster')) {
             $validated['poster_url'] = $this->storePoster($request);
-            $this->deleteStoredPoster($movie->poster_url);
+            $this->deleteStoredPoster($movie->getRawOriginal('poster_url'));
         } else {
-            $validated['poster_url'] = $movie->poster_url;
+            $validated['poster_url'] = $movie->getRawOriginal('poster_url');
         }
 
         $movie->update($validated);
@@ -118,7 +118,7 @@ class MovieController extends Controller
 
     private function storePoster(Request $request): string
     {
-        return Storage::disk('public')->url($request->file('poster')->store('posters', 'public'));
+        return '/storage/'.$request->file('poster')->store('posters', 'public');
     }
 
     private function deleteStoredPoster(?string $posterUrl): void

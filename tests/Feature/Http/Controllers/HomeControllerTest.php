@@ -51,4 +51,40 @@ class HomeControllerTest extends TestCase
             ->assertOk()
             ->assertSee('/img/posters/fallback.svg', false);
     }
+
+    public function test_homepage_uses_now_showing_movies_when_none_are_featured(): void
+    {
+        Movie::factory()->create([
+            'title' => 'Now showing without a feature flag',
+            'slug' => 'now-showing-without-feature',
+            'is_now_showing' => true,
+            'is_featured' => false,
+            'is_active' => true,
+            'banner_url' => '/img/banners/now-showing.svg',
+        ]);
+
+        $this->get('/')
+            ->assertOk()
+            ->assertSee('Now showing without a feature flag')
+            ->assertSee('/img/banners/now-showing.svg', false);
+    }
+
+    public function test_homepage_shows_upcoming_movies_that_are_not_flagged_coming_soon(): void
+    {
+        Movie::factory()->create([
+            'title' => 'Unflagged upcoming movie',
+            'slug' => 'unflagged-upcoming-movie',
+            'is_now_showing' => true,
+            'is_coming_soon' => false,
+            'is_active' => true,
+            'release_date' => now()->addMonth()->toDateString(),
+        ]);
+
+        $this->get('/')
+            ->assertOk()
+            ->assertSee('Coming Soon')
+            ->assertSee('Next Releases')
+            ->assertSee('Get ready for the movies arriving soon.')
+            ->assertSee('Unflagged upcoming movie');
+    }
 }

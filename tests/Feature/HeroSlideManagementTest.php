@@ -419,7 +419,7 @@ class HeroSlideManagementTest extends TestCase
             );
     }
 
-    public function test_unpublished_managed_slides_do_not_fall_back_to_featured_movies(): void
+    public function test_homepage_falls_back_to_featured_movies_when_no_slide_is_published(): void
     {
         Movie::factory()->featured()->create([
             'title' => 'Legacy featured movie',
@@ -429,7 +429,8 @@ class HeroSlideManagementTest extends TestCase
 
         $this->get(route('home'))
             ->assertOk()
-            ->assertDontSee('data-hero-page', false);
+            ->assertSee('Legacy featured movie')
+            ->assertSee('data-hero-page', false);
     }
 
     public function test_desktop_banner_below_the_former_minimum_dimensions_is_accepted(): void

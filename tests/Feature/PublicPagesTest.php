@@ -189,6 +189,28 @@ class PublicPagesTest extends TestCase
             ->assertSee($movie->poster_url, false);
     }
 
+    public function test_movie_posters_saved_with_a_localhost_url_are_served_from_the_current_site(): void
+    {
+        config(['app.url' => 'https://cinego.softworica.com']);
+        url()->forceRootUrl('https://cinego.softworica.com');
+
+        $movie = Movie::factory()->create([
+            'title' => 'Ramayana',
+            'slug' => 'ramayana',
+            'poster_url' => 'http://localhost:8000/storage/posters/ramayana.png',
+        ]);
+
+        $this->get(route('movies.index'))
+            ->assertOk()
+            ->assertSee('/storage/posters/ramayana.png', false)
+            ->assertDontSee('localhost:8000', false);
+
+        $this->assertSame(
+            'http://localhost:8000/storage/posters/ramayana.png',
+            $movie->fresh()->getRawOriginal('poster_url'),
+        );
+    }
+
     public function test_coming_soon_movie_cards_show_release_date_on_the_poster(): void
     {
         $movie = Movie::factory()->comingSoon()->create([

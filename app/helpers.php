@@ -37,6 +37,31 @@ if (! function_exists('selected_city')) {
     }
 }
 
+if (! function_exists('public_media_url')) {
+    /**
+     * Turn a stored poster or banner into a URL for the current site.
+     * Uploads saved while APP_URL was localhost stay usable in production.
+     */
+    function public_media_url(?string $value): ?string
+    {
+        if ($value === null || $value === '') {
+            return $value;
+        }
+
+        $path = parse_url($value, PHP_URL_PATH);
+
+        if (! is_string($path) || $path === '') {
+            return $value;
+        }
+
+        if (str_starts_with($path, '/storage/') || str_starts_with($path, '/img/')) {
+            return $path;
+        }
+
+        return $value;
+    }
+}
+
 if (! function_exists('is_current_city')) {
     function is_current_city(int $cityId): bool
     {

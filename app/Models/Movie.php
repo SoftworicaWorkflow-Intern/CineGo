@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Database\Factories\MovieFactory;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -115,6 +116,22 @@ class Movie extends Model
     public function scopeFeatured(Builder $query): Builder
     {
         return $query->active()->where('is_featured', true);
+    }
+
+    /**
+     * @return Attribute<string|null, string|null>
+     */
+    protected function posterUrl(): Attribute
+    {
+        return Attribute::get(fn (?string $value): ?string => public_media_url($value));
+    }
+
+    /**
+     * @return Attribute<string|null, string|null>
+     */
+    protected function bannerUrl(): Attribute
+    {
+        return Attribute::get(fn (?string $value): ?string => public_media_url($value));
     }
 
     public function localised_title(): string

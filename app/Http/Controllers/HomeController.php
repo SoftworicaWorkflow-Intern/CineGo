@@ -24,19 +24,29 @@ class HomeController extends Controller
                 'mobile_image' => $slide->mobile_image_url() ?? $slide->desktop_image_url() ?? '',
             ]);
 
-        if ($heroItems->isEmpty() && ! HeroSlide::query()->exists()) {
-            $heroItems = Movie::query()
+        if ($heroItems->isEmpty()) {
+            $fallbackMovies = Movie::query()
                 ->featured()
                 ->nowShowing()
                 ->orderBy('sort_order')
                 ->orderByDesc('release_date')
                 ->limit(5)
-                ->get()
-                ->map(fn (Movie $movie): array => [
-                    'movie' => $movie,
-                    'desktop_image' => $movie->banner_url ?: $movie->poster_url,
-                    'mobile_image' => $movie->banner_url ?: $movie->poster_url,
-                ]);
+                ->get();
+
+            if ($fallbackMovies->isEmpty()) {
+                $fallbackMovies = Movie::query()
+                    ->nowShowing()
+                    ->orderBy('sort_order')
+                    ->orderByDesc('release_date')
+                    ->limit(5)
+                    ->get();
+            }
+
+            $heroItems = $fallbackMovies->map(fn (Movie $movie): array => [
+                'movie' => $movie,
+                'desktop_image' => $movie->banner_url ?: $movie->poster_url,
+                'mobile_image' => $movie->banner_url ?: $movie->poster_url,
+            ]);
         }
 
         $nowShowing = Movie::query()
@@ -47,7 +57,13 @@ class HomeController extends Controller
             ->get();
 
         $comingSoon = Movie::query()
-            ->comingSoon()
+            ->active()
+            ->where(function ($query): void {
+                $query->where(function ($query): void {
+                    $query->where('is_coming_soon', true)
+                        ->where('is_now_showing', false);
+                })->orWhereDate('release_date', '>', now()->toDateString());
+            })
             ->orderBy('release_date')
             ->limit(6)
             ->get();
