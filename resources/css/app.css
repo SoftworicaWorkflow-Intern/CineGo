@@ -334,7 +334,11 @@
 }
 
 .cg-seat-number {
-    @apply pointer-events-none absolute inset-x-0 top-0.5 z-10 text-center text-[10px] font-extrabold leading-none;
+    @apply pointer-events-none absolute inset-x-0 top-1 z-10 text-center text-[8px] font-extrabold leading-none;
+}
+
+.cg-seat-column-label {
+    @apply text-xs font-bold text-cg-muted;
 }
 
 /* Available: green */

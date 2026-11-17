@@ -58,6 +58,17 @@
                                     <span class="cg-screen mx-auto block h-3 w-full rounded-[100%] border border-cg-red/60"></span>
                                 </div>
 
+                                @if ($rows->isNotEmpty())
+                                    <div class="flex items-center gap-3" aria-hidden="true">
+                                        <span class="h-8 w-8 shrink-0"></span>
+                                        <div class="flex gap-2">
+                                            @foreach ($rows->first() as $seat)
+                                                <span class="cg-seat-column-label flex h-8 w-8 items-center justify-center sm:h-9 sm:w-9">{{ $seat->seat_number }}</span>
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                @endif
+
                                 @foreach ($rows as $rowLabel => $seats)
                                     <div class="flex items-center gap-3">
                                         <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-cg-red/40 bg-cg-red/10 text-sm font-bold text-cg-white shadow-sm">{{ $rowLabel }}</span>
@@ -91,7 +102,7 @@
                                                         {{ $isSelected ? 'cg-seat-selected' : '' }}"
                                                 >
                                                     <x-icon name="armchair" :size="24" class="cg-seat-icon" />
-                                                    <span aria-hidden="true" class="cg-seat-number">{{ $seat->seat_number }}</span>
+                                                    <span aria-hidden="true" class="cg-seat-number">{{ $seat->label() }}</span>
                                                 </button>
                                             @endforeach
                                         </div>
