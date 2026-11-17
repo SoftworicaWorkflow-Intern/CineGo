@@ -89,10 +89,10 @@
                     <span class="hidden shrink-0 text-sm font-semibold text-cg-red sm:block">{{ ui('admin_panel', 'Admin panel') }}</span>
                     <span class="hidden text-cg-dim sm:block" aria-hidden="true">/</span>
                     <h1 class="truncate font-semibold text-cg-white">@yield('title', ui('admin_panel', 'Admin panel'))</h1>
-                    <span id="admin-clock" class="hidden text-sm text-cg-muted md:block" aria-live="polite"></span>
                 </div>
 
                 <div class="flex items-center gap-3">
+                    <span id="admin-clock" class="hidden whitespace-nowrap rounded-lg border border-cg-border bg-cg-charcoal px-3 py-2 text-xs tabular-nums text-cg-muted sm:inline-flex" aria-live="off"></span>
                     <button type="button" data-admin-fullscreen class="hidden h-10 w-10 items-center justify-center rounded-lg border border-cg-border bg-cg-charcoal text-cg-muted transition hover:text-cg-white sm:flex" aria-label="{{ ui('fullscreen', 'Toggle fullscreen') }}">
                         <x-icon name="maximize" :size="17" />
                     </button>

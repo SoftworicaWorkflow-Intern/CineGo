@@ -18,18 +18,21 @@
     </div>
 
     <div class="card overflow-x-auto overflow-y-hidden">
-        <table class="w-full min-w-[760px] text-sm">
+        <table class="w-full min-w-[800px] text-sm">
             <thead>
                 <tr class="border-b border-cg-border-soft text-left text-xs uppercase tracking-wide text-cg-dim">
+                    <th class="w-16 px-4 py-4 text-center font-bold text-black">#</th>
                     <th class="px-5 py-4 font-bold text-black">{{ ui('movies', 'Movie') }}</th>
                     <th class="px-5 py-4 font-bold text-black">{{ ui('language_label', 'Language') }}</th>
-                    <th class="px-5 py-4 font-bold text-black">{{ ui('status', 'Status') }}</th>
                     <th class="px-5 py-4 text-right font-bold text-black">{{ ui('actions', 'Actions') }}</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-cg-border-soft">
                 @forelse ($movies as $movie)
                     <tr class="transition hover:bg-cg-charcoal">
+                        <td data-serial-number="{{ $movies->firstItem() + $loop->index }}" class="px-4 py-4 text-center tabular-nums text-cg-dim">
+                            {{ $movies->firstItem() + $loop->index }}
+                        </td>
                         <td class="px-5 py-4">
                             <div class="flex items-center gap-3">
                                 <img src="{{ $movie->poster_url }}" alt="" class="h-14 w-10 rounded object-cover" loading="lazy">
@@ -42,14 +45,6 @@
                             </div>
                         </td>
                         <td class="px-5 py-4 text-cg-muted">{{ $movie->language }}</td>
-                        <td class="px-5 py-4">
-                            <div class="flex flex-wrap gap-1.5">
-                                @if ($movie->is_now_showing)<span class="badge-green">{{ ui('now_showing', 'Now Showing') }}</span>@endif
-                                @if ($movie->is_coming_soon)<span class="badge-amber">{{ ui('coming_soon', 'Coming Soon') }}</span>@endif
-                                @if ($movie->is_featured)<span class="badge-red">{{ ui('featured', 'Featured') }}</span>@endif
-                                @unless ($movie->is_active)<span class="badge-dark">{{ ui('inactive', 'Inactive') }}</span>@endunless
-                            </div>
-                        </td>
                         <td class="px-5 py-4">
                             <div class="flex justify-end gap-2">
                                 <a href="{{ route('admin.movies.edit', $movie) }}" class="btn-ghost px-3 py-1.5 text-xs">

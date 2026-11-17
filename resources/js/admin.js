@@ -11,28 +11,49 @@ function readChartData(id) {
     try {
         return JSON.parse(node.textContent);
     } catch (error) {
+        console.error(`Unable to parse chart data in #${id}.`, error);
         return null;
     }
 }
 
 function mountCharts() {
-    const data = readChartData('chart-data');
-    const canvas = document.getElementById('bookings-chart');
+    const data = readChartData('dashboard-chart-data');
+    if (!data) return;
 
-    if (!data || !canvas) return;
-
-    const accent = '#E50914';
+    const theme = getComputedStyle(document.documentElement);
+    const accent = theme.getPropertyValue('--color-cg-red').trim() || '#E50914';
+    const deepAccent = theme.getPropertyValue('--color-cg-red-dark').trim() || '#B00710';
+    const palette = [accent, deepAccent, '#F0444D', '#85050C', '#F58289', '#C51A25', '#FFC2C5', '#5B0308'];
     const muted = '#666666';
     const grid = 'rgba(23,23,23,0.08)';
+    const configurations = {
+        booking_trend: { type: 'bar', trend: true },
+        booking_status: { type: 'doughnut', label: 'Bookings' },
+        payment_outcomes: { type: 'pie', label: 'Payments' },
+        tickets_by_movie: { type: 'bar', horizontal: true, label: 'Confirmed seats' },
+        revenue_by_movie: { type: 'bar', horizontal: true, label: 'Revenue (Rs.)' },
+        bookings_by_cinema: { type: 'bar', horizontal: true, label: 'Confirmed bookings' },
+        bookings_by_weekday: { type: 'bar', label: 'Bookings' },
+        payment_methods: { type: 'doughnut', label: 'Confirmed bookings' },
+    };
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    new Chart(canvas, {
-        data: {
-            labels: data.labels,
-            datasets: [
+    Object.entries(configurations).forEach(([key, configuration]) => {
+        const canvas = document.querySelector(`[data-dashboard-chart="${key}"]`);
+        const series = data[key];
+        if (!canvas || !series) {
+            console.error(`Missing dashboard chart canvas or data for "${key}".`);
+            return;
+        }
+
+        const isCircular = configuration.type === 'doughnut' || configuration.type === 'pie';
+        const isDoughnut = configuration.type === 'doughnut';
+        const datasets = configuration.trend
+            ? [
                 {
                     type: 'bar',
                     label: 'Bookings',
-                    data: data.bookings,
+                    data: series.bookings,
                     backgroundColor: 'rgba(229,9,20,0.55)',
                     borderColor: accent,
                     borderWidth: 1,
@@ -43,41 +64,57 @@ function mountCharts() {
                 {
                     type: 'line',
                     label: 'Revenue (Rs.)',
-                    data: data.revenue,
-                    borderColor: '#16a34a',
-                    backgroundColor: 'rgba(22,163,74,0.12)',
+                    data: series.revenue,
+                    borderColor: deepAccent,
+                    backgroundColor: 'rgba(176,7,16,0.12)',
                     fill: true,
                     tension: 0.35,
                     pointRadius: 3,
-                    pointBackgroundColor: '#16a34a',
+                    pointBackgroundColor: deepAccent,
                     borderWidth: 2,
                     yAxisID: 'y1',
                 },
-            ],
-        },
-        options: {
+            ]
+            : [{
+                label: configuration.label,
+                data: series.values,
+                backgroundColor: isCircular ? palette : 'rgba(229,9,20,0.55)',
+                borderColor: isCircular ? '#ffffff' : accent,
+                borderWidth: isCircular ? 2 : 1,
+                borderRadius: isCircular ? 0 : 6,
+                hoverOffset: isCircular ? 8 : 0,
+                maxBarThickness: 30,
+            }];
+        const options = {
             responsive: true,
             maintainAspectRatio: false,
+            indexAxis: configuration.horizontal ? 'y' : 'x',
+            animation: reducedMotion ? false : { duration: 900, easing: 'easeOutQuart' },
+            transitions: { active: { animation: { duration: 220 } } },
             interaction: { mode: 'index', intersect: false },
             plugins: {
                 legend: {
-                    labels: { color: muted, boxWidth: 12, boxHeight: 12, usePointStyle: true },
+                    display: isCircular || configuration.trend,
+                    position: isCircular ? 'bottom' : 'top',
+                    labels: { color: muted, boxWidth: 12, boxHeight: 12, usePointStyle: true, padding: 16 },
                 },
                 tooltip: {
                     backgroundColor: '#ffffff',
                     borderColor: '#e5e7eb',
                     borderWidth: 1,
-                    titleColor: '#ffffff',
-                    bodyColor: '#666666',
+                    titleColor: '#171717',
+                    bodyColor: muted,
                     padding: 10,
                     cornerRadius: 8,
                 },
             },
-            scales: {
-                x: {
-                    ticks: { color: muted, maxRotation: 0, autoSkip: true },
-                    grid: { color: grid },
-                },
+        };
+
+        if (isCircular) {
+            if (isDoughnut) options.cutout = '64%';
+        } else if (configuration.trend) {
+            options.scales = {
+                x: { ticks: { color: muted, maxRotation: 0, autoSkip: true }, grid: { color: grid } },
                 y: {
                     position: 'left',
                     beginAtZero: true,
@@ -92,8 +129,15 @@ function mountCharts() {
                     grid: { drawOnChartArea: false },
                     title: { display: true, text: 'Revenue (Rs.)', color: muted },
                 },
-            },
-        },
+            };
+        } else {
+            options.scales = {
+                x: { beginAtZero: true, ticks: { color: muted, precision: 0 }, grid: { color: grid } },
+                y: { ticks: { color: muted, autoSkip: false }, grid: { color: grid } },
+            };
+        }
+
+        new Chart(canvas, { type: configuration.type, data: { labels: series.labels, datasets }, options });
     });
 }
 

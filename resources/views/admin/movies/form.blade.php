@@ -54,15 +54,15 @@
                 </div>
 
                 <div>
-                    <label class="label" for="release_date">{{ ui('release_date', 'Release date') }} *</label>
-                    <input
-                        id="release_date"
-                        type="date"
-                        name="release_date"
-                        value="{{ old('release_date', $movie->release_date?->toDateString() ?? today()->toDateString()) }}"
-                        class="input"
-                        required
-                    >
+                    <label class="label" for="movie_status">{{ ui('movie_status', 'Movie status') }} *</label>
+                    <select id="movie_status" name="movie_status" class="input cursor-pointer" required>
+                        <option value="now_showing" @selected(old('movie_status', $movie->is_coming_soon ? 'coming_soon' : 'now_showing') === 'now_showing')>
+                            {{ ui('now_showing', 'Now Showing') }}
+                        </option>
+                        <option value="coming_soon" @selected(old('movie_status', $movie->is_coming_soon ? 'coming_soon' : 'now_showing') === 'coming_soon')>
+                            {{ ui('coming_soon', 'Coming Soon') }}
+                        </option>
+                    </select>
                 </div>
 
                 <div>

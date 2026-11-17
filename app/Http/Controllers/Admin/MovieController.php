@@ -85,6 +85,7 @@ class MovieController extends Controller
             'genres.*' => 'string|max:40',
             'duration_minutes' => 'required|integer|min:1|max:600',
             'language' => 'required|string|max:40',
+            'movie_status' => 'nullable|in:now_showing,coming_soon',
             'release_date' => 'nullable|date_format:Y-m-d',
             'certificate' => 'nullable|string|max:10',
             'poster' => [
@@ -107,7 +108,11 @@ class MovieController extends Controller
         $movie = $request->route('movie');
         $validated['release_date'] = $validated['release_date']
             ?? ($movie instanceof Movie ? $movie->release_date?->toDateString() : today()->toDateString());
-        $isComingSoon = now()->toDateString() < $validated['release_date'];
+        $movieStatus = $validated['movie_status'] ?? null;
+        unset($validated['movie_status']);
+        $isComingSoon = $movieStatus === null
+            ? now()->toDateString() < $validated['release_date']
+            : $movieStatus === 'coming_soon';
         $validated['is_now_showing'] = ! $isComingSoon;
         $validated['is_coming_soon'] = $isComingSoon;
         $validated['is_featured'] = $movie instanceof Movie ? $movie->is_featured : false;

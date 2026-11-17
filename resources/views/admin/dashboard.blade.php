@@ -28,24 +28,35 @@
         @endforeach
     </div>
 
-    <div class="mt-6">
-        {{-- Chart --}}
-        <section class="card p-5">
-            <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
-                <div>
-                    <h2 class="font-semibold text-cg-white">{{ ui('bookings_report', 'Bookings & revenue') }}</h2>
-                    <p class="text-xs text-cg-dim">{{ ui('last_14_days', 'Last 14 days') }}</p>
+    <div class="mt-6 grid gap-4 lg:grid-cols-2 2xl:grid-cols-3">
+        @foreach ([
+            ['key' => 'booking_trend', 'type' => 'bar', 'title' => 'Bookings & revenue', 'description' => 'Daily activity over the last 14 days', 'span' => 'lg:col-span-2 2xl:col-span-2', 'height' => 'h-80'],
+            ['key' => 'booking_status', 'type' => 'doughnut', 'title' => 'Booking status', 'description' => 'Confirmed, pending, and cancelled bookings', 'span' => '', 'height' => 'h-64'],
+            ['key' => 'payment_outcomes', 'type' => 'pie', 'title' => 'Payment outcomes', 'description' => 'Successful, pending, and failed payments', 'span' => '', 'height' => 'h-64'],
+            ['key' => 'tickets_by_movie', 'type' => 'bar', 'title' => 'Tickets by movie', 'description' => 'Top movies by confirmed seats sold', 'span' => '', 'height' => 'h-64'],
+            ['key' => 'revenue_by_movie', 'type' => 'bar', 'title' => 'Revenue by movie', 'description' => 'Top movies by successful payment revenue', 'span' => '', 'height' => 'h-64'],
+            ['key' => 'bookings_by_cinema', 'type' => 'bar', 'title' => 'Bookings by cinema', 'description' => 'Top cinemas by confirmed bookings', 'span' => '', 'height' => 'h-64'],
+            ['key' => 'bookings_by_weekday', 'type' => 'bar', 'title' => 'Bookings by weekday', 'description' => 'Booking activity over the last 7 days', 'span' => '', 'height' => 'h-64'],
+            ['key' => 'payment_methods', 'type' => 'doughnut', 'title' => 'Payment methods', 'description' => 'Payment mix for confirmed bookings', 'span' => '', 'height' => 'h-64'],
+        ] as $chartCard)
+            <section class="card {{ $chartCard['span'] }} p-5 transition duration-300 hover:-translate-y-0.5 hover:border-cg-red/40">
+                <div class="mb-4">
+                    <h2 class="font-semibold text-cg-white">{{ $chartCard['title'] }}</h2>
+                    <p class="text-xs text-cg-dim">{{ $chartCard['description'] }}</p>
                 </div>
-                <span class="badge-dark">{{ now()->subDays(13)->format('M j') }} – {{ now()->format('M j') }}</span>
-            </div>
-
-            <div class="relative h-72">
-                <canvas id="bookings-chart"></canvas>
-            </div>
-
-            <script type="application/json" id="chart-data">{!! json_encode($chart) !!}</script>
-        </section>
+                <div class="relative {{ $chartCard['height'] }}">
+                    <canvas
+                        data-dashboard-chart="{{ $chartCard['key'] }}"
+                        data-chart-type="{{ $chartCard['type'] }}"
+                        role="img"
+                        aria-label="{{ $chartCard['title'] }}"
+                    ></canvas>
+                </div>
+            </section>
+        @endforeach
     </div>
+
+    <script type="application/json" id="dashboard-chart-data">{!! json_encode($charts, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) !!}</script>
 
     {{-- Quick actions --}}
     <div class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">

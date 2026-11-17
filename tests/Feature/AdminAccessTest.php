@@ -36,13 +36,15 @@ class AdminAccessTest extends TestCase
         $dashboard = $this->actingAs($admin)->get('/admin');
         $dashboard->assertOk()->assertDontSee('Cinemas');
 
+        $movieIndex = $this->actingAs($admin)->get('/admin/movies');
+        $movieIndex->assertOk()->assertDontSee(ui('status', 'Status'));
+
         $movies = $this->actingAs($admin)->get('/admin/movies/create');
         $movies->assertOk()
             ->assertSee('<option value="Nepali"', false)
-            ->assertSee('id="release_date"', false)
-            ->assertSee('type="date"', false)
-            ->assertSee('name="release_date"', false)
-            ->assertSee('value="2026-11-17"', false)
+            ->assertSee('<option value="now_showing"', false)
+            ->assertSee('<option value="coming_soon"', false)
+            ->assertDontSee('id="release_date"', false)
             ->assertSee('Description');
         $this->actingAs($admin)->get('/admin/cinemas')->assertNotFound();
         $this->actingAs($admin)->get('/admin/announcements')->assertNotFound();
@@ -57,7 +59,8 @@ class AdminAccessTest extends TestCase
             ->assertDontSee('Choose a screen')
             ->assertSee('id="start_time"', false)
             ->assertSee('step="60"', false);
-        $this->actingAs($admin)->get('/admin/bookings')->assertOk();
+        $bookingIndex = $this->actingAs($admin)->get('/admin/bookings');
+        $bookingIndex->assertOk()->assertDontSee(ui('status', 'Status'));
 
         $settings = $this->actingAs($admin)->get('/admin/settings');
         $settings->assertOk()
@@ -179,6 +182,53 @@ class AdminAccessTest extends TestCase
         $this->get(route('movies.index', ['tab' => 'coming_soon']))
             ->assertOk()
             ->assertSee('Future Release Movie');
+    }
+
+    public function test_admin_can_choose_movie_status_independently_of_release_date(): void
+    {
+        Storage::fake('public');
+        $this->travelTo('2026-11-06 12:00:00');
+        $admin = User::factory()->create(['is_admin' => true]);
+
+        $nowShowingResponse = $this->actingAs($admin)->post(route('admin.movies.store'), [
+            'title' => 'Selected Now Showing Movie',
+            'synopsis' => 'An upcoming movie chosen as now showing.',
+            'genres' => ['Drama'],
+            'duration_minutes' => 120,
+            'language' => 'English',
+            'movie_status' => 'now_showing',
+            'release_date' => '2027-01-01',
+            'poster' => UploadedFile::fake()->createWithContent(
+                'now-showing-poster.png',
+                base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII='),
+            ),
+        ]);
+        $nowShowingResponse->assertRedirect();
+        $this->assertDatabaseHas('movies', [
+            'title' => 'Selected Now Showing Movie',
+            'is_now_showing' => true,
+            'is_coming_soon' => false,
+        ]);
+
+        $comingSoonResponse = $this->post(route('admin.movies.store'), [
+            'title' => 'Selected Coming Soon Movie',
+            'synopsis' => 'A movie chosen as coming soon.',
+            'genres' => ['Drama'],
+            'duration_minutes' => 120,
+            'language' => 'English',
+            'movie_status' => 'coming_soon',
+            'release_date' => today()->toDateString(),
+            'poster' => UploadedFile::fake()->createWithContent(
+                'coming-soon-poster.png',
+                base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII='),
+            ),
+        ]);
+        $comingSoonResponse->assertRedirect();
+        $this->assertDatabaseHas('movies', [
+            'title' => 'Selected Coming Soon Movie',
+            'is_now_showing' => false,
+            'is_coming_soon' => true,
+        ]);
     }
 
     public function test_admin_updates_movie_status_when_release_date_changes(): void

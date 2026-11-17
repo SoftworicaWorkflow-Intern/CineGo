@@ -6,8 +6,6 @@
     $statusTabs = [
         '' => ['label' => ui('all', 'All'), 'count' => $counts['all']],
         'confirmed' => ['label' => ui('confirmed', 'Confirmed'), 'count' => $counts['confirmed']],
-        'pending' => ['label' => ui('pending', 'Pending'), 'count' => $counts['pending']],
-        'cancelled' => ['label' => ui('cancelled', 'Cancelled'), 'count' => $counts['cancelled']],
     ];
 @endphp
 
@@ -35,7 +33,7 @@
     </div>
 
     <div class="card overflow-x-auto">
-        <table class="w-full min-w-[880px] text-sm">
+        <table class="w-full min-w-[760px] text-sm">
             <thead>
                 <tr class="border-b border-cg-border-soft text-left text-xs uppercase tracking-wide text-cg-dim">
                     <th class="px-5 py-4 font-bold text-black">{{ ui('booking_id', 'Booking') }}</th>
@@ -44,7 +42,6 @@
                     <th class="px-5 py-4 font-bold text-black">{{ ui('show', 'Show') }}</th>
                     <th class="px-5 py-4 font-bold text-black">{{ ui('seats', 'Seats') }}</th>
                     <th class="px-5 py-4 font-bold text-black">{{ ui('total', 'Amount') }}</th>
-                    <th class="px-5 py-4 font-bold text-black">{{ ui('status', 'Status') }}</th>
                     <th class="px-5 py-4 text-right font-bold text-black">{{ ui('actions', 'Actions') }}</th>
                 </tr>
             </thead>
@@ -68,19 +65,6 @@
                         </td>
                         <td class="px-5 py-4 text-xs text-cg-red">{{ $booking->seat_labels() }}</td>
                         <td class="px-5 py-4 font-semibold text-cg-white">Rs. {{ number_format($booking->total_amount) }}</td>
-                        <td class="px-5 py-4">
-                            <div class="flex flex-col gap-1">
-                                <span class="{{ $booking->status === \App\Models\Booking::STATUS_CONFIRMED ? 'badge-green' : ($booking->status === \App\Models\Booking::STATUS_CANCELLED ? 'badge-red' : 'badge-amber') }}">
-                                    {{ $booking->status_label() }}
-                                </span>
-                                @if ($booking->is_paid)
-                                    <span class="badge-dark">{{ ui('paid', 'Paid') }}</span>
-                                @endif
-                                @if ($booking->checked_in_at)
-                                    <span class="badge-dark">{{ ui('used', 'Used') }}</span>
-                                @endif
-                            </div>
-                        </td>
                         <td class="px-5 py-4 text-right">
                             <a href="{{ route('admin.bookings.show', $booking) }}" class="btn-ghost px-3 py-1.5 text-xs">
                                 <x-icon name="eye" :size="14" /> {{ ui('view_details', 'View') }}
@@ -89,7 +73,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="8" class="px-5 py-10 text-center text-cg-muted">{{ ui('no_results', 'Nothing matched your search.') }}</td>
+                        <td colspan="7" class="px-5 py-10 text-center text-cg-muted">{{ ui('no_results', 'Nothing matched your search.') }}</td>
                     </tr>
                 @endforelse
             </tbody>
