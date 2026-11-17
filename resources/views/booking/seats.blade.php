@@ -91,7 +91,7 @@
                                                         {{ $isLocked ? 'cg-seat-locked' : '' }}
                                                         {{ $isSelected ? 'cg-seat-selected' : '' }}"
                                                 >
-                                                    <x-icon name="armchair" :size="30" class="cg-seat-icon" />
+                                                    <x-icon name="armchair" :size="24" class="cg-seat-icon" />
                                                     <span aria-hidden="true" class="cg-seat-label">{{ $seat->label() }}</span>
                                                 </button>
                                             @endforeach

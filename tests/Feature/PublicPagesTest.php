@@ -184,9 +184,30 @@ class PublicPagesTest extends TestCase
 
         $this->get('/')
             ->assertOk()
-            ->assertSee('Release Date: Dec 25, 2026')
-            ->assertSee('bg-black/75 px-2 py-1.5 text-center text-xs font-bold text-white', false)
+            ->assertSee('aria-label="Release Date: Dec 25, 2026"', false)
+            ->assertSee('Dec 25, 2026')
             ->assertSee($movie->poster_url, false);
+    }
+
+    public function test_coming_soon_movie_cards_show_release_date_on_the_poster(): void
+    {
+        $movie = Movie::factory()->comingSoon()->create([
+            'title' => 'Next Release Poster',
+            'slug' => 'next-release-poster',
+            'release_date' => '2026-11-18',
+        ]);
+
+        $response = $this->get(route('movies.index', ['tab' => 'coming_soon']));
+
+        $response->assertOk()
+            ->assertSee($movie->poster_url, false)
+            ->assertSee('aria-label="Release Date: Nov 18, 2026"', false)
+            ->assertSee('Nov 18, 2026')
+            ->assertSee('Release Date: Nov 18, 2026')
+            ->assertSee('cg-poster-overlay pointer-events-none', false)
+            ->assertSee('cg-card group flex h-full flex-col', false)
+            ->assertSee('mt-auto flex gap-2 pt-1', false);
+        $this->assertSame(3, substr_count($response->getContent(), 'Nov 18, 2026'));
     }
 
     public function test_movies_page_has_no_filter_bar(): void

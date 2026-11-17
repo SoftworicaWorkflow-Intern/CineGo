@@ -325,16 +325,16 @@
 
 /* Seat map */
 .cg-seat {
-    @apply relative flex h-10 w-10 cursor-pointer items-center justify-center rounded-md border text-xs font-bold
-        transition duration-150 sm:h-11 sm:w-11;
+    @apply relative flex h-8 w-8 cursor-pointer items-center justify-center rounded-md border text-xs font-bold
+        transition duration-150 sm:h-9 sm:w-9;
 }
 
 .cg-seat-icon {
-    @apply absolute bottom-0.5 h-7 w-7;
+    @apply absolute bottom-0.5 h-5 w-5;
 }
 
 .cg-seat-label {
-    @apply pointer-events-none absolute top-[19px] z-10 text-[6px] font-extrabold leading-none;
+    @apply pointer-events-none absolute inset-x-0 top-[18px] z-10 whitespace-nowrap text-center text-[4px] font-extrabold leading-none tracking-[-0.05em] sm:top-5;
 }
 
 /* Available: green */

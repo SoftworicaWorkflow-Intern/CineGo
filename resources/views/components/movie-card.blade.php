@@ -3,9 +3,10 @@
 @php
     $detailRoute = route('movies.show', $movie);
     $isComingSoon = $movie->is_coming_soon && ! $movie->is_now_showing;
+    $showPosterReleaseDate = $showReleaseDateOnPoster || $isComingSoon;
 @endphp
 
-<article {{ $attributes->merge(['class' => 'cg-card group']) }}>
+<article {{ $attributes->merge(['class' => 'cg-card group flex h-full flex-col']) }}>
     <div class="cg-poster">
         <a href="{{ $detailRoute }}" class="absolute inset-0">
             <img
@@ -17,7 +18,14 @@
             >
 
             <div class="absolute inset-x-0 top-0 flex items-start justify-between p-3">
-                @if ($movie->certificate)
+                @if ($showPosterReleaseDate && $movie->release_date)
+                    <span
+                        class="badge-dark"
+                        aria-label="{{ ui('release_date', 'Release Date') }}: {{ $movie->release_date->format('M j, Y') }}"
+                    >
+                        {{ $movie->release_date->format('M j, Y') }}
+                    </span>
+                @elseif ($movie->certificate)
                     <span class="badge-dark">{{ $movie->certificate }}</span>
                 @endif
                 @if ($movie->is_featured && $movie->is_now_showing)
@@ -25,12 +33,6 @@
                 @endif
             </div>
         </a>
-
-        @if ($showReleaseDateOnPoster && $movie->release_date)
-            <span class="absolute inset-x-2 bottom-2 z-10 rounded-md bg-black/75 px-2 py-1.5 text-center text-xs font-bold text-white backdrop-blur-sm">
-                {{ ui('release_date', 'Release Date') }}: {{ $movie->release_date->format('M j, Y') }}
-            </span>
-        @endif
 
         <div class="cg-poster-overlay pointer-events-none">
             <a href="{{ $detailRoute }}" class="btn-primary pointer-events-auto w-full justify-center text-xs">
@@ -48,28 +50,26 @@
         </div>
     </div>
 
-    <div class="mt-3.5 space-y-2">
-        <h3 class="line-clamp-1 font-semibold text-cg-white transition group-hover:text-cg-red">
+    <div class="mt-3.5 flex flex-1 flex-col gap-2">
+        <h3 class="min-h-6 line-clamp-1 font-semibold text-cg-white transition group-hover:text-cg-red">
             <a href="{{ $detailRoute }}">{{ $movie->localised_title() }}</a>
         </h3>
 
-        <p class="line-clamp-1 text-xs text-cg-muted">
+        <p class="min-h-5 line-clamp-1 text-xs text-cg-muted">
             {{ $movie->genre_label() }}
             <span class="meta-dot"></span>{{ $movie->duration_label() }}
             <span class="meta-dot"></span>{{ $movie->language }}
         </p>
 
-        @unless ($showReleaseDateOnPoster)
-            <p class="text-xs text-cg-dim">
-                @if ($isComingSoon)
-                    {{ ui('release_date', 'Release Date') }}: {{ $movie->release_date?->format('M j, Y') }}
-                @else
-                    {{ $movie->release_date?->format('M j, Y') }}
-                @endif
-            </p>
-        @endunless
+        <p class="min-h-5 text-xs text-cg-dim">
+            @if ($isComingSoon)
+                {{ ui('release_date', 'Release Date') }}: {{ $movie->release_date?->format('M j, Y') }}
+            @else
+                {{ $movie->release_date?->format('M j, Y') }}
+            @endif
+        </p>
 
-        <div class="flex gap-2 pt-1">
+        <div class="mt-auto flex gap-2 pt-1">
             @if ($showBook)
                 <a href="{{ $detailRoute }}#showtimes" class="btn-primary flex-1 justify-center px-3 py-2 text-xs">
                     {{ ui('book_tickets', 'Book Tickets') }}
