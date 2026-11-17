@@ -62,11 +62,7 @@
         </p>
 
         <p class="min-h-5 text-xs text-cg-dim">
-            @if ($isComingSoon)
-                {{ ui('release_date', 'Release Date') }}: {{ $movie->release_date?->format('M j, Y') }}
-            @else
-                {{ $movie->release_date?->format('M j, Y') }}
-            @endif
+            {{ $movie->release_date?->format('M j, Y') }}
         </p>
 
         <div class="mt-auto flex gap-2 pt-1">

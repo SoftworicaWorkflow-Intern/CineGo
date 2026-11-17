@@ -203,10 +203,10 @@ class PublicPagesTest extends TestCase
             ->assertSee($movie->poster_url, false)
             ->assertSee('aria-label="Release Date: Nov 18, 2026"', false)
             ->assertSee('Nov 18, 2026')
-            ->assertSee('Release Date: Nov 18, 2026')
             ->assertSee('cg-poster-overlay pointer-events-none', false)
             ->assertSee('cg-card group flex h-full flex-col', false)
             ->assertSee('mt-auto flex gap-2 pt-1', false);
+        $this->assertSame(1, substr_count($response->getContent(), 'Release Date: Nov 18, 2026'));
         $this->assertSame(3, substr_count($response->getContent(), 'Nov 18, 2026'));
     }
 
