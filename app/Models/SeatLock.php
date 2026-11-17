@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\DB;
 
 class SeatLock extends Model
 {
-    public const TTL_MINUTES = 10;
+    public const TTL_MINUTES = 5;
 
     protected $fillable = [
         'showtime_id',

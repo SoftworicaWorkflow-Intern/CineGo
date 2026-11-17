@@ -70,13 +70,13 @@ class NewsletterSubscriptionTest extends TestCase
         $this->assertDatabaseCount('newsletter_subscriptions', 1);
     }
 
-    public function test_footer_newsletter_copy_uses_the_selected_nepali_locale(): void
+    public function test_footer_newsletter_section_is_absent_in_the_selected_nepali_locale(): void
     {
         $response = $this->withSession(['locale' => 'np'])->get('/');
 
         $response->assertOk()
-            ->assertSee('CineGo सँग नयाँ जानकारी पाउनुहोस्')
-            ->assertSee('सदस्यता लिनुहोस्')
+            ->assertDontSee('CineGo सँग नयाँ जानकारी पाउनुहोस्')
+            ->assertDontSee('सदस्यता लिनुहोस्')
             ->assertSee('कानुनी लिङ्कहरू');
     }
 }

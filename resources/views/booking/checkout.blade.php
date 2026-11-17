@@ -40,17 +40,17 @@
                         <div class="grid gap-4 sm:grid-cols-2">
                             <div class="sm:col-span-2">
                                 <label class="label font-bold" for="customer_name">{{ ui('full_name', 'Full name') }} *</label>
-                                <input id="customer_name" type="text" name="customer_name" value="{{ old('customer_name', auth()->user()?->name) }}" class="input bg-[#27272a] text-white" required maxlength="100" autocomplete="name">
+                                <input id="customer_name" type="text" name="customer_name" value="{{ old('customer_name', auth()->user()?->name) }}" class="input bg-transparent" required maxlength="100" autocomplete="name">
                             </div>
 
                             <div>
                                 <label class="label font-bold" for="customer_email">{{ ui('email_address', 'Email address') }}</label>
-                                <input id="customer_email" type="email" name="customer_email" value="{{ old('customer_email', auth()->user()?->email) }}" class="input" maxlength="160" autocomplete="email" placeholder="you@example.com">
+                                <input id="customer_email" type="email" name="customer_email" value="{{ old('customer_email', auth()->user()?->email) }}" class="input bg-transparent" maxlength="160" autocomplete="email" placeholder="you@example.com">
                             </div>
 
                             <div>
                                 <label class="label font-bold" for="customer_phone">{{ ui('mobile_number', 'Mobile number') }} *</label>
-                                <input id="customer_phone" type="tel" name="customer_phone" value="{{ old('customer_phone', auth()->user()?->phone) }}" class="input" required maxlength="20" autocomplete="tel" placeholder="98XXXXXXXX">
+                                <input id="customer_phone" type="tel" name="customer_phone" value="{{ old('customer_phone', auth()->user()?->phone) }}" class="input bg-transparent" required maxlength="20" autocomplete="tel" placeholder="98XXXXXXXX">
                             </div>
                         </div>
                     </section>
@@ -105,21 +105,12 @@
                                                 <img src="{{ asset('img/payments/esewa.png') }}" alt="eSewa" class="h-6 w-16 object-contain" width="120" height="52">
                                             @elseif ($method === 'khalti')
                                                 <img src="{{ asset('img/payments/khalti.png') }}" alt="Khalti" class="h-8 w-8 object-contain" width="694" height="694">
-                                            @else
-                                                <span class="flex items-center gap-2">
-                                                    <img src="{{ asset('img/payments/visa.svg') }}" alt="Visa" class="h-4 w-10 object-contain" width="24" height="24">
-                                                    <img src="{{ asset('img/payments/mastercard.svg') }}" alt="Mastercard" class="h-5 w-5 object-contain" width="24" height="24">
-                                                </span>
                                             @endif
                                         </span>
                                         <span>
                                             <span class="block text-sm font-semibold text-cg-white">{{ $label }}</span>
                                             <span class="block text-[11px] text-cg-dim">
-                                                @if ($method === 'card')
-                                                    {{ ui('card_note', 'Visa / Mastercard / debit') }}
-                                                @else
-                                                    {{ ui('wallet_note', 'Instant wallet payment') }}
-                                                @endif
+                                                {{ ui('wallet_note', 'Sandbox checkout') }}
                                             </span>
                                         </span>
                                     </span>
@@ -129,7 +120,7 @@
 
                         <p class="mt-4 flex items-start gap-2 rounded-lg border border-cg-border bg-cg-charcoal px-3.5 py-3 text-xs text-cg-muted">
                             <x-icon name="shield-check" :size="15" class="mt-0.5 shrink-0 text-cg-red" />
-                            {{ ui('demo_payment', 'Demo mode: the payment is verified by our server, no real money moves.') }}
+                            {{ ui('demo_payment', 'Official provider sandbox checkout. No real money is charged.') }}
                         </p>
                     </section>
 

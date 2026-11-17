@@ -1,36 +1,4 @@
 <footer class="mt-16 border-t border-cg-border-soft bg-[#FFF1F1] shadow-[0_-8px_32px_rgba(23,23,23,0.04)]">
-    <div class="container-page pt-10 sm:pt-14">
-        <section class="grid gap-6 rounded-2xl border border-cg-red/10 bg-white p-6 shadow-sm sm:p-8 lg:grid-cols-[1fr_auto] lg:items-center">
-            <div class="max-w-xl">
-                <h2 class="text-xl font-bold tracking-tight text-cg-white sm:text-2xl">{{ ui('newsletter_title', 'Stay Updated with CineGo') }}</h2>
-                <p class="mt-2 text-sm leading-relaxed text-cg-muted">{{ ui('newsletter_description', 'Sign up to hear about upcoming movie releases and exclusive offers from CineGo.') }}</p>
-            </div>
-
-            <form action="{{ route('newsletter-subscriptions.store') }}" method="POST" class="w-full lg:min-w-[26rem]">
-                @csrf
-                <label for="newsletter-email" class="sr-only">{{ ui('newsletter_email', 'Email address') }}</label>
-                <div class="flex flex-col gap-2 sm:flex-row">
-                    <input
-                        id="newsletter-email"
-                        type="email"
-                        name="email"
-                        value="{{ old('email') }}"
-                        autocomplete="email"
-                        maxlength="254"
-                        required
-                        placeholder="{{ ui('newsletter_email', 'Email address') }}"
-                        class="input min-w-0 flex-1 @error('email') border-cg-red @enderror"
-                        @error('email') aria-invalid="true" @enderror
-                    >
-                    <button type="submit" class="btn-primary shrink-0">
-                        {{ ui('newsletter_subscribe', 'Subscribe') }}
-                        <x-icon name="arrow-right" :size="16" />
-                    </button>
-                </div>
-            </form>
-        </section>
-    </div>
-
     <div class="container-page grid gap-10 py-12 sm:grid-cols-2 sm:gap-x-8 sm:gap-y-12 lg:grid-cols-[1.25fr_0.9fr_1.2fr_1fr] lg:gap-10 lg:py-14">
         <div class="space-y-5">
             <a href="{{ route('home') }}" class="inline-flex rounded-sm focus-visible:outline">

@@ -79,6 +79,9 @@ Route::post('/verify/{bookingCode}', [BookingController::class, 'checkIn'])
 
 Route::get('/payments/{payment}', [PaymentController::class, 'process'])->name('payment.process');
 Route::post('/payments/{payment}/verify', [PaymentController::class, 'verify'])->name('payment.verify');
+Route::get('/payments/{payment}/esewa/success', [PaymentController::class, 'esewaSuccess'])->name('payment.esewa.success');
+Route::get('/payments/{payment}/esewa/failure', [PaymentController::class, 'esewaFailure'])->name('payment.esewa.failure');
+Route::get('/payments/{payment}/khalti/return', [PaymentController::class, 'khaltiReturn'])->name('payment.khalti.return');
 
 /*
 |--------------------------------------------------------------------------

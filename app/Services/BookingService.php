@@ -17,7 +17,7 @@ class BookingService
     /**
      * Minutes a pending (unpaid) booking keeps holding its seats.
      */
-    public const PENDING_TTL_MINUTES = 15;
+    public const PENDING_TTL_MINUTES = SeatLock::TTL_MINUTES;
 
     public const MAX_SEATS_PER_BOOKING = 10;
 

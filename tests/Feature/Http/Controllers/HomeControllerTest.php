@@ -3,6 +3,7 @@
 namespace Tests\Feature\Http\Controllers;
 
 use App\Models\Movie;
+use App\Models\Showtime;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -54,13 +55,19 @@ class HomeControllerTest extends TestCase
 
     public function test_homepage_uses_now_showing_movies_when_none_are_featured(): void
     {
-        Movie::factory()->create([
+        $movie = Movie::factory()->create([
             'title' => 'Now showing without a feature flag',
             'slug' => 'now-showing-without-feature',
             'is_now_showing' => true,
             'is_featured' => false,
             'is_active' => true,
             'banner_url' => '/img/banners/now-showing.svg',
+        ]);
+        Showtime::factory()->create([
+            'movie_id' => $movie->id,
+            'show_date' => now()->addDay()->toDateString(),
+            'start_time' => '19:00:00',
+            'is_active' => true,
         ]);
 
         $this->get('/')
@@ -69,11 +76,11 @@ class HomeControllerTest extends TestCase
             ->assertSee('/img/banners/now-showing.svg', false);
     }
 
-    public function test_homepage_shows_upcoming_movies_that_are_not_flagged_coming_soon(): void
+    public function test_homepage_does_not_treat_movies_without_showtimes_as_now_showing(): void
     {
         Movie::factory()->create([
-            'title' => 'Unflagged upcoming movie',
-            'slug' => 'unflagged-upcoming-movie',
+            'title' => 'Flagged movie without a showtime',
+            'slug' => 'flagged-movie-without-showtime',
             'is_now_showing' => true,
             'is_coming_soon' => false,
             'is_active' => true,
@@ -85,6 +92,8 @@ class HomeControllerTest extends TestCase
             ->assertSee('Coming Soon')
             ->assertSee('Next Releases')
             ->assertSee('Get ready for the movies arriving soon.')
-            ->assertSee('Unflagged upcoming movie');
+            ->assertSee('Flagged movie without a showtime')
+            ->assertViewHas('nowShowing', fn ($movies): bool => ! $movies->contains('slug', 'flagged-movie-without-showtime'))
+            ->assertViewHas('comingSoon', fn ($movies): bool => $movies->contains('slug', 'flagged-movie-without-showtime'));
     }
 }

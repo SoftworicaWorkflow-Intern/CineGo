@@ -109,7 +109,7 @@ class PageController extends Controller
             ],
             [
                 'heading' => ui('privacy_3_h', 'Payments'),
-                'body' => ui('privacy_3_b', 'Payments are handled by your chosen provider (eSewa, Khalti or card gateway). We store transaction references for receipts and audit purposes only.'),
+                'body' => ui('privacy_3_b', 'Payments are verified with eSewa or Khalti. We store transaction references for receipts and audit purposes only.'),
             ],
             [
                 'heading' => ui('privacy_4_h', 'Your choices'),

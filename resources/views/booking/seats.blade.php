@@ -91,7 +91,7 @@
                                                         {{ $isSelected ? 'cg-seat-selected' : '' }}"
                                                 >
                                                     <x-icon name="armchair" :size="24" class="cg-seat-icon" />
-                                                    <span aria-hidden="true" class="cg-seat-label">{{ $seat->label() }}</span>
+                                                    <span aria-hidden="true" class="cg-seat-number">{{ $seat->seat_number }}</span>
                                                 </button>
                                             @endforeach
                                         </div>
@@ -107,7 +107,6 @@
                         <div class="flex flex-wrap gap-x-5 gap-y-2.5 text-xs text-cg-muted">
                             <span class="inline-flex items-center gap-2"><span class="h-4 w-4 rounded border border-emerald-300 bg-emerald-100"></span>{{ ui('seat_available', 'Available') }}</span>
                             <span class="inline-flex items-center gap-2"><span class="h-4 w-4 rounded border border-cg-red bg-cg-red"></span>{{ ui('seat_selected', 'Selected') }}</span>
-                            <span class="inline-flex items-center gap-2"><span class="h-4 w-4 rounded border border-emerald-300 bg-emerald-100"></span>{{ ui('normal', 'Normal') }} · Rs. {{ number_format($showtime->price_for()) }}</span>
                             <span class="inline-flex items-center gap-2"><span class="h-4 w-4 rounded border border-gray-300 bg-gray-200"></span>{{ ui('seat_booked', 'Booked') }}</span>
                         </div>
                     </div>
@@ -146,9 +145,9 @@
                         <span class="text-xl text-cg-red">Rs. <span id="total">0</span></span>
                     </div>
 
-                    <p id="hold-timer" class="mt-3 hidden items-center justify-between rounded-lg border border-cg-border bg-cg-charcoal px-3 py-2 text-xs text-cg-amber">
+                    <p id="hold-timer" data-hold-seconds="{{ \App\Models\SeatLock::TTL_MINUTES * 60 }}" class="mt-3 hidden items-center justify-between rounded-lg border border-cg-border bg-cg-charcoal px-3 py-2 text-xs text-cg-amber">
                         <span class="inline-flex items-center gap-1.5"><x-icon name="clock" :size="13" /> {{ ui('expires_in', 'Seats held for') }}</span>
-                        <span id="hold-time" class="font-mono font-bold">10:00</span>
+                        <span id="hold-time" class="font-mono font-bold">05:00</span>
                     </p>
 
                     <button type="submit" form="seat-form" id="proceed-button" class="btn-primary btn-lg btn-block mt-4" disabled>
@@ -177,7 +176,8 @@
             var holdTimer = document.getElementById('hold-timer');
             var holdTime = document.getElementById('hold-time');
             var countdown = null;
-            var remaining = 600;
+            var holdDurationSeconds = Number(holdTimer.getAttribute('data-hold-seconds'));
+            var remaining = holdDurationSeconds;
 
             var selected = new Map();
 
@@ -228,7 +228,7 @@
             }
 
             function startCountdown() {
-                remaining = 600;
+                remaining = holdDurationSeconds;
                 countdown = window.setInterval(function () {
                     remaining -= 1;
                     if (remaining <= 0) {

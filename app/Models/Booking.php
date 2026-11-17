@@ -23,7 +23,6 @@ class Booking extends Model
     public const ONLINE_PAYMENT_METHODS = [
         'esewa' => 'eSewa',
         'khalti' => 'Khalti',
-        'card' => 'Credit / Debit Card',
     ];
 
     public const PAYMENT_METHODS = [

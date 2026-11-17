@@ -15,6 +15,7 @@ use App\Models\User;
 use App\Services\BookingService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Validation\ValidationException;
 use Tests\TestCase;
 
@@ -192,7 +193,8 @@ class BookingFlowTest extends TestCase
             ->assertOk()
             ->assertSee('Screen this way')
             ->assertSee('border-cg-red/40 bg-cg-red/10 text-sm font-bold text-cg-white', false)
-            ->assertSee('<span aria-hidden="true" class="cg-seat-label">A1</span>', false)
+            ->assertSee('<span aria-hidden="true" class="cg-seat-number">1</span>', false)
+            ->assertSee('data-hold-seconds="300"', false)
             ->assertSee('<svg', false)
             ->assertDontSee('Seat number')
             ->assertDontSee('>Locked<', false);
@@ -206,16 +208,17 @@ class BookingFlowTest extends TestCase
             'seat_id' => $seat->id,
         ]);
 
-        $this->get(route('booking.checkout', $showtime))
+        $checkoutResponse = $this->get(route('booking.checkout', $showtime));
+        $checkoutResponse
             ->assertOk()
             ->assertSee('eSewa')
             ->assertSee('Khalti')
-            ->assertSee('Credit / Debit Card')
             ->assertSee('payments/esewa.png')
             ->assertSee('payments/khalti.png')
-            ->assertSee('payments/visa.svg')
-            ->assertSee('payments/mastercard.svg')
-            ->assertSee('class="input bg-[#27272a] text-white"', false)
+            ->assertDontSee('Credit / Debit Card')
+            ->assertDontSee('payments/visa.svg')
+            ->assertDontSee('payments/mastercard.svg')
+            ->assertSee('class="input bg-transparent"', false)
             ->assertSee('class="label font-bold" for="customer_name"', false)
             ->assertSee('class="label font-bold" for="customer_email"', false)
             ->assertSee('class="label font-bold" for="customer_phone"', false)
@@ -224,6 +227,7 @@ class BookingFlowTest extends TestCase
             ->assertDontSee('Pay at the counter')
             ->assertSee('border-2 border-cg-red/40', false)
             ->assertSee('font-bold', false);
+        $this->assertSame(3, substr_count($checkoutResponse->getContent(), 'class="input bg-transparent"'));
     }
 
     public function test_checkout_requires_a_live_seat_hold(): void
@@ -284,10 +288,62 @@ class BookingFlowTest extends TestCase
             'price' => 500,
         ]);
 
-        // The simulated provider page is reachable for this guest session.
-        $this->get(route('payment.process', $payment))->assertOk();
+        config([
+            'services.esewa.product_code' => 'EPAYTEST',
+            'services.esewa.secret_key' => 'test-esewa-secret',
+        ]);
 
-        $this->post(route('payment.verify', $payment))->assertRedirect();
+        $this->get(route('payment.process', $payment))
+            ->assertOk()
+            ->assertSee('Continue to eSewa sandbox')
+            ->assertSee('https://rc-epay.esewa.com.np/api/epay/main/v2/form', false)
+            ->assertSee('name="signed_field_names" value="total_amount,transaction_uuid,product_code"', false);
+
+        Http::preventStrayRequests();
+        Http::fake([
+            'https://rc.esewa.com.np/api/epay/transaction/status/*' => Http::response([
+                'product_code' => 'EPAYTEST',
+                'transaction_uuid' => $payment->reference,
+                'total_amount' => '500.00',
+                'status' => 'COMPLETE',
+                'ref_id' => 'esewa-test-transaction',
+            ]),
+        ]);
+
+        $signedFields = ['total_amount', 'transaction_uuid', 'product_code', 'status'];
+        $callbackData = [
+            'total_amount' => '500.00',
+            'transaction_uuid' => $payment->reference,
+            'product_code' => 'EPAYTEST',
+            'status' => 'COMPLETE',
+            'signed_field_names' => implode(',', $signedFields),
+        ];
+        $callbackData['signature'] = base64_encode(hash_hmac(
+            'sha256',
+            implode(',', array_map(
+                fn (string $field): string => $field.'='.$callbackData[$field],
+                $signedFields,
+            )),
+            'test-esewa-secret',
+            true,
+        ));
+        $invalidCallbackData = $callbackData;
+        $invalidCallbackData['signature'] = 'invalid-signature';
+
+        $this->get(route('payment.esewa.success', ['payment' => $payment, 'data' => base64_encode(json_encode($invalidCallbackData, JSON_THROW_ON_ERROR))]))
+            ->assertRedirect(route('payment.process', $payment))
+            ->assertSessionHasErrors('payment');
+        $this->assertSame(Payment::STATUS_PENDING, $payment->fresh()->status);
+        Http::assertSentCount(0);
+
+        $this->get(route('payment.esewa.success', ['payment' => $payment, 'data' => base64_encode(json_encode($callbackData, JSON_THROW_ON_ERROR))]))
+            ->assertRedirect(route('booking.ticket', $payment->booking->booking_code));
+
+        Http::assertSent(fn ($request): bool => (
+            str_starts_with($request->url(), 'https://rc.esewa.com.np/api/epay/transaction/status/')
+            && $request['product_code'] === 'EPAYTEST'
+            && $request['transaction_uuid'] === $payment->reference
+        ));
 
         $payment->refresh();
         $this->assertSame(Payment::STATUS_SUCCESS, $payment->status);
@@ -308,13 +364,167 @@ class BookingFlowTest extends TestCase
         ])->assertRedirect();
 
         $payment = Payment::sole();
+        $payment->update(['provider_payload' => ['pidx' => 'test-pidx']]);
+        config(['services.khalti.secret_key' => 'test-khalti-secret']);
+        Http::preventStrayRequests();
+        Http::fake([
+            'https://dev.khalti.com/api/v2/epayment/lookup/' => Http::response([
+                'pidx' => 'test-pidx',
+                'purchase_order_id' => $payment->reference,
+                'total_amount' => 50000,
+                'status' => 'Completed',
+                'transaction_id' => 'khalti-test-transaction',
+            ]),
+        ]);
 
         $this->post(route('payment.verify', $payment))->assertRedirect();
         $this->post(route('payment.verify', $payment))->assertRedirect();
 
+        Http::assertSentCount(1);
         $this->assertSame(1, Payment::count());
         $this->assertSame(Payment::STATUS_SUCCESS, $payment->fresh()->status);
         $this->assertSame(Booking::STATUS_CONFIRMED, Booking::sole()->status);
+    }
+
+    public function test_khalti_checkout_starts_a_sandbox_payment_session(): void
+    {
+        config(['services.khalti.secret_key' => 'test-khalti-secret']);
+        Http::preventStrayRequests();
+        Http::fake([
+            'https://dev.khalti.com/api/v2/epayment/initiate/' => Http::response([
+                'pidx' => 'test-pidx',
+                'payment_url' => 'https://test-pay.khalti.com/?pidx=test-pidx',
+            ]),
+        ]);
+        $showtime = $this->makeShowtime();
+
+        $this->post(route('booking.select', $showtime), ['seats' => [$this->seat($showtime, 1)->id]])
+            ->assertRedirect(route('booking.checkout', $showtime));
+        $this->post(route('booking.place', $showtime), [
+            'customer_name' => 'Khalti Fan',
+            'customer_phone' => '9822222222',
+            'payment_method' => 'khalti',
+        ])->assertRedirect();
+
+        $payment = Payment::sole();
+        $this->get(route('payment.process', $payment))
+            ->assertOk()
+            ->assertSee('Continue to Khalti sandbox')
+            ->assertSee('https://test-pay.khalti.com/?pidx=test-pidx', false);
+
+        Http::assertSent(fn ($request): bool => (
+            $request->url() === 'https://dev.khalti.com/api/v2/epayment/initiate/'
+            && $request->method() === 'POST'
+            && $request['amount'] === 50000
+            && $request['purchase_order_id'] === $payment->reference
+            && $request->hasHeader('Authorization', 'key test-khalti-secret')
+        ));
+    }
+
+    public function test_khalti_gateway_server_error_is_displayed_without_confirming_the_booking(): void
+    {
+        config(['services.khalti.secret_key' => 'test-khalti-secret']);
+        Http::preventStrayRequests();
+        Http::fake([
+            'https://dev.khalti.com/api/v2/epayment/initiate/' => Http::response([], 503),
+        ]);
+        $showtime = $this->makeShowtime();
+
+        $this->post(route('booking.select', $showtime), ['seats' => [$this->seat($showtime, 1)->id]])
+            ->assertRedirect(route('booking.checkout', $showtime));
+        $this->post(route('booking.place', $showtime), [
+            'customer_name' => 'Khalti Fan',
+            'customer_phone' => '9822222222',
+            'payment_method' => 'khalti',
+        ])->assertRedirect();
+        $payment = Payment::sole();
+
+        $this->get(route('payment.process', $payment))
+            ->assertOk()
+            ->assertSee('Khalti could not start this payment. Please try again.');
+
+        $this->assertSame(Payment::STATUS_PENDING, $payment->fresh()->status);
+        $this->assertSame(Booking::STATUS_PENDING, $payment->booking->fresh()->status);
+    }
+
+    public function test_khalti_connection_failure_is_displayed_without_confirming_the_booking(): void
+    {
+        config(['services.khalti.secret_key' => 'test-khalti-secret']);
+        Http::preventStrayRequests();
+        Http::fake([
+            'https://dev.khalti.com/api/v2/epayment/initiate/' => Http::failedConnection(),
+        ]);
+        $showtime = $this->makeShowtime();
+
+        $this->post(route('booking.select', $showtime), ['seats' => [$this->seat($showtime, 2)->id]])
+            ->assertRedirect(route('booking.checkout', $showtime));
+        $this->post(route('booking.place', $showtime), [
+            'customer_name' => 'Khalti Fan',
+            'customer_phone' => '9822222222',
+            'payment_method' => 'khalti',
+        ])->assertRedirect();
+        $payment = Payment::sole();
+
+        $this->get(route('payment.process', $payment))
+            ->assertOk()
+            ->assertSee('Could not connect to Khalti. Please try again.');
+
+        $this->assertSame(Payment::STATUS_PENDING, $payment->fresh()->status);
+        $this->assertSame(Booking::STATUS_PENDING, $payment->booking->fresh()->status);
+    }
+
+    public function test_khalti_completed_payment_with_wrong_order_details_stays_pending(): void
+    {
+        config(['services.khalti.secret_key' => 'test-khalti-secret']);
+        Http::preventStrayRequests();
+        $showtime = $this->makeShowtime();
+
+        $this->post(route('booking.select', $showtime), ['seats' => [$this->seat($showtime, 2)->id]])
+            ->assertRedirect(route('booking.checkout', $showtime));
+        $this->post(route('booking.place', $showtime), [
+            'customer_name' => 'Khalti Fan',
+            'customer_phone' => '9822222222',
+            'payment_method' => 'khalti',
+        ])->assertRedirect();
+
+        $payment = Payment::sole();
+        $payment->update(['provider_payload' => ['pidx' => 'test-pidx']]);
+        Http::fake([
+            'https://dev.khalti.com/api/v2/epayment/lookup/' => Http::response([
+                'pidx' => 'test-pidx',
+                'purchase_order_id' => 'another-payment',
+                'total_amount' => 50000,
+                'status' => 'Completed',
+            ]),
+        ]);
+
+        $this->post(route('payment.verify', $payment))
+            ->assertRedirect()
+            ->assertSessionHasErrors('payment');
+
+        $this->assertSame(Payment::STATUS_PENDING, $payment->fresh()->status);
+        $this->assertSame(Booking::STATUS_PENDING, $payment->booking->fresh()->status);
+        $this->assertFalse((bool) $payment->booking->fresh()->is_paid);
+    }
+
+    public function test_payment_provider_return_requires_the_booking_session(): void
+    {
+        $showtime = $this->makeShowtime();
+        $this->post(route('booking.select', $showtime), ['seats' => [$this->seat($showtime, 3)->id]])
+            ->assertRedirect(route('booking.checkout', $showtime));
+        $this->post(route('booking.place', $showtime), [
+            'customer_name' => 'Guest Customer',
+            'customer_phone' => '9800000000',
+            'payment_method' => 'esewa',
+        ])->assertRedirect();
+        $payment = Payment::sole();
+
+        $this->withSession(['guest_booking_ids' => []])
+            ->get(route('payment.esewa.success', $payment))
+            ->assertForbidden();
+
+        $this->assertSame(Payment::STATUS_PENDING, $payment->fresh()->status);
+        $this->assertSame(Booking::STATUS_PENDING, $payment->booking->fresh()->status);
     }
 
     public function test_duplicate_seat_booking_is_blocked(): void
