@@ -13,7 +13,7 @@ use Illuminate\Contracts\View\View;
 class DashboardController extends Controller
 {
     /**
-     * Admin overview: KPIs, revenue chart and the latest bookings.
+     * Admin overview: KPIs and revenue chart.
      */
     public function index(): View
     {
@@ -36,14 +36,9 @@ class DashboardController extends Controller
             'tickets_sold' => Booking::query()->where('status', Booking::STATUS_CONFIRMED)->sum('seat_count'),
         ];
 
-        $recentBookings = Booking::query()
-            ->latest()
-            ->take(8)
-            ->get();
-
         $chart = $this->bookingChart();
 
-        return view('admin.dashboard', compact('stats', 'recentBookings', 'chart'));
+        return view('admin.dashboard', compact('stats', 'chart'));
     }
 
     /**

@@ -28,7 +28,7 @@
         @endforeach
     </div>
 
-    <div class="mt-6 grid gap-6 xl:grid-cols-[1fr_380px]">
+    <div class="mt-6">
         {{-- Chart --}}
         <section class="card p-5">
             <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
@@ -44,43 +44,6 @@
             </div>
 
             <script type="application/json" id="chart-data">{!! json_encode($chart) !!}</script>
-        </section>
-
-        {{-- Recent bookings --}}
-        <section class="card p-5">
-            <div class="mb-4 flex items-center justify-between gap-3">
-                <h2 class="font-semibold text-cg-white">{{ ui('recent_bookings', 'Recent bookings') }}</h2>
-                <a href="{{ route('admin.bookings.index') }}" class="text-xs font-semibold text-cg-red hover:underline">
-                    {{ ui('view_all', 'View all') }}
-                </a>
-            </div>
-
-            @if ($recentBookings->isEmpty())
-                <p class="rounded-lg border border-cg-border bg-cg-charcoal px-4 py-6 text-center text-sm text-cg-muted">
-                    {{ ui('no_bookings_yet', 'You have not booked anything yet.') }}
-                </p>
-            @else
-                <ul class="divide-y divide-cg-border-soft">
-                    @foreach ($recentBookings as $booking)
-                        <li>
-                            <a href="{{ route('admin.bookings.show', $booking) }}" class="flex items-center justify-between gap-3 py-3 transition hover:opacity-80">
-                                <span class="min-w-0">
-                                    <span class="block truncate text-sm font-medium text-cg-white">{{ $booking->movie_title }}</span>
-                                    <span class="block truncate text-xs text-cg-dim">
-                                        {{ $booking->booking_code }} · {{ $booking->customer_name }}
-                                    </span>
-                                </span>
-                                <span class="flex shrink-0 flex-col items-end gap-1">
-                                    <span class="text-sm font-semibold text-cg-white">Rs. {{ number_format($booking->total_amount) }}</span>
-                                    <span class="{{ $booking->status === \App\Models\Booking::STATUS_CONFIRMED ? 'badge-green' : ($booking->status === \App\Models\Booking::STATUS_CANCELLED ? 'badge-red' : 'badge-amber') }}">
-                                        {{ $booking->status_label() }}
-                                    </span>
-                                </span>
-                            </a>
-                        </li>
-                    @endforeach
-                </ul>
-            @endif
         </section>
     </div>
 
